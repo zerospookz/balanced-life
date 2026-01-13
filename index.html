@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#e9eaee" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Balanced life</title>
+
+  <link rel="preload" href="fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="preload" href="fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grain"></div>
+  </div>
+
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">BL</div>
+      <div>
+        <div class="title">Balanced life <span class="ver">v4.7.3 FINAL</span></div>
+        <div class="subtitle" id="streakLine">Офлайн • данните са на телефона</div>
+      </div>
+    </div>
+    <div class="hdrBtns">
+      <button id="editTilesBtn" class="btn ghost" type="button">Подреди</button>
+      <button id="installHint" class="btn ghost" type="button">iPhone: Safari → Share → Add to Home Screen</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="tab-home" class="panel active">
+      <div class="card">
+        <div class="cardHead">
+          <h2>Начало</h2>
+          <div class="muted">Плочките се местят само в режим „Подреди“.</div>
+        </div>
+        
+        <div id="tilesGrid" class="tiles" aria-label="Плочки за навигация">
+          <button class="tile" type="button" data-open="plan">
+            <div class="ticon">🏋️</div>
+            <div class="tname">Тренировки</div>
+            <div class="tdesc">Пълният 7-дневен план</div>
+            <div class="handle">⠿</div>
+          </button>
+
+          <button class="tile" type="button" data-open="log">
+            <div class="ticon">📊</div>
+            <div class="tname">Прогрес</div>
+            <div class="tdesc">Записвай резултати и стойности</div>
+            <div class="handle">⠿</div>
+          </button>
+
+          <button class="tile" type="button" data-open="charts">
+            <div class="ticon">📈</div>
+            <div class="tname">PR/Графики</div>
+            <div class="tdesc">Прогрес във времето</div>
+            <div class="handle">⠿</div>
+          </button>
+
+          <button class="tile" type="button" data-open="nutrition">
+            <div class="ticon">🥗</div>
+            <div class="tname">Хранене</div>
+            <div class="tdesc">Храни, калории и снимки</div>
+            <div class="handle">⠿</div>
+          </button>
+
+          <button class="tile" type="button" data-open="finance">
+            <div class="ticon">💰</div>
+            <div class="tname">Финанси</div>
+            <div class="tdesc">Приходи и разходи</div>
+            <div class="handle">⠿</div>
+          </button>
+
+          <button class="tile" type="button" data-open="calendar">
+            <div class="ticon">🗓️</div>
+            <div class="tname">Календар</div>
+            <div class="tdesc">Събития и напомняния</div>
+            <div class="handle">⠿</div>
+          </button>
+
+          <button class="tile" type="button" data-open="settings">
+            <div class="ticon">⚙️</div>
+            <div class="tname">Настройки</div>
+            <div class="tdesc">Експорт/импорт/нулиране</div>
+            <div class="handle">⠿</div>
+          </button>
+        </div>
+
+        <div class="hint" id="editHint" style="display:none; margin-top:10px;">
+          Режим подреждане: задръж и плъзни плочка. Натисни „Готово“, когато приключиш.
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-log" class="panel">
+      <div class="card">
+        <div class="cardHead rowBetween">
+          <div>
+            <h2>Дневник (по план)</h2>
+            <div class="muted">Упражненията идват от плана (в същия ред). Ти попълваш стойностите.</div>
+          </div>
+          <button class="btn" id="backHome1" type="button">⬅️ Плочки</button>
+        </div>
+
+        <div id="dayHint" class="chip"></div>
+
+        <form id="logForm" class="form">
+          <div class="row2">
+            <div class="field">
+              <label>Дата</label>
+              <input id="date" type="date" required />
+            </div>
+            <div class="field">
+              <label>Ден от плана</label>
+              <select id="dayPlan"></select>
+              <div class="hint">Можеш да го сменяш независимо от датата.</div>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label>Тренировка</label>
+              <select id="done">
+                <option value="yes">Да</option>
+                <option value="no">Не</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>RPE (1–10)</label>
+              <input id="rpe" inputmode="numeric" type="number" min="1" max="10" step="1" placeholder="8" />
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="groupTitle">✅ Упражнения от плана</div>
+            <div class="muted">Пример: <b>4×6@60kg</b>, <b>5×35s</b>, <b>12 рунда</b>, <b>90 мин</b>…</div>
+            <div id="planFields" class="planFields"></div>
+          </div>
+
+          <div class="group">
+            <div class="groupTitle rowBetween">
+              <div>🧩 Допълнителни (по желание)</div>
+              <button id="addCustom" class="btn small" type="button">+ Добави</button>
+            </div>
+            <div class="muted">За всичко извън плана.</div>
+            <div id="customList" class="customList"></div>
+          </div>
+
+          <details class="more">
+            <summary>Още (по желание)</summary>
+            <div class="grid2" style="margin-top:10px;">
+              <div class="field">
+                <label>Сън (часа)</label>
+                <input id="sleep" inputmode="decimal" type="number" min="0" max="24" step="0.5" placeholder="7.5" />
+              </div>
+              <div class="field">
+                <label>Бележки</label>
+                <textarea id="notes" rows="3" placeholder="мач, болки, настроение..."></textarea>
+              </div>
+            </div>
+          </details>
+
+          <div class="actions">
+            <button class="btn primary" type="submit">Запази</button>
+            <button class="btn" id="quickToday" type="button">Днес</button>
+          </div>
+
+          <div id="prLine" class="pr" style="display:none;"></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="cardHead rowBetween">
+          <div>
+            <h2>История</h2>
+            <div class="muted">Най-новото е отгоре.</div>
+          </div>
+          <div class="searchRow">
+            <input id="search" class="input" placeholder="Търси..." />
+            <button id="clearSearch" class="btn small" type="button">X</button>
+          </div>
+        </div>
+        <div id="logList" class="list"></div>
+      </div>
+    </section>
+
+    <section id="tab-plan" class="panel">
+      <div class="card">
+        <div class="cardHead rowBetween">
+          <div>
+            <h2>План (пълен)</h2>
+            <div class="muted">Пълните тренировки за всеки ден.</div>
+          </div>
+          <button class="btn" id="backHome2" type="button">⬅️ Плочки</button>
+        </div>
+        <div id="planToday" class="chip"></div>
+        <div id="planList" class="planList"></div>
+      </div>
+    </section>
+
+    <section id="tab-charts" class="panel">
+      <div class="card">
+        <div class="cardHead rowBetween">
+          <div>
+            <h2>Графики</h2>
+            <div class="muted">Хваща “best” стойности, ако ги напишеш (напр. “best 20s”).</div>
+          </div>
+          <button class="btn" id="backHome3" type="button">⬅️ Плочки</button>
+        </div>
+
+        <div class="rowBetween" style="align-items:center; margin-top:10px;">
+          <div class="muted">Период</div>
+          <div class="range">
+            <button class="btn small" id="range30" type="button">30</button>
+            <button class="btn small" id="range90" type="button">90</button>
+            <button class="btn small" id="rangeAll" type="button">Всички</button>
+          </div>
+        </div>
+
+        <div class="charts">
+          <div class="chartCard"><div class="chartTitle">Handstand best (сек)</div><canvas id="cHs" height="160"></canvas></div>
+          <div class="chartCard"><div class="chartTitle">Planche best (сек)</div><canvas id="cPl" height="160"></canvas></div>
+          <div class="chartCard"><div class="chartTitle">Flag best (сек)</div><canvas id="cFl" height="160"></canvas></div>
+          <div class="chartCard"><div class="chartTitle">Weighted Pull-ups (+кг)</div><canvas id="cPu" height="160"></canvas></div>
+          <div class="chartCard"><div class="chartTitle">Squat (кг)</div><canvas id="cSq" height="160"></canvas></div>
+          <div class="chartCard"><div class="chartTitle">Press (кг)</div><canvas id="cPr" height="160"></canvas></div>
+        </div>
+
+        <div class="muted" style="margin-top:10px; line-height:1.6;">
+          Пример: напиши <b>“best 18s”</b> или <b>“best 60kg”</b> в стойността на упражнението.
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-settings" class="panel">
+      <div class="card">
+        <div class="cardHead rowBetween">
+          <div>
+            <h2>Настройки / Бекъп</h2>
+            <div class="muted">Ако сменяш телефон — експортирай JSON.</div>
+          </div>
+          <button class="btn" id="backHome4" type="button">⬅️ Плочки</button>
+        </div>
+
+        <div class="grid2">
+          <div class="mini">
+            <h3>Експорт</h3>
+            <div class="muted">Сваля .json файл.</div>
+            <button class="btn primary" id="exportBtn" type="button">Експортирай</button>
+          </div>
+          <div class="mini">
+            <h3>Импорт</h3>
+            <div class="muted">Връща записи от JSON.</div>
+            <input id="importFile" type="file" accept="application/json" />
+            <button class="btn" id="importBtn" type="button">Импортирай</button>
+          </div>
+          <div class="mini danger" style="grid-column: 1 / -1;">
+            <h3>Нулиране</h3>
+            <div class="muted">Изтрива всички записи от този телефон.</div>
+            <button class="btn dangerBtn" id="resetBtn" type="button">Изтрий всичко</button>
+          </div>
+        </div>
+
+        <div class="muted" style="margin-top:14px; line-height:1.6;">
+          <b>iPhone:</b> отвори сайта в Safari → Share → Add to Home Screen.
+        </div>
+      </div>
+    </section>
+  
+    <section id="tab-finance" class="panel">
+      <div class="card">
+        <div class="cardHead rowBetween">
+          <div>
+            <h2>Финанси</h2>
+            <div class="muted">Бюджет, разходи и цели (офлайн).</div>
+          </div>
+          <button class="btn" id="backHome5" type="button">⬅️ Плочки</button>
+        </div>
+
+        <div class="group">
+          <div class="groupTitle">💸 Обобщение</div>
+          <div class="muted">Приходи vs разходи и баланс.</div>
+          <div id="finSummary" class="kv" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="group">
+          <div class="groupTitle">💸 Бърз запис</div>
+          <div class="muted">Добави разход/приход (ще развием модула по-нататък).</div>
+          <div class="row2" style="margin-top:10px;">
+            <div class="field">
+              <label>Тип</label>
+              <select id="finType">
+                <option value="expense">Разход</option>
+                <option value="income">Приход</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Сума</label>
+              <input id="finAmount" inputmode="decimal" type="number" min="0" step="0.01" placeholder="20.00" />
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Категория</label>
+              <input id="finCat" placeholder="храна, транспорт..." />
+            </div>
+            <div class="field">
+              <label>Бележка</label>
+              <input id="finNote" placeholder="по желание" />
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="finSave" type="button">Запази</button>
+            <button class="btn" id="finClear" type="button">Изчисти</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <div class="cardHead rowBetween">
+            <div>
+              <h3>История</h3>
+              <div class="muted">Последните записи.</div>
+            </div>
+            <button class="btn small" id="finExport" type="button">Експорт</button>
+          </div>
+          <div id="finList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-calendar" class="panel">
+      <div class="card">
+        <div class="cardHead rowBetween">
+          <div>
+            <h2>Календар</h2>
+            <div class="muted">Събития и напомняния (офлайн).</div>
+          </div>
+          <button class="btn" id="backHome6" type="button">⬅️ Плочки</button>
+        </div>
+
+        <div class="group">
+          <div class="groupTitle">🔔 Нотификации</div>
+          <div class="muted">Работи докато приложението е отворено. За истински push трябва онлайн услуга.</div>
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn" id="notifBtn" type="button">Разреши нотификации</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="groupTitle">📅 Ново събитие</div>
+          <div class="row2" style="margin-top:10px;">
+            <div class="field">
+              <label>Дата</label>
+              <input id="calDate" type="date" />
+            </div>
+            <div class="field">
+              <label>Час</label>
+              <input id="calTime" type="time" />
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Напомни (минути преди)</label>
+              <input id="calRemind" inputmode="numeric" type="number" min="0" step="5" placeholder="30" />
+            </div>
+            <div class="field">
+              <label>Повтори</label>
+              <select id="calRepeat">
+                <option value="none">Без</option>
+                <option value="daily">Ежедневно</option>
+                <option value="weekly">Седмично</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Заглавие</label>
+            <input id="calTitle" placeholder="напр. тренировка, среща..." />
+          </div>
+          <div class="field">
+            <label>Бележка</label>
+            <input id="calNote" placeholder="по желание" />
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="calSave" type="button">Запази</button>
+            <button class="btn" id="calClear" type="button">Изчисти</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <div class="cardHead rowBetween">
+            <div>
+              <h3>Предстоящи</h3>
+              <div class="muted">Сортирано по дата.</div>
+            </div>
+            <button class="btn small" id="calExport" type="button">Експорт</button>
+          </div>
+          <div id="calList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+  
+    <section id="tab-nutrition" class="panel">
+      <div class="card">
+        <div class="cardHead rowBetween">
+          <div>
+            <h2>Хранене</h2>
+            <div class="muted">Офлайн дневник: добавяй храна, kcal и снимка.</div>
+          </div>
+          <button class="btn" id="backHome7" type="button">⬅️ Плочки</button>
+        </div>
+
+        <div class="group">
+          <div class="groupTitle">🥗 Нов запис</div>
+          <div class="row2" style="margin-top:10px;">
+            <div class="field">
+              <label>Храна</label>
+              <input id="nutFood" placeholder="напр. ориз + пилешко" />
+            </div>
+            <div class="field">
+              <label>Калории (kcal)</label>
+              <input id="nutKcal" inputmode="numeric" type="number" min="0" step="1" placeholder="600" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Снимка (по желание)</label>
+            <input id="nutPhoto" type="file" accept="image/*" capture="environment" />
+            <div class="hint">Снимката се пази локално. Ако е голяма, може да не се запише.</div>
+          </div>
+
+          <div id="nutPreviewWrap" style="display:none; margin-top:12px;">
+            <div class="muted">Преглед:</div>
+            <img id="nutPreview" alt="Преглед на снимката" style="width:100%;max-width:360px;border-radius:18px;border:1px solid rgba(11,14,20,.12);" />
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="nutSave" type="button">Запази</button>
+            <button class="btn" id="nutClear" type="button">Изчисти</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <div class="cardHead rowBetween">
+            <div>
+              <h3>Дневник хранене</h3>
+              <div class="muted">Последните записи.</div>
+            </div>
+            <button class="btn small" id="nutExport" type="button">Експорт</button>
+          </div>
+          <div id="nutList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot muted">Balanced life • offline-first</footer>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

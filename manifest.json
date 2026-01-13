@@ -1,0 +1,21 @@
+{
+  "name": "Balanced life",
+  "short_name": "Balanced life",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#e9eaee",
+  "theme_color": "#e9eaee",
+  "description": "Офлайн тракер за тренировки и прогрес (localStorage).",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

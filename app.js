@@ -235,14 +235,12 @@
             <div class="statLabel">Отметнати</div>
             <div class="statValue">${totalDone}</div>
           </div>
-          <div class="statMini">
-            <div class="statLabel">Навлици</div>
-            <div class="statValue">${habits.length}</div>
-          </div>
+        <div class="statMini">
+          <div class="statLabel">Навици</div>
+          <div class="statValue">${habits.length}</div>
         </div>
-      </section>
-      ${viewHabitTracker()}
       </div>
+    </section>
     `;
   }
 

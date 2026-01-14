@@ -591,3 +591,46 @@ h1,h2,h3,h4,h5,h6,
   color:#3f3f46 !important;
   font-weight: 600;
 }
+
+
+/* ===== v4.9.3 COLOR TOKENS ===== */
+:root{
+  --bg-light: #f4f6fb;
+  --bg-dark: #0f172a;
+  --text-primary: #0b1220;
+  --text-secondary: #1e3a8a; /* dark blue */
+  --card-bg-light: #ffffff;
+  --card-bg-dark: #111827;
+}
+
+/* Apply tokens */
+body{
+  background: var(--bg-light);
+  color: var(--text-primary);
+}
+
+.card, .panel, .tile{
+  background: var(--card-bg-light);
+}
+
+/* Secondary text */
+.muted, .sub, .hint, .tdesc, .smallText, .panelSub, .cardDesc, .weeklySub{
+  color: var(--text-secondary) !important;
+  font-weight: 600;
+}
+
+/* Dark mode support (future toggle) */
+body.dark{
+  background: var(--bg-dark);
+  color: #e5e7eb;
+}
+body.dark .card,
+body.dark .panel,
+body.dark .tile{
+  background: var(--card-bg-dark);
+}
+body.dark .muted,
+body.dark .sub,
+body.dark .hint{
+  color: #93c5fd !important;
+}

@@ -634,3 +634,7 @@ body.dark .sub,
 body.dark .hint{
   color: #93c5fd !important;
 }
+
+/* v4.9.4 – HARD duplicate tile kill */
+.tilesGrid{display:grid !important}
+.tile{display:flex !important}

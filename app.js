@@ -1718,3 +1718,19 @@ function setRingProgressV49(pct){
   c.style.strokeDasharray = String(C);
   c.style.strokeDashoffset = String(off);
 }
+
+
+// ===== V492_TILE_GUARD =====
+document.addEventListener("click", (e)=>{
+  const el = e.target.closest("[data-open]");
+  if(!el) return;
+  const id = el.getAttribute("data-open");
+  if(!id) return;
+  // If panel doesn't exist, route to home to avoid dead click
+  const panel = document.getElementById("tab-"+id);
+  if(!panel && typeof showPanel === "function"){
+    // allow modules that exist under different names
+    const map = { "progress":"log", "workouts":"plan", "settings":"settings" };
+    if(map[id] && document.getElementById("tab-"+map[id])) showPanel(map[id]);
+  }
+}, true);

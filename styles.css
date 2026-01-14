@@ -535,3 +535,59 @@ body::before, body::after,
 /* link fix v4.9.1 */
 a{ color:#111; text-decoration:none; }
 a:visited{ color:#111; }
+
+
+/* ===== v4.9.2 global text fix (force black text) ===== */
+html, body{
+  color:#111 !important;
+}
+*{
+  color: inherit;
+}
+h1,h2,h3,h4,h5,h6,
+.tile, .tile *, .card, .card *, .panel, .panel *,
+.bottomNav, .bottomNav *, header, header *{
+  color:#111 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+/* Make secondary text dark gray instead of white */
+.muted, .sub, .hint, .tdesc, .smallText, .panelSub, .cardDesc, .weeklySub{
+  color:#3f3f46 !important;
+  opacity: 1 !important;
+}
+
+/* Ensure icons remain visible */
+.cardIcon, .tile-icon, .bnIcon{
+  color: inherit !important;
+}
+
+/* Remove any accidental duplicate tile stacks */
+.tileStack, .tilesStack, .tilesColumn, .tiles-column, .sideTiles, .legacyTiles{
+  display:none !important;
+}
+
+/* Info cards inside panels */
+.infoCard{
+  margin: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+.infoTitle{
+  font-weight: 900;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.infoList{
+  margin: 0;
+  padding-left: 18px;
+}
+.infoList li{
+  margin: 6px 0;
+  color:#3f3f46 !important;
+  font-weight: 600;
+}

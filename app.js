@@ -2708,3 +2708,869 @@ document.addEventListener("click", (e)=>{
     };
   }
 })();
+
+
+// ===== V500: Daily Check-in + Streaks + Skills + Journal + Review + QuickAdd =====
+(function(){
+  const CHECKIN_KEY = "bl_checkin_v1";
+  const SKILL_KEY = "bl_skills_v1";
+  const JOURNAL_KEY = "bl_journal_v1";
+
+  const $ = (s)=>document.querySelector(s);
+  const $$ = (s)=>Array.from(document.querySelectorAll(s));
+
+  function isoDate(d){
+    const dt = new Date(d);
+    const x = new Date(dt.getTime() - dt.getTimezoneOffset()*60000);
+    return x.toISOString().slice(0,10);
+  }
+  function todayISO(){
+    return isoDate(Date.now());
+  }
+  function daysAgo(n){
+    const d = new Date();
+    d.setDate(d.getDate()-n);
+    return isoDate(d);
+  }
+  function load(key, fallback){
+    try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch(e){ return fallback; }
+  }
+  function save(key, val){
+    localStorage.setItem(key, JSON.stringify(val));
+  }
+  function uid(){
+    return Math.random().toString(36).slice(2)+Date.now().toString(36);
+  }
+  function esc(s){
+    return String(s||"").replace(/[&<>"']/g,(c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  // ----- Check-in + streaks -----
+  function computeStreak(map, field){
+    let streak = 0;
+    for(let i=0;i<365;i++){
+      const d = daysAgo(i);
+      const r = map[d];
+      if(r && r[field]) streak++;
+      else break;
+    }
+    return streak;
+  }
+
+  function loadCheckinUI(){
+    const m = load(CHECKIN_KEY, {});
+    const t = todayISO();
+    const r = m[t] || {workout:false, nutrition:false, budget:false, mood:1};
+
+    const a = $("#ciWorkout"), b = $("#ciNutrition"), c = $("#ciBudget"), mood = $("#ciMood");
+    if(a) a.checked = !!r.workout;
+    if(b) b.checked = !!r.nutrition;
+    if(c) c.checked = !!r.budget;
+    if(mood) mood.value = String(r.mood ?? 1);
+
+    // streaks
+    setText("stWorkout", computeStreak(m, "workout"));
+    setText("stNutrition", computeStreak(m, "nutrition"));
+    setText("stBudget", computeStreak(m, "budget"));
+  }
+
+  function saveCheckin(){
+    const m = load(CHECKIN_KEY, {});
+    const t = todayISO();
+    m[t] = {
+      workout: !!($("#ciWorkout") && $("#ciWorkout").checked),
+      nutrition: !!($("#ciNutrition") && $("#ciNutrition").checked),
+      budget: !!($("#ciBudget") && $("#ciBudget").checked),
+      mood: Number(($("#ciMood") && $("#ciMood").value) || 0)
+    };
+    save(CHECKIN_KEY, m);
+    loadCheckinUI();
+    try{ if(typeof initDashboard==="function") initDashboard(); }catch(e){}
+  }
+
+  // ----- Skills tracker -----
+  function renderSkills(){
+    const list = $("#skillList");
+    const sum = $("#skillsSummary");
+    if(!list || !sum) return;
+
+    const items = load(SKILL_KEY, []);
+    list.innerHTML = "";
+    const by = {handstand:[], planche:[], flag:[]};
+    items.forEach(x=>{ if(by[x.name]) by[x.name].push(x); });
+
+    function prFor(name){
+      const arr = (by[name]||[]).slice().sort((a,b)=>Number(b.value)-Number(a.value));
+      return arr[0] ? `${arr[0].value} ${arr[0].unit}` : "—";
+    }
+    sum.innerHTML = `
+      <div class="skillPR">Handstand PR <span>${prFor("handstand")}</span></div>
+      <div class="skillPR">Planche PR <span>${prFor("planche")}</span></div>
+      <div class="skillPR">Flag PR <span>${prFor("flag")}</span></div>
+    `;
+
+    items.slice().reverse().slice(0,60).forEach(it=>{
+      const row = document.createElement("div");
+      row.className = "itemRow";
+      row.innerHTML = `
+        <div class="itemMain">
+          <div class="itemTitle">${it.name}</div>
+          <div class="itemMeta">${it.date} • ${it.value} ${it.unit}</div>
+        </div>
+        <div class="itemBtns">
+          <button class="smallBtn" data-skill-del="${it.id}">✕</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  function bindSkills(){
+    const date = $("#skillDate");
+    if(date && !date.value) date.value = todayISO();
+
+    const form = $("#skillForm");
+    if(form){
+      form.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        const name = $("#skillName").value;
+        const value = Number(($("#skillValue").value||"").replace(",", "."));
+        const unit = $("#skillUnit").value;
+        const dateV = $("#skillDate").value || todayISO();
+        if(!isFinite(value)) return;
+        const items = load(SKILL_KEY, []);
+        items.push({id:uid(), name, value: Math.round(value*100)/100, unit, date: dateV});
+        save(SKILL_KEY, items);
+        $("#skillValue").value="";
+        renderSkills();
+        try{ if(typeof initDashboard==="function") initDashboard(); }catch(e){}
+      });
+    }
+
+    const clear = $("#skillClear");
+    if(clear){
+      clear.addEventListener("click", ()=>{
+        save(SKILL_KEY, []);
+        renderSkills();
+        try{ if(typeof initDashboard==="function") initDashboard(); }catch(e){}
+      });
+    }
+
+    document.addEventListener("click",(e)=>{
+      const b = e.target.closest("[data-skill-del]");
+      if(!b) return;
+      const id = b.getAttribute("data-skill-del");
+      const items = load(SKILL_KEY, []).filter(x=>x.id!==id);
+      save(SKILL_KEY, items);
+      renderSkills();
+      try{ if(typeof initDashboard==="function") initDashboard(); }catch(e){}
+    }, true);
+  }
+
+  // ----- Journal -----
+  function renderJournal(){
+    const list = $("#jrList");
+    if(!list) return;
+    const items = load(JOURNAL_KEY, []);
+    list.innerHTML = "";
+    items.slice().reverse().slice(0,30).forEach(it=>{
+      const row = document.createElement("div");
+      row.className = "itemRow";
+      row.innerHTML = `
+        <div class="itemMain">
+          <div class="itemTitle">${it.date}</div>
+          <div class="itemMeta">${esc(it.text).slice(0,120)}${it.text.length>120?"…":""}</div>
+        </div>
+        <div class="itemBtns">
+          <button class="smallBtn" data-jr-load="${it.id}">↩︎</button>
+          <button class="smallBtn" data-jr-del="${it.id}">✕</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  function loadJournalForToday(){
+    const t = todayISO();
+    const items = load(JOURNAL_KEY, []);
+    const it = items.slice().reverse().find(x=>x.date===t);
+    if($("#jrText")) $("#jrText").value = it ? it.text : "";
+  }
+
+  function bindJournal(){
+    const saveBtn = $("#jrSave");
+    if(saveBtn){
+      saveBtn.addEventListener("click", ()=>{
+        const text = ($("#jrText").value||"").trim();
+        const t = todayISO();
+        const items = load(JOURNAL_KEY, []);
+        // replace today
+        const rest = items.filter(x=>x.date!==t);
+        if(text) rest.push({id:uid(), date:t, text});
+        save(JOURNAL_KEY, rest);
+        renderJournal();
+        try{ if(typeof initDashboard==="function") initDashboard(); }catch(e){}
+      });
+    }
+    const clearBtn = $("#jrClear");
+    if(clearBtn){
+      clearBtn.addEventListener("click", ()=>{
+        if($("#jrText")) $("#jrText").value="";
+      });
+    }
+    document.addEventListener("click",(e)=>{
+      const loadBtn = e.target.closest("[data-jr-load]");
+      if(loadBtn){
+        const id = loadBtn.getAttribute("data-jr-load");
+        const it = load(JOURNAL_KEY, []).find(x=>x.id===id);
+        if(it && $("#jrText")) $("#jrText").value = it.text;
+      }
+      const delBtn = e.target.closest("[data-jr-del]");
+      if(delBtn){
+        const id = delBtn.getAttribute("data-jr-del");
+        const items = load(JOURNAL_KEY, []).filter(x=>x.id!==id);
+        save(JOURNAL_KEY, items);
+        renderJournal();
+      }
+    }, true);
+  }
+
+  // ----- Weekly review -----
+  function renderReview(){
+    const grid = $("#reviewGrid");
+    const tips = $("#reviewTips");
+    if(!grid || !tips) return;
+
+    const c = load(CHECKIN_KEY, {});
+    let w=0,n=0,b=0,mood=0,count=0;
+    grid.innerHTML = "";
+    for(let i=6;i>=0;i--){
+      const d = daysAgo(i);
+      const r = c[d] || {};
+      const ww = !!r.workout, nn=!!r.nutrition, bb=!!r.budget;
+      w += ww?1:0; n += nn?1:0; b += bb?1:0;
+      mood += Number(r.mood||0); count += (r.mood!=null?1:0);
+
+      const card = document.createElement("div");
+      card.className="reviewCard";
+      card.innerHTML = `
+        <div class="reviewDay">${d.slice(5)}</div>
+        <div class="reviewMeta">${ww?"🏋️":"—"} ${nn?"🥗":"—"} ${bb?"💰":"—"}</div>
+      `;
+      grid.appendChild(card);
+    }
+    const avgMood = count ? (mood/count).toFixed(1) : "—";
+    const msg = [];
+    msg.push(`Тренировки: ${w}/7 • Хранене: ${n}/7 • Бюджет: ${b}/7 • Mood avg: ${avgMood}`);
+    if(w<3) msg.push("Tip: сложи 3 по-къси тренировки (30 мин) вместо 1 дълга.");
+    if(n<4) msg.push("Tip: добави protein шаблон (яйца/кисело мляко) за бързи дни.");
+    if(b<4) msg.push("Tip: запиши 1–2 основни разхода като шаблон, за да не ги пропускаш.");
+    tips.textContent = msg.join("  •  ");
+  }
+
+  // ----- Quick Add modal -----
+  function showModal(show){
+    const m = $("#qaModal");
+    if(!m) return;
+    m.classList.toggle("hidden", !show);
+    m.setAttribute("aria-hidden", show ? "false" : "true");
+  }
+
+  function bindQuickAdd(){
+    // hook plus button (if exists)
+    const addBtn = $("#bnAdd");
+    if(addBtn){
+      addBtn.addEventListener("click", ()=>showModal(true));
+    }
+    const close = $("#qaClose");
+    if(close) close.addEventListener("click", ()=>showModal(false));
+    const modal = $("#qaModal");
+    if(modal){
+      modal.addEventListener("click", (e)=>{
+        if(e.target === modal) showModal(false);
+      });
+    }
+    document.addEventListener("click", (e)=>{
+      const b = e.target.closest("[data-qa]");
+      if(!b) return;
+      const type = b.getAttribute("data-qa");
+      showModal(false);
+      if(typeof showPanel !== "function") return;
+      if(type==="expense"){ showPanel("finance"); setTimeout(()=>{ const t=$("#finType"); if(t) t.value="expense"; const d=$("#finDesc"); if(d) d.focus(); }, 250); }
+      if(type==="income"){ showPanel("finance"); setTimeout(()=>{ const t=$("#finType"); if(t) t.value="income"; const d=$("#finDesc"); if(d) d.focus(); }, 250); }
+      if(type==="food"){ showPanel("nutrition"); setTimeout(()=>{ const f=$("#nutFood"); if(f) f.focus(); }, 250); }
+      if(type==="skill"){ showPanel("skills"); setTimeout(()=>{ const v=$("#skillValue"); if(v) v.focus(); }, 250); }
+      if(type==="checkin"){ showPanel("checkin"); }
+      if(type==="note"){ showPanel("journal"); setTimeout(()=>{ const t=$("#jrText"); if(t) t.focus(); }, 250); }
+    }, true);
+  }
+
+  // ----- Dashboard ring: incorporate check-in mood + skills PR bonus -----
+  const oldDash = (typeof initDashboard==="function") ? initDashboard : null;
+  if(oldDash){
+    window.initDashboard = function(){
+      oldDash();
+      // add mood effect
+      const c = load(CHECKIN_KEY, {});
+      const r = c[todayISO()] || {};
+      const mood = Number(r.mood||0);
+      const pctEl = document.getElementById("ringPct");
+      if(!pctEl) return;
+
+      const cur = Number(String(pctEl.textContent||"0").replace("%","")) || 0;
+      // skills PR bonus if today logged
+      const skills = load(SKILL_KEY, []);
+      const bonus = skills.some(x=>x.date===todayISO()) ? 3 : 0;
+      let next = Math.max(0, Math.min(100, cur + mood*2 + bonus));
+      pctEl.textContent = next + "%";
+      if(typeof setRingProgressV49==="function") setRingProgressV49(next);
+    };
+  }
+
+  function setText(id, v){
+    const el = document.getElementById(id);
+    if(el) el.textContent = String(v);
+  }
+
+  // ----- Bind everything on load and when navigating -----
+  document.addEventListener("DOMContentLoaded", ()=>{
+    // check-in
+    loadCheckinUI();
+    const ciSave = $("#ciSave");
+    if(ciSave) ciSave.addEventListener("click", saveCheckin);
+
+    // skills
+    const sd = $("#skillDate");
+    if(sd && !sd.value) sd.value = todayISO();
+    bindSkills();
+    renderSkills();
+
+    // journal
+    loadJournalForToday();
+    bindJournal();
+    renderJournal();
+
+    // review
+    renderReview();
+
+    // quick add
+    bindQuickAdd();
+  });
+
+  // refresh when panels open
+  const oldShow = window.showPanel;
+  if(typeof oldShow === "function"){
+    window.showPanel = function(name, opts){
+      oldShow(name, opts);
+      if(name==="checkin") loadCheckinUI();
+      if(name==="skills") renderSkills();
+      if(name==="journal"){ loadJournalForToday(); renderJournal(); }
+      if(name==="review") renderReview();
+    };
+  }
+})();
+
+
+// ===== V51_ROUTE_FIX (Chrome) =====
+(function(){
+  document.addEventListener("click", (e)=>{
+    const t = e.target.closest("[data-open]");
+    if(!t) return;
+    const id = t.getAttribute("data-open");
+    if(!id) return;
+    // Prevent any accidental default on buttons/links
+    e.preventDefault();
+    // If modal overlay somehow exists, hide it
+    const m = document.getElementById("qaModal");
+    if(m && !m.classList.contains("hidden")) m.classList.add("hidden");
+    if(typeof window.showPanel === "function") window.showPanel(id);
+  }, true);
+})();
+
+
+// ===== V51_FEATURES (templates, monthly, sparklines, PR badge) =====
+(function(){
+  const FIN_KEY = "bl_fin_v1";
+  const NUT_KEY = "bl_nut_v1";
+  const SKILL_KEY = "bl_skills_v1";
+
+  const $ = (s)=>document.querySelector(s);
+
+  function load(key, fallback){
+    try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch(e){ return fallback; }
+  }
+  function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+  function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+  function isoToday(){
+    const d = new Date(Date.now() - new Date().getTimezoneOffset()*60000);
+    return d.toISOString().slice(0,10);
+  }
+  function monthKey(dStr){
+    // YYYY-MM
+    return (dStr||"").slice(0,7);
+  }
+  function esc(s){
+    return String(s||"").replace(/[&<>"']/g,(c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  // ----- Nutrition templates -----
+  function bindTemplates(){
+    document.addEventListener("click",(e)=>{
+      const b = e.target.closest("[data-tpl-food]");
+      if(!b) return;
+      const raw = b.getAttribute("data-tpl-food") || "";
+      const [food,kcal,protein] = raw.split("|");
+      if(typeof window.showPanel === "function") window.showPanel("nutrition");
+      setTimeout(()=>{
+        const f = document.getElementById("nutFood");
+        const k = document.getElementById("nutKcal");
+        const p = document.getElementById("nutProtein");
+        const d = document.getElementById("nutDate");
+        if(d && !d.value) d.value = isoToday();
+        if(f) f.value = food || "";
+        if(k) k.value = kcal || "";
+        if(p) p.value = protein || "";
+        if(f) f.focus();
+      }, 200);
+    }, true);
+  }
+
+  // ----- Finance monthly overview + safe-to-spend -----
+  function getBudgetDaily(){
+    const v = Number(localStorage.getItem("balanced_life_budget_target")||"60");
+    return (isFinite(v) && v>0) ? v : 60;
+  }
+
+  function computeSafeToSpend(finItems){
+    const now = new Date();
+    const y = now.getFullYear(), m = now.getMonth();
+    const start = new Date(y,m,1);
+    const end = new Date(y,m+1,0);
+    const daysInMonth = end.getDate();
+    const day = now.getDate();
+
+    let spent = 0;
+    finItems.forEach(it=>{
+      if((it.type||"")!=="expense") return;
+      if(!it.date) return;
+      const dt = new Date(it.date+"T00:00:00");
+      if(dt.getFullYear()===y && dt.getMonth()===m) spent += Number(it.amount)||0;
+    });
+
+    const monthlyBudget = getBudgetDaily() * daysInMonth;
+    const remaining = Math.max(0, monthlyBudget - spent);
+    const daysLeft = Math.max(1, daysInMonth - day + 1);
+    const perDay = remaining / daysLeft;
+
+    return {spent, monthlyBudget, remaining, daysLeft, perDay};
+  }
+
+  function renderMonthly(){
+    const list = document.getElementById("finMonthly");
+    const safe = document.getElementById("safeSpend");
+    const monthInput = document.getElementById("finMonth");
+    if(!list || !safe || !monthInput) return;
+
+    const fin = load(FIN_KEY, []);
+    // default month to current
+    const now = new Date();
+    const cur = now.toISOString().slice(0,7);
+    if(!monthInput.value) monthInput.value = cur;
+    const targetMonth = monthInput.value;
+
+    // safe-to-spend uses current month always
+    const s = computeSafeToSpend(fin);
+    safe.textContent = `Safe to spend today: ~ ${Math.round(s.perDay)} лв (ост. ${Math.round(s.remaining)} лв, ${s.daysLeft} дни)`;
+
+    // category sums for selected month
+    const cat = {};
+    fin.forEach(it=>{
+      if(!it.date) return;
+      if(monthKey(it.date) !== targetMonth) return;
+      const type = it.type || "expense";
+      const c = (it.cat && it.cat.trim()) ? it.cat.trim() : (type==="income"?"Приход":"Друго");
+      const sign = (type==="income") ? 1 : -1;
+      cat[c] = (cat[c]||0) + sign*(Number(it.amount)||0);
+    });
+
+    const rows = Object.entries(cat).sort((a,b)=>Math.abs(b[1]) - Math.abs(a[1]));
+    list.innerHTML = "";
+    if(!rows.length){
+      list.innerHTML = `<div class="muted">Няма записи за този месец.</div>`;
+      return;
+    }
+    rows.forEach(([name, amt])=>{
+      const row = document.createElement("div");
+      row.className = "catRow";
+      row.innerHTML = `<div class="catName">${esc(name)}</div><div class="catAmt">${Math.round(amt)} лв</div>`;
+      list.appendChild(row);
+    });
+  }
+
+  function bindMonthly(){
+    const btn = document.getElementById("finMonthRefresh");
+    if(btn) btn.addEventListener("click", renderMonthly);
+  }
+
+  // ----- Skills sparklines + PR badge -----
+  function sparkPath(values, w=220, h=44, pad=4){
+    if(!values.length) return "";
+    const min = Math.min(...values), max = Math.max(...values);
+    const span = (max-min) || 1;
+    const step = (w - pad*2) / Math.max(1, values.length-1);
+    return values.map((v,i)=>{
+      const x = pad + i*step;
+      const y = pad + (h - pad*2) * (1 - (v - min)/span);
+      return (i===0 ? `M ${x.toFixed(1)} ${y.toFixed(1)}` : `L ${x.toFixed(1)} ${y.toFixed(1)}`);
+    }).join(" ");
+  }
+
+  function renderSparks(){
+    const grid = document.getElementById("sparkGrid");
+    if(!grid) return;
+
+    const items = load(SKILL_KEY, []);
+    const names = [
+      ["handstand","Handstand"],
+      ["planche","Planche"],
+      ["flag","Human Flag"]
+    ];
+    const today = isoToday();
+
+    grid.innerHTML = "";
+    names.forEach(([key,label])=>{
+      const arr = items.filter(x=>x.name===key).slice().sort((a,b)=> (a.date||"").localeCompare(b.date||""));
+      const last14 = arr.slice(-14);
+      const vals = last14.map(x=>Number(x.value)||0);
+      const pr = arr.reduce((m,x)=>Math.max(m, Number(x.value)||0), 0);
+      const loggedToday = arr.some(x=>x.date===today);
+      const isNewPRToday = loggedToday && pr>0 && arr.filter(x=>x.date===today).some(x=>Number(x.value)===pr);
+
+      const card = document.createElement("div");
+      card.className = "sparkCard";
+      const badge = isNewPRToday ? `<span class="prBadge">New PR</span>` : ``;
+      const d = sparkPath(vals, 220, 44, 4);
+      card.innerHTML = `
+        <div class="sparkTop">
+          <div class="sparkName">${label}${badge}</div>
+          <div class="sparkPR">PR: ${pr ? pr : "—"}</div>
+        </div>
+        <svg class="sparkSvg" viewBox="0 0 220 44" preserveAspectRatio="none" aria-label="sparkline">
+          <path d="${d}" fill="none" stroke="rgba(30,58,138,0.65)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  // Hook into existing renderSkills if exists, so sparklines update
+  const oldRenderSkills = window.renderSkills;
+  if(typeof oldRenderSkills === "function"){
+    window.renderSkills = function(){
+      oldRenderSkills();
+      renderSparks();
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    bindTemplates();
+    bindMonthly();
+    // initial renders
+    renderMonthly();
+    renderSparks();
+  });
+
+  // refresh when opening finance/skills
+  const oldShow = window.showPanel;
+  if(typeof oldShow === "function"){
+    window.showPanel = function(name, opts){
+      oldShow(name, opts);
+      if(name==="finance") renderMonthly();
+      if(name==="skills") renderSparks();
+    };
+  }
+})();
+
+// v5.2 hub routing
+(function(){
+  document.addEventListener("click", (e)=>{
+    const t = e.target.closest('[data-open]');
+    if(!t) return;
+    const id = t.getAttribute('data-open');
+    if(id === 'training') { showPanel('trainingHub'); e.preventDefault(); }
+    if(id === 'nutrition') { showPanel('nutritionHub'); e.preventDefault(); }
+    if(id === 'finance') { showPanel('financeHub'); e.preventDefault(); }
+  }, true);
+})();
+
+
+// ===== V53_HOME_DASH =====
+(function(){
+  const CHECKIN_KEY = "bl_checkin_v1";
+  const FIN_KEY = "bl_fin_v1";
+  const NUT_KEY = "bl_nut_v1";
+
+  const $ = (s)=>document.querySelector(s);
+
+  function isoToday(){
+    const d = new Date(Date.now() - new Date().getTimezoneOffset()*60000);
+    return d.toISOString().slice(0,10);
+  }
+  function daysAgo(n){
+    const d = new Date();
+    d.setDate(d.getDate()-n);
+    const x = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+    return x.toISOString().slice(0,10);
+  }
+  function load(key, fallback){
+    try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch(e){ return fallback; }
+  }
+
+  function streak(map, field){
+    let s=0;
+    for(let i=0;i<365;i++){
+      const d = daysAgo(i);
+      const r = map[d];
+      if(r && r[field]) s++;
+      else break;
+    }
+    return s;
+  }
+
+  function setChip(id, v){
+    const el = document.getElementById(id);
+    if(el) el.textContent = String(v);
+  }
+
+  function setTodayCard(elId, ok, text){
+    const el = document.getElementById(elId);
+    if(!el) return;
+    el.classList.toggle("todayOk", ok === true);
+    el.classList.toggle("todayBad", ok === false);
+    const v = el.querySelector(".tVal");
+    if(v) v.textContent = text;
+  }
+
+  function refreshHome(){
+    // streaks
+    const c = load(CHECKIN_KEY, {});
+    setChip("chipWorkout", streak(c,"workout"));
+    setChip("chipNutrition", streak(c,"nutrition"));
+    setChip("chipBudget", streak(c,"budget"));
+
+    const t = isoToday();
+    const r = c[t] || {};
+
+    // today status derives from check-in if present; else infer from data
+    const fin = load(FIN_KEY, []);
+    const nut = load(NUT_KEY, []);
+
+    const spentToday = fin.filter(x=>x.date===t && x.type==="expense").reduce((a,b)=>a+(Number(b.amount)||0),0);
+    const kcalToday = nut.filter(x=>x.date===t).reduce((a,b)=>a+(Number(b.kcal)||0),0);
+
+    const budgetTarget = Number(localStorage.getItem("balanced_life_budget_target")||"60") || 60;
+    const kcalTarget = Number(localStorage.getItem("balanced_life_kcal_target")||"2100") || 2100;
+
+    const workoutOK = (r.workout != null) ? !!r.workout : null;
+    const nutritionOK = (r.nutrition != null) ? !!r.nutrition : (kcalToday>0 ? (kcalToday>=kcalTarget*0.7 && kcalToday<=kcalTarget*1.3) : null);
+    const budgetOK = (r.budget != null) ? !!r.budget : (spentToday>0 ? (spentToday<=budgetTarget) : null);
+
+    setTodayCard("tsWorkout", workoutOK, workoutOK==null?"—":(workoutOK?"Done":"Missing"));
+    setTodayCard("tsNutrition", nutritionOK, nutritionOK==null?"—":(nutritionOK?"OK":"Off"));
+    setTodayCard("tsBudget", budgetOK, budgetOK==null?"—":(budgetOK?"OK":"Over"));
+
+    // Pulse if all 3 true
+    const ring = document.getElementById("ringPctWrap");
+    if(ring){
+      const all = (workoutOK===true && nutritionOK===true && budgetOK===true);
+      ring.classList.toggle("pulseOk", all);
+    }
+
+    // Ensure dashboard numbers are updated
+    try{ if(typeof initDashboard==="function") initDashboard(); }catch(e){}
+  }
+
+  // Quick actions
+  document.addEventListener("click",(e)=>{
+    const b = e.target.closest("[data-q]");
+    if(!b) return;
+    const q = b.getAttribute("data-q");
+    if(typeof showPanel !== "function") return;
+    if(q==="workout"){ showPanel("workoutsDash"); }
+    if(q==="food"){ showPanel("nutrition"); setTimeout(()=>{ const f=document.getElementById("nutFood"); if(f) f.focus(); }, 250); }
+    if(q==="expense"){ showPanel("finance"); setTimeout(()=>{ const d=document.getElementById("finDesc"); if(d) d.focus(); const t=document.getElementById("finType"); if(t) t.value="expense"; }, 250); }
+    if(q==="skill"){ showPanel("skills"); setTimeout(()=>{ const v=document.getElementById("skillValue"); if(v) v.focus(); }, 250); }
+  }, true);
+
+  // Refresh on load and whenever home opens
+  document.addEventListener("DOMContentLoaded", refreshHome);
+  const oldShow = window.showPanel;
+  if(typeof oldShow === "function"){
+    window.showPanel = function(name, opts){
+      oldShow(name, opts);
+      if(name==="home") refreshHome();
+    };
+  }
+})();
+
+
+// ===== V54_PROGRESS =====
+(function(){
+  const FIN_KEY = "bl_fin_v1";
+  const NUT_KEY = "bl_nut_v1";
+  const SKILL_KEY = "bl_skills_v1";
+  const CHECKIN_KEY = "bl_checkin_v1";
+
+  const $ = (s)=>document.querySelector(s);
+  const $$ = (s)=>Array.from(document.querySelectorAll(s));
+
+  function iso(d){
+    const dt = new Date(d);
+    const x = new Date(dt.getTime() - dt.getTimezoneOffset()*60000);
+    return x.toISOString().slice(0,10);
+  }
+  function today(){ return iso(Date.now()); }
+  function daysAgo(n){
+    const d = new Date(); d.setDate(d.getDate()-n);
+    return iso(d);
+  }
+  function load(key, fallback){
+    try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch(e){ return fallback; }
+  }
+  function num(v, def){
+    const n = Number(String(v||"").replace(",", "."));
+    return (isFinite(n)) ? n : def;
+  }
+
+  function sparkPath(values, w=320, h=80, pad=6){
+    if(!values.length) return "";
+    const min = Math.min(...values), max = Math.max(...values);
+    const span = (max-min) || 1;
+    const step = (w - pad*2) / Math.max(1, values.length-1);
+    return values.map((v,i)=>{
+      const x = pad + i*step;
+      const y = pad + (h - pad*2) * (1 - (v - min)/span);
+      return (i===0 ? `M ${x.toFixed(1)} ${y.toFixed(1)}` : `L ${x.toFixed(1)} ${y.toFixed(1)}`);
+    }).join(" ");
+  }
+
+  function collectRange(days){
+    const dates = [];
+    for(let i=days-1;i>=0;i--) dates.push(daysAgo(i));
+    return dates;
+  }
+
+  function renderProgress(days){
+    const dates = collectRange(days);
+    const fin = load(FIN_KEY, []);
+    const nut = load(NUT_KEY, []);
+    const skills = load(SKILL_KEY, []);
+    const checkin = load(CHECKIN_KEY, {});
+
+    const budgetTarget = num(localStorage.getItem("balanced_life_budget_target"), 60);
+    const kcalTarget = num(localStorage.getItem("balanced_life_kcal_target"), 2100);
+
+    // Training: from checkin workout + skills entries (proxy minutes if checkin true = 45)
+    const trainVals = dates.map(d=> (checkin[d] && checkin[d].workout) ? 1 : 0);
+    const workouts = trainVals.reduce((a,b)=>a+b,0);
+    const minutes = workouts * 45;
+
+    // Skill PR overall (max value across all skills)
+    const pr = skills.reduce((m,x)=>Math.max(m, num(x.value,0)), 0);
+
+    // Nutrition: daily kcal sum
+    const kcalPerDay = dates.map(d=> nut.filter(x=>x.date===d).reduce((a,b)=>a+num(b.kcal,0),0));
+    const nutLogs = nut.filter(x=> dates.includes(x.date)).length;
+    const avgKcal = kcalPerDay.length ? Math.round(kcalPerDay.reduce((a,b)=>a+b,0)/kcalPerDay.length) : 0;
+    const kcalDays = kcalPerDay.filter(k=> k>0 && k>=kcalTarget*0.7 && k<=kcalTarget*1.3).length;
+
+    // Finance: daily spent
+    const spentPerDay = dates.map(d=> fin.filter(x=>x.date===d && x.type==="expense").reduce((a,b)=>a+num(b.amount,0),0));
+    const spent = Math.round(spentPerDay.reduce((a,b)=>a+b,0));
+    const budgetDays = spentPerDay.filter(s=> s>0 && s<=budgetTarget).length;
+    const saved = Math.round(spentPerDay.reduce((a,b)=>a + Math.max(0, budgetTarget - b),0));
+
+    // Paths
+    const trLine = $("#trLine"); if(trLine) trLine.setAttribute("d", sparkPath(trainVals, 320, 80, 6));
+    const nuLine = $("#nuLine"); if(nuLine) nuLine.setAttribute("d", sparkPath(kcalPerDay.map(x=>x||0), 320, 80, 6));
+    const fiLine = $("#fiLine"); if(fiLine) fiLine.setAttribute("d", sparkPath(spentPerDay.map(x=>x||0), 320, 80, 6));
+
+    // Meta
+    setText("trMeta", `${workouts} тренировки`);
+    setText("nuMeta", `avg ${avgKcal} kcal`);
+    setText("fiMeta", `${spent} лв за периода`);
+
+    // KPIs
+    setText("kpiWorkouts", workouts);
+    setText("kpiMinutes", minutes);
+    setText("kpiPR", pr ? pr : "—");
+
+    setText("kpiAvgKcal", avgKcal);
+    setText("kpiKcalDays", `${kcalDays}/${days}`);
+    setText("kpiNutLogs", nutLogs);
+
+    setText("kpiSpent", spent);
+    setText("kpiSaved", saved);
+    setText("kpiBudgetDays", `${budgetDays}/${days}`);
+
+    // Highlights list
+    const hi = $("#hiList");
+    if(hi){
+      hi.innerHTML = "";
+      const items = [];
+      items.push(`🏋️ Workouts: ${workouts}/${days}`);
+      items.push(`🥗 On target days: ${kcalDays}/${days} (avg ${avgKcal} kcal)`);
+      items.push(`💰 Budget OK days: ${budgetDays}/${days} (spent ${spent} лв, saved ~${saved} лв)`);
+      if(pr) items.push(`🤸 Skill PR: ${pr}`);
+      // best day (lowest spend among days with spend>0)
+      const spendPairs = dates.map((d,i)=>({d, v: spentPerDay[i]})).filter(x=>x.v>0).sort((a,b)=>a.v-b.v);
+      if(spendPairs[0]) items.push(`✅ Най-добър финансов ден: ${spendPairs[0].d} (${Math.round(spendPairs[0].v)} лв)`);
+      const kcalPairs = dates.map((d,i)=>({d, v: kcalPerDay[i]})).filter(x=>x.v>0).sort((a,b)=>Math.abs(a.v-kcalTarget)-Math.abs(b.v-kcalTarget));
+      if(kcalPairs[0]) items.push(`✅ Най-добър nutrition ден: ${kcalPairs[0].d} (${Math.round(kcalPairs[0].v)} kcal)`);
+      items.forEach(t=>{
+        const row = document.createElement("div");
+        row.className = "catRow";
+        row.innerHTML = `<div class="catName">${t}</div>`;
+        hi.appendChild(row);
+      });
+    }
+  }
+
+  function setText(id, v){
+    const el = document.getElementById(id);
+    if(el) el.textContent = String(v);
+  }
+
+  function bindSeg(){
+    document.addEventListener("click",(e)=>{
+      const b = e.target.closest("[data-range]");
+      if(!b) return;
+      $$(".seg").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      const d = Number(b.getAttribute("data-range")||"30");
+      renderProgress(d);
+    }, true);
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    bindSeg();
+    renderProgress(30);
+  });
+
+  // refresh when opening progress panel
+  const oldShow = window.showPanel;
+  if(typeof oldShow === "function"){
+    window.showPanel = function(name, opts){
+      oldShow(name, opts);
+      if(name==="progress"){
+        const active = document.querySelector(".seg.active");
+        const d = active ? Number(active.getAttribute("data-range")||"30") : 30;
+        renderProgress(d);
+      }
+    };
+  }
+})();

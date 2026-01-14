@@ -29,7 +29,7 @@
     <div class="brand">
       <div class="logo" aria-hidden="true">BL</div>
       <div>
-        <div class="title">Balanced life <span class="ver">v4.9.7 (Plan + Quick Add)</span></div>
+        <div class="title">Balanced life <span class="ver">v5.4 (Unified Progress)</span></div>
         <div class="subtitle" id="streakLine">Офлайн • данните са на телефона</div>
       </div>
     </div>
@@ -46,13 +46,17 @@
           <h2>Начало</h2>
           
 <div class="tilesGrid">
-  <button class="tile" data-open="plan"><span class="tileIcon">🏋️</span><span class="tileTitle">Тренировки</span></button>
-  <button class="tile" data-open="log"><span class="tileIcon">📊</span><span class="tileTitle">Прогрес</span></button>
+  
+  
   <button class="tile" data-open="nutrition"><span class="tileIcon">🥗</span><span class="tileTitle">Хранене</span></button>
   <button class="tile" data-open="finance"><span class="tileIcon">💰</span><span class="tileTitle">Финанси</span></button>
-  <button class="tile" data-open="calendar"><span class="tileIcon">📅</span><span class="tileTitle">Календар</span></button>
-  <button class="tile" data-open="charts"><span class="tileIcon">📈</span><span class="tileTitle">PR / Графики</span></button>
-  <button class="tile" data-open="settings"><span class="tileIcon">⚙️</span><span class="tileTitle">Настройки</span></button>
+  
+  
+  
+  
+  
+  
+  
 </div>
 <div class="muted">Плочките се местят само в режим „Подреди“.</div>
         </div>
@@ -558,6 +562,29 @@
         <button class="btn backBtn" data-open="home" aria-label="Back">← Назад</button>
         <div class="panelHead">
           <div class="panelTitle">Spending</div>
+    <!-- v51-fin-monthly -->
+    <div class="crudWrap">
+      <div class="crudTitle">Месечен обзор</div>
+      <div class="muted">Автоматично по категории</div>
+      <div class="safeSpend" id="safeSpend"></div>
+      <div class="monthRow">
+        <input class="in" id="finMonth" type="month"/>
+        <button class="btn primary" id="finMonthRefresh" type="button">Обнови</button>
+      </div>
+      <div class="list" id="finMonthly"></div>
+    </div>
+
+    <!-- v51-nut-templates -->
+    <div class="crudWrap">
+      <div class="crudTitle">Шаблони</div>
+      <div class="muted">1 клик за бърз запис</div>
+      <div class="tplRow">
+        <button class="tplBtn" type="button" data-tpl-food="Закуска|450|25">🍳 Закуска</button>
+        <button class="tplBtn" type="button" data-tpl-food="Post-workout|600|35">💪 Post</button>
+        <button class="tplBtn" type="button" data-tpl-food="Вечеря|700|30">🍽️ Вечеря</button>
+      </div>
+    </div>
+
       <!-- plan:full-v42 -->
       <div class="crudWrap">
         <div class="crudTitle">Тренировки (пълен план)</div>
@@ -831,7 +858,8 @@
   <button class="bnItem" data-open="spending" type="button">
     <span class="bnIco">💰</span><span class="bnTxt">Spending</span>
   </button>
-  <button class="bnItem" data-open="nutritiondash" type="button">
+  <button class="bnAdd" id="bnAdd" type="button" aria-label="Quick add">＋</button>
+    <button class="bnItem" data-open="nutritiondash" type="button">
     <span class="bnIco">🥗</span><span class="bnTxt">Nutrition</span>
   </button>
   <button class="bnItem" data-open="workoutsDash" type="button">
@@ -842,6 +870,258 @@
   </button>
 </nav>
 
+
+
+<!-- v5-panels -->
+
+<section class="panel hidden" id="tab-checkin" data-panel="checkin">
+  <div class="panelTop">
+    <button class="btn backBtn" data-open="home" aria-label="Back">← Назад</button>
+    <div class="panelHead">
+      <div class="panelTitle">Daily Check-in</div>
+      <div class="panelSub">30 секунди – за streak и ring</div>
+    </div>
+  </div>
+
+  <div class="crudWrap">
+    <div class="crudTitle">Днес</div>
+    <div class="checkGrid">
+      <label class="checkItem"><input type="checkbox" id="ciWorkout"/> <span>Тренировка</span></label>
+      <label class="checkItem"><input type="checkbox" id="ciNutrition"/> <span>Хранене OK</span></label>
+      <label class="checkItem"><input type="checkbox" id="ciBudget"/> <span>Бюджет OK</span></label>
+    </div>
+
+    <div class="row2">
+      <select class="in" id="ciMood">
+        <option value="2">🔥 Супер</option>
+        <option value="1">🙂 Добре</option>
+        <option value="0">😐 Нормално</option>
+        <option value="-1">😴 Уморен</option>
+        <option value="-2">😣 Тежко</option>
+      </select>
+      <button class="btn primary" id="ciSave" type="button">Запази</button>
+    </div>
+
+    <div class="streakBox">
+      <div class="streakRow"><span>Workout streak</span><b id="stWorkout">0</b></div>
+      <div class="streakRow"><span>Nutrition streak</span><b id="stNutrition">0</b></div>
+      <div class="streakRow"><span>Budget streak</span><b id="stBudget">0</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="panel hidden" id="tab-skills" data-panel="skills">
+  <div class="panelTop">
+    <button class="btn backBtn" data-open="home" aria-label="Back">← Назад</button>
+    <div class="panelHead">
+      <div class="panelTitle">Skills</div>
+    <!-- v51-skill-sparklines -->
+    <div class="crudWrap">
+      <div class="crudTitle">Тренд (последни 14)</div>
+      <div class="muted">Мини графики по skill</div>
+      <div class="sparkGrid" id="sparkGrid"></div>
+    </div>
+
+      <div class="panelSub">Handstand • Planche • Flag</div>
+    </div>
+  </div>
+
+  <div class="crudWrap">
+    <div class="crudTitle">Добави запис</div>
+    <form class="crudForm" id="skillForm">
+      <div class="row2">
+        <select class="in" id="skillName">
+          <option value="handstand">Handstand</option>
+          <option value="planche">Planche</option>
+          <option value="flag">Human Flag</option>
+        </select>
+        <input class="in" id="skillValue" inputmode="decimal" placeholder="стойност (сек)" required />
+      </div>
+      <div class="row2">
+        <select class="in" id="skillUnit">
+          <option value="sec">сек</option>
+          <option value="reps">бр</option>
+        </select>
+        <input class="in" id="skillDate" type="date"/>
+      </div>
+      <button class="btn primary" type="submit">Запази</button>
+    </form>
+    <div class="listHead">
+      <div class="muted">PR и последни</div>
+      <button class="btn" type="button" id="skillClear">Изчисти</button>
+    </div>
+    <div class="skillsSummary" id="skillsSummary"></div>
+    <div class="list" id="skillList"></div>
+  </div>
+</section>
+
+<section class="panel hidden" id="tab-journal" data-panel="journal">
+  <div class="panelTop">
+    <button class="btn backBtn" data-open="home" aria-label="Back">← Назад</button>
+    <div class="panelHead">
+      <div class="panelTitle">Journal</div>
+      <div class="panelSub">1 изречение на ден</div>
+    </div>
+  </div>
+
+  <div class="crudWrap">
+    <div class="crudTitle">Бележка за днес</div>
+    <textarea class="in ta" id="jrText" rows="5" placeholder="Как мина денят?"></textarea>
+    <div class="row2">
+      <button class="btn primary" id="jrSave" type="button">Запази</button>
+      <button class="btn" id="jrClear" type="button">Изчисти</button>
+    </div>
+    <div class="listHead">
+      <div class="muted">Последни</div>
+    </div>
+    <div class="list" id="jrList"></div>
+  </div>
+</section>
+
+<section class="panel hidden" id="tab-review" data-panel="review">
+  <div class="panelTop">
+    <button class="btn backBtn" data-open="home" aria-label="Back">← Назад</button>
+    <div class="panelHead">
+      <div class="panelTitle">Weekly Review</div>
+      <div class="panelSub">Автоматичен отчет</div>
+    </div>
+  </div>
+
+  <div class="crudWrap">
+    <div class="crudTitle">Последни 7 дни</div>
+    <div class="reviewGrid" id="reviewGrid"></div>
+    <div class="reviewTips" id="reviewTips"></div>
+  </div>
+</section>
+
+<!-- Quick Add Modal -->
+<div class="modal hidden" id="qaModal" aria-hidden="true">
+  <div class="modalSheet">
+    <div class="modalTop">
+      <div class="modalTitle">Quick Add</div>
+      <button class="iconBtn" id="qaClose" type="button">✕</button>
+    </div>
+    <div class="cardsGrid">
+      <button class="cardLink" data-qa="expense"><div class="cardIcon">💸</div><div class="cardText"><div class="cardTitle">Разход</div><div class="cardDesc">във Финанси</div></div></button>
+      <button class="cardLink" data-qa="income"><div class="cardIcon">💵</div><div class="cardText"><div class="cardTitle">Приход</div><div class="cardDesc">във Финанси</div></div></button>
+      <button class="cardLink" data-qa="food"><div class="cardIcon">🥗</div><div class="cardText"><div class="cardTitle">Храна</div><div class="cardDesc">в Хранене</div></div></button>
+      <button class="cardLink" data-qa="skill"><div class="cardIcon">🤸</div><div class="cardText"><div class="cardTitle">Skill</div><div class="cardDesc">Handstand/Planche/Flag</div></div></button>
+      <button class="cardLink" data-qa="checkin"><div class="cardIcon">✅</div><div class="cardText"><div class="cardTitle">Check-in</div><div class="cardDesc">streak + ring</div></div></button>
+      <button class="cardLink" data-qa="note"><div class="cardIcon">📝</div><div class="cardText"><div class="cardTitle">Бележка</div><div class="cardDesc">дневник</div></div></button>
+    </div>
+  </div>
+</div>
+
+
+<section class="panel hidden" id="tab-trainingHub" data-panel="trainingHub">
+  <div class="panelTop">
+    <button class="btn backBtn" data-open="home">← Home</button>
+    <div class="panelHead"><div class="panelTitle">Training</div></div>
+  </div>
+  <div class="cardsGrid">
+    <button class="cardLink" data-open="plan">📋 Plan</button>
+    <button class="cardLink" data-open="skills">🤸 Skills</button>
+    <button class="cardLink" data-open="progress">📈 Progress</button>
+    <button class="cardLink" data-open="calendar">🗓 Calendar</button>
+  </div>
+</section>
+
+<section class="panel hidden" id="tab-nutritionHub" data-panel="nutritionHub">
+  <div class="panelTop">
+    <button class="btn backBtn" data-open="home">← Home</button>
+    <div class="panelHead"><div class="panelTitle">Nutrition</div></div>
+  </div>
+  <div class="cardsGrid">
+    <button class="cardLink" data-open="nutrition">🍽 Log</button>
+    <button class="cardLink" data-open="nutrition">🧩 Templates</button>
+    <button class="cardLink" data-open="progress">📈 Progress</button>
+    <button class="cardLink" data-open="calendar">🗓 Calendar</button>
+  </div>
+</section>
+
+<section class="panel hidden" id="tab-financeHub" data-panel="financeHub">
+  <div class="panelTop">
+    <button class="btn backBtn" data-open="home">← Home</button>
+    <div class="panelHead"><div class="panelTitle">Finance</div></div>
+  </div>
+  <div class="cardsGrid">
+    <button class="cardLink" data-open="finance">💸 Daily</button>
+    <button class="cardLink" data-open="finance">📊 Monthly</button>
+    <button class="cardLink" data-open="finance">🧮 Safe to spend</button>
+    <button class="cardLink" data-open="calendar">🗓 Calendar</button>
+  </div>
+</section>
+
+
+<section class="panel hidden" id="tab-progress" data-panel="progress">
+  <div class="panelTop">
+    <button class="btn backBtn" data-open="home">← Home</button>
+    <div class="panelHead">
+      <div class="panelTitle">Progress</div>
+      <div class="panelSub">Един екран за всичко</div>
+    </div>
+  </div>
+
+  <div class="crudWrap">
+    <div class="crudTitle">Последни 30 дни</div>
+    <div class="muted">Тренировки • Хранене • Финанси</div>
+    <div class="segRow">
+      <button class="seg active" type="button" data-range="7">7d</button>
+      <button class="seg" type="button" data-range="30">30d</button>
+      <button class="seg" type="button" data-range="90">90d</button>
+    </div>
+  </div>
+
+  <div class="sectionCard">
+    <div class="secHead">
+      <div class="secTitle">🏋️ Training</div>
+      <div class="secMeta" id="trMeta">—</div>
+    </div>
+    <svg class="bigSpark" viewBox="0 0 320 80" preserveAspectRatio="none">
+      <path id="trLine" d="" fill="none" stroke="rgba(30,58,138,0.65)" stroke-width="3" stroke-linecap="round"></path>
+    </svg>
+    <div class="kpiRow">
+      <div class="kpi"><div class="kpiLabel">Workouts</div><div class="kpiVal" id="kpiWorkouts">0</div></div>
+      <div class="kpi"><div class="kpiLabel">Minutes</div><div class="kpiVal" id="kpiMinutes">0</div></div>
+      <div class="kpi"><div class="kpiLabel">Skill PR</div><div class="kpiVal" id="kpiPR">—</div></div>
+    </div>
+  </div>
+
+  <div class="sectionCard">
+    <div class="secHead">
+      <div class="secTitle">🥗 Nutrition</div>
+      <div class="secMeta" id="nuMeta">—</div>
+    </div>
+    <svg class="bigSpark" viewBox="0 0 320 80" preserveAspectRatio="none">
+      <path id="nuLine" d="" fill="none" stroke="rgba(30,58,138,0.65)" stroke-width="3" stroke-linecap="round"></path>
+    </svg>
+    <div class="kpiRow">
+      <div class="kpi"><div class="kpiLabel">Avg kcal</div><div class="kpiVal" id="kpiAvgKcal">0</div></div>
+      <div class="kpi"><div class="kpiLabel">On target</div><div class="kpiVal" id="kpiKcalDays">0</div></div>
+      <div class="kpi"><div class="kpiLabel">Logs</div><div class="kpiVal" id="kpiNutLogs">0</div></div>
+    </div>
+  </div>
+
+  <div class="sectionCard">
+    <div class="secHead">
+      <div class="secTitle">💰 Finance</div>
+      <div class="secMeta" id="fiMeta">—</div>
+    </div>
+    <svg class="bigSpark" viewBox="0 0 320 80" preserveAspectRatio="none">
+      <path id="fiLine" d="" fill="none" stroke="rgba(30,58,138,0.65)" stroke-width="3" stroke-linecap="round"></path>
+    </svg>
+    <div class="kpiRow">
+      <div class="kpi"><div class="kpiLabel">Spent</div><div class="kpiVal" id="kpiSpent">0</div></div>
+      <div class="kpi"><div class="kpiLabel">Saved</div><div class="kpiVal" id="kpiSaved">0</div></div>
+      <div class="kpi"><div class="kpiLabel">Days OK</div><div class="kpiVal" id="kpiBudgetDays">0</div></div>
+    </div>
+  </div>
+
+  <div class="crudWrap">
+    <div class="crudTitle">Highlights</div>
+    <div class="list" id="hiList"></div>
+  </div>
+</section>
 
 </body>
 </html>

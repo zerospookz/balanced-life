@@ -1,12 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="bg">
 <head>
-  <meta charset="UTF-8" />
-  <title>Balanced life v5.5</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f3f4f6"/>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>Balanced life</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="app"></div>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">BL</div>
+        <div>
+          <div class="brandTitle">Balanced life</div>
+          <div class="brandSub">Офлайн • данните са на телефона</div>
+        </div>
+      </div>
+      <button id="btnReorder" class="btn ghost" type="button">Подреди</button>
+    </header>
+
+    <main id="view" class="view"></main>
+
+    <nav class="bottomnav" aria-label="Bottom navigation">
+      <button class="tab" data-route="home" aria-label="Home"><span class="ico">🏠</span><span>Home</span></button>
+      <button class="tab" data-route="finances" aria-label="Finances"><span class="ico">💰</span><span>Finances</span></button>
+      <button class="tab" data-route="nutrition" aria-label="Nutrition"><span class="ico">🥗</span><span>Nutrition</span></button>
+      <button class="tab" data-route="workouts" aria-label="Workouts"><span class="ico">🏋️</span><span>Workouts</span></button>
+      <button class="tab" data-route="settings" aria-label="Settings"><span class="ico">⚙️</span><span>Settings</span></button>
+    </nav>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div id="modalTitle" class="modalTitle">—</div>
+        <button id="modalClose" class="btn ghost" type="button">✕</button>
+      </div>
+      <div id="modalBody" class="modalBody"></div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

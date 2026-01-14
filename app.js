@@ -208,6 +208,9 @@
     { id:"settings", icon:"⚙️", name:"Настройки", desc:"Експорт/импорт/нулиране" },
   ];
 
+  // v5.4.2: expose navigation helpers for global click delegation (Chrome/iOS reliability)
+  try { window.showPanel = showPanel; } catch(e){}
+
   function loadTileOrder() {
     try {
       const raw = localStorage.getItem(TILES_KEY);

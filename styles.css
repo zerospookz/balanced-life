@@ -1291,3 +1291,7 @@ body.dark .hint{
 .header, .topBar, .topbar, .headerBar, .brandRow, .pills, .pill{
   pointer-events: auto;
 }
+
+/* v5.4.2 pointer events hardening */
+button, a, .tile, .navBtn, .iosTab, .pill, [data-open] { pointer-events: auto !important; }
+.panel { pointer-events: auto; }

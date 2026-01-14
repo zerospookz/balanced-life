@@ -331,3 +331,82 @@ body{
 }
 
 .panel{ padding-bottom: 110px !important; }
+
+
+/* ===== v4.8.1 FIXPACK: readability + tiles layout + click/tap blockers ===== */
+:root{
+  --text-primary:#111111;
+  --text-secondary:#3f3f46;
+  --card-bg: rgba(255,255,255,0.92);
+  --card-border: rgba(0,0,0,0.06);
+}
+
+/* Make text readable everywhere */
+body{ color: var(--text-primary) !important; }
+.muted, .sub, .hint, .tdesc, .dashDate, .weeklySub{
+  color: var(--text-secondary) !important;
+  opacity: 1 !important;
+}
+
+/* Cards / tiles on light theme */
+.card, .glass, .tile, .miniCard{
+  background: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text-primary) !important;
+}
+
+/* CLICK FIX: prevent decorative overlays from blocking taps/clicks */
+body::before, body::after,
+.bg, .backdrop, .overlay, .gradient, .noise{
+  pointer-events: none !important;
+}
+
+/* Ensure UI is clickable */
+.panel, .dash, .bottomNav, .tiles, #tilesGrid, .tiles-grid, .tile, .btn, button, a{
+  pointer-events: auto !important;
+}
+
+/* Tiles layout (single clean grid) */
+#tilesGrid, .tiles-grid{
+  display:grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  padding: 14px !important;
+}
+
+@media (min-width: 768px){
+  #tilesGrid, .tiles-grid{
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+.tile{
+  border-radius: 16px !important;
+  padding: 14px !important;
+  text-align:center !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10) !important;
+  transition: transform .15s ease, box-shadow .15s ease !important;
+}
+.tile:active{
+  transform: scale(0.98) !important;
+}
+
+/* Tile text */
+.tname{
+  margin-top: 8px !important;
+  font-weight: 800 !important;
+  color: var(--text-primary) !important;
+}
+.tdesc{
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Fix hero ring/card text on light theme */
+.ringBig{ color: #111 !important; }
+.ringSmall{ color: #444 !important; }
+.ringCaption{ color: #444 !important; }
+.barMeta{ color:#444 !important; }
+

@@ -1586,3 +1586,49 @@
       });
     }
   }
+
+
+// ===== v4.8.1 FIXPACK: ultra-safe click bindings =====
+(function bindClicksUltraSafe(){
+  function openPanel(id){
+    try{
+      if (typeof showPanel === "function") { showPanel(id); return; }
+    }catch(e){}
+    // fallback: data-panel show/hide
+    document.querySelectorAll("[data-panel]").forEach(p => p.classList.add("hidden"));
+    const target = document.querySelector(`[data-panel="${id}"]`);
+    if (target) target.classList.remove("hidden");
+  }
+
+  // Delegate clicks for any element with data-open (tiles, nav buttons, etc.)
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-open]");
+    if (!el) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const id = el.getAttribute("data-open");
+    if (id) openPanel(id);
+  }, true);
+
+  // Reorder button (Подреди) - support multiple selectors
+  const reorderBtn =
+    document.getElementById("reorderBtn") ||
+    document.querySelector('[data-action="reorder"]') ||
+    document.querySelector('button[aria-label="Подреди"]');
+
+  if (reorderBtn) {
+    reorderBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document.body.classList.toggle("reorderMode");
+    }, { passive: false });
+  }
+
+  console.log("✅ Click bindings active");
+})();
+
+
+// Ensure app init after DOM (extra safe)
+document.addEventListener("DOMContentLoaded", function(){
+  // no-op if app already initialized
+});

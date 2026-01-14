@@ -1,4 +1,4 @@
-const CACHE = "balancedlife-v48-dashboard";
+const CACHE = "balancedlife-v481-fixpack";
 const ASSETS = [
   "./",
   "./index.html",

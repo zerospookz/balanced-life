@@ -4,14 +4,41 @@
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-  const STORAGE_KEY = "balancedLife.v58";
+  const STORAGE_KEY = "balancedLife.v59";
   const todayISO = () => new Date().toISOString().slice(0,10);
+
+  const pad2 = (n) => String(n).padStart(2,'0');
+  const isoFromDate = (d) => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  const startOfWeekISO = (iso=todayISO()) => {
+    const d = new Date(iso + "T00:00:00");
+    // Monday as start
+    const day = (d.getDay() + 6) % 7; // 0..6 where 0=Mon
+    d.setDate(d.getDate() - day);
+    return isoFromDate(d);
+  };
+  const weekISOs = (startISO) => {
+    const d = new Date(startISO + "T00:00:00");
+    return Array.from({length:7}, (_,i)=>{ const x=new Date(d); x.setDate(d.getDate()+i); return isoFromDate(x); });
+  };
+  const dayLabel = (iso) => {
+    const d = new Date(iso + "T00:00:00");
+    return ["П","В","С","Ч","П","С","Н"][(d.getDay()+6)%7];
+  };
 
   const defaultState = {
     route: "home",
     finances: [],
     nutrition: [],
     workouts: [], // workout logs (sessions)
+    habits: [
+      {id:"h_workouts", name:"Тренировки", icon:"🏋️"},
+      {id:"h_nutrition", name:"Хранене", icon:"🥗"},
+      {id:"h_finances", name:"Финанси", icon:"💰"},
+      {id:"h_steps", name:"Разходка", icon:"🚶"},
+      {id:"h_mobility", name:"Мобилност", icon:"🧘"},
+      {id:"h_rope", name:"Въже/Кардио", icon:"🪢"},
+    ],
+    habitLogs: {},
     workoutPlan: {"Понеделник": {"Фокус": "Push + Planche (тежко) + Handstand", "Skill: Handstand (15–20 мин)": ["Chest-to-wall 5×30–45 сек (линия)", "Kick-ups 6–10 опита ×10–25 сек", "Scap shrugs в стойка 3×10"], "Skill: Planche (8–12 мин)": ["Tuck/Frog holds 6–10×6–12 сек", "Planche leans 3×20 сек"], "Skill: Flag (8–12 мин)": ["(по желание) 2–4 леки опита"], "Сила — Блок A (тежко)": ["Bench press ИЛИ Weighted dips 4×4–6", "Overhead press 3×5–8"], "Сила — Блок B": ["Pseudo planche push-ups 4×6–10", "Hollow hold 4×20–40 сек"], "Аксесоари / Прехаб": ["Lateral raise 3×12–20", "Китки: wrist rocks 2×10"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "RPE 7–8; спри при разпад на форма"}, "Вторник": {"Фокус": "Pull (тежко) + Flag + Набирания", "Skill: Handstand (15–20 мин)": ["(кратко: 3–5 леки опита по 10–15 сек)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": ["Tuck/ластик 6–10×5–10 сек", "Негативи 4×3–6 сек (контрол)"], "Сила — Блок A (тежко)": ["Weighted pull-ups 5×3–5", "Chin-ups 3×6–10"], "Сила — Блок B": ["Row (щанга/опора) 4×6–10", "Lat pulldown 3×10–15"], "Аксесоари / Прехаб": ["Face pulls 3×15–20", "External rotations 3×15–20", "Side plank/Copenhagen 4×20–40 сек/страна"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Фокус: стабилни рамене, лакът без болка"}, "Сряда": {"Фокус": "Крака (фитнес) + Core + лека стойка", "Skill: Handstand (15–20 мин)": ["Scap shrugs 3×10", "3–5 леки опита стойка (без борба)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": ["Squat (back/front) 4×3–6", "RDL 4×5–8"], "Сила — Блок B": ["Bulgarian split squat 3×8–12/крак", "Leg curl ИЛИ Nordic прогресия 3×8–12"], "Аксесоари / Прехаб": ["Calves 4×10–20", "Ab wheel ИЛИ Hanging knee raises 4×8–15"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Не до отказ (за да пазиш краката)"}, "Четвъртък": {"Фокус": "Кондиция: Бокс + Въже + Мобилност", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Прехаб 10 мин: scap push-ups 2×10", "Wrist rocks 2×10", "External rotations 3×15–20"], "Кондиция / Спорт": ["Въже 12×(40/40)", "Бокс 8–12 рунда × 2–3 мин"], "Център време (мин)": "45–75", "Бележки": "Дръж умерено (техника + дишане)"}, "Петък": {"Фокус": "Upper (обем/умение) + Planche + Pull-up вариации", "Skill: Handstand (15–20 мин)": ["6–10 опита ×10–25 сек (контрол)", "Wall line 2×30 сек"], "Skill: Planche (8–12 мин)": ["Holds 6–8×8–12 сек", "Lean 3×20 сек"], "Skill: Flag (8–12 мин)": ["4–6 леки опита ×5–8 сек (само чисто)"], "Сила — Блок A (тежко)": ["Explosive pull-ups / chest-to-bar 6×2–4", "Archer / Typewriter 4×3–6/страна"], "Сила — Блок B": ["Incline DB press 4×8–12", "Seated cable row 3×10–15"], "Аксесоари / Прехаб": ["Curls 3×10–15", "Triceps pushdown 3×10–15", "Farmer/Suitcase carry 6×20–40 м"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Пази свежест за уикенда (без отказ)"}, "Събота": {"Фокус": "Футбол + кратък Skill/прехаб (леко)", "Skill: Handstand (15–20 мин)": ["8–12 мин лесни опита (или стена)"], "Skill: Planche (8–12 мин)": ["Lean 3×15–25 сек", "PPPUs 3×8 (леки)"], "Skill: Flag (8–12 мин)": ["Само ако си свеж: 1–3 опита ×5–8 сек"], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Face pulls 2×20", "External rotations 2×20", "Разтягане 5–10 мин"], "Кондиция / Спорт": ["Футбол (трен./мач)"], "Център време (мин)": "20–45 + футбол", "Бележки": "Ако мачът е тежък → само мобилност"}, "Неделя": {"Фокус": "Футбол + възстановяване", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Мобилност 10–15 мин (грасци/бедра/таз/гръб/рамене)"], "Кондиция / Спорт": ["Футбол", "Zone 2 20–40 мин (по желание)"], "Център време (мин)": "20–40 + футбол", "Бележки": "Цел: възстановяване"}},
   };
 
@@ -149,9 +176,80 @@
   }
 
   // ---------- Views ----------
-  function viewHome() {
+  
+  function viewHabitTracker(){
+    const start = startOfWeekISO();
+    const days = weekISOs(start);
+    const habits = state.habits || [];
+    const logs = state.habitLogs || {};
+    const weekCounts = habits.map(h=>{
+      let c=0;
+      for(const iso of days){
+        if(logs[iso] && logs[iso][h.id]) c++;
+      }
+      return c;
+    });
+    const totalDone = weekCounts.reduce((a,b)=>a+b,0);
+    const totalPossible = habits.length * days.length;
+    const pct = totalPossible ? Math.round((totalDone/totalPossible)*100) : 0;
+
+    return `
+      <section class="card" style="margin-top:16px">
+        <div class="cardHead">
+          <div>
+            <div class="cardTitle">Habit tracker</div>
+            <div class="muted">Тази седмица • ${start} → ${days[6]}</div>
+          </div>
+          <button class="btn" type="button" data-action="addHabit">+ Навик</button>
+        </div>
+
+        <div class="habitWrap" role="table" aria-label="Habit tracker">
+          <div class="habitHeadRow" role="row">
+            <div class="habitName" role="columnheader">Навик</div>
+            ${days.map(d=>`<div class="habitDay" role="columnheader">${dayLabel(d)}</div>`).join("")}
+          </div>
+
+          ${habits.length ? habits.map((h,idx)=>`
+            <div class="habitRow" role="row">
+              <div class="habitName" role="cell">
+                <div class="habitNameInner">
+                  <span class="habitIcon">${h.icon||"✅"}</span>
+                  <span class="habitText">${escapeHtml(h.name||"Навик")}</span>
+                  <span class="chip">${weekCounts[idx]}/7</span>
+                </div>
+              </div>
+              ${days.map(d=>{
+                const on = !!(logs[d] && logs[d][h.id]);
+                return `<button class="habitDot ${on?"on":""}" type="button" aria-label="${h.name} ${d}" data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
+              }).join("")}
+            </div>
+          `).join("") : `<div class="muted" style="padding:10px 6px">Нямаш навици. Натисни “+ Навик”.</div>`}
+        </div>
+
+        <div class="habitStats">
+          <div class="statMini">
+            <div class="statLabel">Изпълнение</div>
+            <div class="statValue">${pct}%</div>
+          </div>
+          <div class="statMini">
+            <div class="statLabel">Отметнати</div>
+            <div class="statValue">${totalDone}</div>
+          </div>
+          <div class="statMini">
+            <div class="statLabel">Навлици</div>
+            <div class="statValue">${habits.length}</div>
+          </div>
+        </div>
+      </section>
+      ${viewHabitTracker()}
+      </div>
+    `;
+  }
+
+function viewHome() {
     const d = computeDashboard();
     return `
+      <div class="pageStack">
       <section class="card section">
         <div class="h1">Dashboard</div>
         <div class="sub">Днес: бюджет • хранене • тренировки</div>
@@ -188,6 +286,8 @@
           <button class="btn ghost" data-route="workouts" type="button">🏋️ Workouts</button>
         </div>
       </section>
+      ${viewHabitTracker()}
+      </div>
     `;
   }
 
@@ -386,6 +486,8 @@
 
   function handleAction(e) {
     const a = e.currentTarget.dataset.action;
+    if(a==="toggleHabit") return toggleHabit(e.currentTarget.dataset.habit, e.currentTarget.dataset.date);
+    if(a==="addHabit") return openAddHabit();
     if(a==="addFinance") return openAddFinance();
     if(a==="delFinance") {
       const idx = Number(e.currentTarget.dataset.idx);
@@ -631,7 +733,96 @@
     });
   }
 
-  // ---------- Init ----------
+  
+  function openAddHabit(){
+    const habits = state.habits || [];
+    const listHtml = habits.map(h=>`
+      <div class="row" style="justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(15,23,42,.06)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">${h.icon||"✅"}</span>
+          <div>
+            <div style="font-weight:700">${escapeHtml(h.name||"Навик")}</div>
+            <div class="muted" style="font-size:12px">${h.id}</div>
+          </div>
+        </div>
+        <button class="btn danger" type="button" data-habit-del="${h.id}">Изтрий</button>
+      </div>
+    `).join("") || `<div class="muted">Нямаш навици.</div>`;
+
+    openModal(`
+      <div class="modalHeader">
+        <div>
+          <div class="modalTitle">Нови навици</div>
+          <div class="muted">Добави / изтрий навик за Habit tracker.</div>
+        </div>
+        <button class="btn ghost" type="button" data-modal-close>✕</button>
+      </div>
+
+      <form id="habitForm" class="form">
+        <div class="grid2">
+          <label class="field">
+            <span>Име</span>
+            <input id="habitName" required placeholder="Напр. Стречинг" />
+          </label>
+          <label class="field">
+            <span>Иконка (emoji)</span>
+            <input id="habitIcon" placeholder="🧘" maxlength="4" />
+          </label>
+        </div>
+        <div class="row" style="justify-content:flex-end;gap:10px;margin-top:10px">
+          <button class="btn" type="submit">Добави</button>
+        </div>
+      </form>
+
+      <div style="margin-top:12px">
+        <div class="muted" style="font-size:12px;margin-bottom:6px">Текущи навици</div>
+        ${listHtml}
+      </div>
+    `);
+
+    document.querySelectorAll("[data-habit-del]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const hid = btn.getAttribute("data-habit-del");
+        state.habits = (state.habits||[]).filter(h=>h.id!==hid);
+        // clean logs
+        const logs = state.habitLogs || {};
+        Object.keys(logs).forEach(d=>{ if(logs[d]) delete logs[d][hid]; });
+        saveState();
+        closeModal();
+        render();
+        toast("Навикът е изтрит.");
+      });
+    });
+
+    const form = document.getElementById("habitForm");
+    form.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      const name = document.getElementById("habitName").value.trim();
+      const icon = document.getElementById("habitIcon").value.trim() || "✅";
+      if(!name) return;
+      const id = "h_" + Date.now().toString(36);
+      state.habits = [...(state.habits||[]), {id, name, icon}];
+      saveState();
+      closeModal();
+      render();
+      toast("Навикът е добавен.");
+    });
+  }
+
+  function toggleHabit(hid, iso){
+    if(!hid || !iso) return;
+    state.habitLogs = state.habitLogs || {};
+    state.habitLogs[iso] = state.habitLogs[iso] || {};
+    state.habitLogs[iso][hid] = !state.habitLogs[iso][hid];
+    // remove empty
+    if(!state.habitLogs[iso][hid]) delete state.habitLogs[iso][hid];
+    if(Object.keys(state.habitLogs[iso]).length===0) delete state.habitLogs[iso];
+    saveState();
+    render();
+  }
+
+
+// ---------- Init ----------
   $("#btnReorder").addEventListener("click", () => {
     alert("Подреждане: в тази версия плочките са премахнати (ползва се долната навигация).");
   });

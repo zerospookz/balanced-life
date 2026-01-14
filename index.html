@@ -29,7 +29,7 @@
     <div class="brand">
       <div class="logo" aria-hidden="true">BL</div>
       <div>
-        <div class="title">Balanced life <span class="ver">v4.9.2 (Final UI Fix)</span></div>
+        <div class="title">Balanced life <span class="ver">v4.9.7 (Plan + Quick Add)</span></div>
         <div class="subtitle" id="streakLine">Офлайн • данните са на телефона</div>
       </div>
     </div>
@@ -403,6 +403,7 @@
             <div class="field">
               <label>Бележка</label>
               <input id="finNote" placeholder="по желание" />
+              <input id="finEditTs" type="hidden" value="" />
             </div>
           </div>
           <div class="actions">
@@ -516,6 +517,7 @@
             <div class="field">
               <label>Калории (kcal)</label>
               <input id="nutKcal" inputmode="numeric" type="number" min="0" step="1" placeholder="600" />
+              <input id="nutEditTs" type="hidden" value="" />
             </div>
           </div>
 
@@ -556,6 +558,128 @@
         <button class="btn backBtn" data-open="home" aria-label="Back">← Назад</button>
         <div class="panelHead">
           <div class="panelTitle">Spending</div>
+      <!-- plan:full-v42 -->
+      <div class="crudWrap">
+        <div class="crudTitle">Тренировки (пълен план)</div>
+        <div class="muted">7-дневен план с калистеника + фитнес + кардио (от v4.2), с новия UI.</div>
+        <div class="planV42" id="planFullV42"></div>
+      </div>
+
+      <!-- goals:targets -->
+      <div class="crudWrap">
+        <div class="crudTitle">Цели (Targets)</div>
+        <div class="muted">Тези стойности влияят на Dashboard ring.</div>
+        <form class="crudForm" id="targetsForm">
+          <div class="row2">
+            <input class="in" id="tBudget" inputmode="decimal" placeholder="Бюджет/ден (лв) напр. 60" />
+            <input class="in" id="tKcal" inputmode="numeric" placeholder="Калории/ден напр. 2100" />
+          </div>
+          <div class="row2">
+            <input class="in" id="tWork" inputmode="numeric" placeholder="Тренировка/ден (мин) напр. 60" />
+            <button class="btn primary" type="submit">Запази</button>
+          </div>
+        </form>
+      </div>
+
+  <div class="quickAdd">
+    <div class="quickTitle">Бързо добавяне</div>
+    <div class="quickRow" id="quickMin">
+      <button class="smallBtn" type="button" data-quickmin="10">+10 мин</button>
+      <button class="smallBtn" type="button" data-quickmin="20">+20 мин</button>
+      <button class="smallBtn" type="button" data-quickmin="30">+30 мин</button>
+      <button class="smallBtn" type="button" data-quickmin="45">+45 мин</button>
+    </div>
+    <div class="muted">Записва се като “Workout” в минути за днес (за ring-а).</div>
+  </div>
+
+  <div class="planWrap">
+    <div class="planHead">
+      <div class="planTitle">Седмичен план (пълен)</div>
+      <div class="planSub muted">Същият план като v4.2, адаптиран към новия UI</div>
+    </div>
+    <div id="planWeek" class="planWeek"></div>
+  </div>
+
+
+  <!-- CRUD:log -->
+  <div class="crudWrap">
+    <div class="crudTitle">Прогрес</div>
+    <form class="crudForm" id="logForm">
+      <div class="row2">
+        <input class="in" id="logExercise" placeholder="Упражнение (напр. handstand)" required />
+        <input class="in" id="logValue" placeholder="Стойност (сек/бр/кг)" inputmode="decimal" required />
+      </div>
+      <div class="row2">
+        <select class="in" id="logUnit">
+          <option value="sec">сек</option>
+          <option value="reps">бр</option>
+          <option value="kg">кг</option>
+          <option value="min">мин</option>
+        </select>
+        <input class="in" id="logDate" type="date" />
+      </div>
+      <button class="btn primary" type="submit">Добави</button>
+    </form>
+
+    <div class="listHead">
+      <div class="muted">Последни записи</div>
+      <button class="btn" type="button" id="logClear">Изчисти</button>
+    </div>
+    <div class="list" id="logList"></div>
+  </div>
+
+
+
+  <!-- CRUD:nutrition -->
+  <div class="crudWrap">
+    <div class="crudTitle">Хранене</div>
+    <form class="crudForm" id="nutForm">
+      <div class="row2">
+        <input class="in" id="nutFood" placeholder="Храна (напр. яйца, ориз)" required />
+        <input class="in" id="nutKcal" placeholder="Калории" inputmode="numeric" required />
+      </div>
+      <div class="row2">
+        <input class="in" id="nutProtein" placeholder="Протеин (g) - по желание" inputmode="decimal" />
+        <input class="in" id="nutDate" type="date" />
+      </div>
+      <button class="btn primary" type="submit">Добави</button>
+    </form>
+
+    <div class="listHead">
+      <div class="muted">Днес и последни записи</div>
+      <button class="btn" type="button" id="nutClear">Изчисти</button>
+    </div>
+    <div class="list" id="nutList"></div>
+  </div>
+
+
+
+  <!-- CRUD:finance -->
+  <div class="crudWrap">
+    <div class="crudTitle">Финанси</div>
+    <form class="crudForm" id="finForm">
+      <div class="row2">
+        <input class="in" id="finDesc" placeholder="Описание (напр. храна, наем)" required />
+        <input class="in" id="finAmount" placeholder="Сума" inputmode="decimal" required />
+      </div>
+      <div class="row2">
+        <select class="in" id="finType">
+          <option value="expense">Разход</option>
+          <option value="income">Приход</option>
+        </select>
+        <input class="in" id="finDate" type="date" />
+      </div>
+      <button class="btn primary" type="submit">Добави</button>
+    </form>
+
+    <div class="listHead">
+      <div class="muted">Последни записи</div>
+      <button class="btn" type="button" id="finClear">Изчисти</button>
+    </div>
+    <div class="list" id="finList"></div>
+  </div>
+
+
       <!-- info:settings -->
       <div class="infoCard">
         <div class="infoTitle">Настройки</div>
@@ -699,13 +823,25 @@
     }
   </script>
 
-  <nav class="bottomNav" aria-label="Навигация">
-    <button class="bnItem active" data-open="home" type="button"><span class="bnIco">🏠</span><span class="bnTxt">Home</span></button>
-    <button class="bnItem" data-open="plan" type="button"><span class="bnIco">🏋️</span><span class="bnTxt">Трен</span></button>
-    <button class="bnAdd" id="bnAdd" type="button" title="Добави">＋</button>
-    <button class="bnItem" data-open="nutrition" type="button"><span class="bnIco">🥗</span><span class="bnTxt">Хран</span></button>
-    <button class="bnItem" data-open="finance" type="button"><span class="bnIco">💰</span><span class="bnTxt">Фин</span></button>
-  </nav>
+  
+<nav class="bottomNav iosTabbar" aria-label="Навигация">
+  <button class="bnItem active" data-open="home" type="button">
+    <span class="bnIco">🏠</span><span class="bnTxt">Home</span>
+  </button>
+  <button class="bnItem" data-open="spending" type="button">
+    <span class="bnIco">💰</span><span class="bnTxt">Spending</span>
+  </button>
+  <button class="bnItem" data-open="nutritiondash" type="button">
+    <span class="bnIco">🥗</span><span class="bnTxt">Nutrition</span>
+  </button>
+  <button class="bnItem" data-open="workoutsDash" type="button">
+    <span class="bnIco">🏋️</span><span class="bnTxt">Workouts</span>
+  </button>
+  <button class="bnItem" data-open="settings" type="button">
+    <span class="bnIco">⚙️</span><span class="bnTxt">Settings</span>
+  </button>
+</nav>
+
 
 </body>
 </html>

@@ -1636,6 +1636,89 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ===== SPA_ROUTER_V49 =====
+// ===== Embedded workouts plan from v4.2 =====
+const WEEKLY_PLAN_FULL_V42 = [
+    { day:"Понеделник", focus:"Push + Planche (тежко) + Handstand",
+      items:[
+        "Handstand: Chest-to-wall 5×30–45 сек + 6–10 kick-up опита",
+        "Planche: 6–10×6–12 сек (tuck/frog) + leans 3×20 сек",
+        "Bench press ИЛИ Weighted dips 4×4–6",
+        "Overhead press 3×5–8",
+        "Pseudo planche push-ups 4×6–10",
+        "Lateral raise 3×12–20",
+        "Hollow hold 4×20–40 сек"
+      ],
+      note:"RPE 7–8, без разпад на форма"
+    },
+    { day:"Вторник", focus:"Pull (тежко) + Flag + Набирания",
+      items:[
+        "Flag: 6–10×5–10 сек (tuck/ластик)",
+        "Flag negatives: 4×3–6 сек",
+        "Weighted pull-ups 5×3–5",
+        "Chin-ups 3×6–10",
+        "Row 4×6–10",
+        "Lat pulldown 3×10–15",
+        "Face pulls + external rotations 3×15–20",
+        "Side plank/Copenhagen 4×20–40 сек/страна"
+      ],
+      note:"Фокус: стабилни рамене"
+    },
+    { day:"Сряда", focus:"Крака (фитнес) + Core + лека стойка",
+      items:[
+        "Handstand: scap shrugs 3×10 + 3–5 леки опита",
+        "Squat 4×3–6",
+        "RDL 4×6–8",
+        "Bulgarian split squat 3×8–12/крак",
+        "Leg curl или Nordic 3×8–12",
+        "Calves 4×10–20",
+        "Ab wheel или hanging knee raises 4×8–15"
+      ],
+      note:"Не до отказ"
+    },
+    { day:"Четвъртък", focus:"Кондиция: Бокс + Въже + Мобилност",
+      items:[
+        "Въже 12×(40/40)",
+        "Бокс 8–12 рунда × 2–3 мин",
+        "Прехаб: scap push-ups 2×10, wrist rocks 2×10, external rotations 3×15–20"
+      ],
+      note:"Умерено темпо, техника"
+    },
+    { day:"Петък", focus:"Upper (обем/умение) + Planche + Pull-up вариации",
+      items:[
+        "Handstand: 6–10 опита × 10–25 сек + wall line 2×30 сек",
+        "Planche: holds 6–8×6–12 сек + leans 3×20 сек",
+        "Flag: 4–6 леки опита × 5–8 сек (само чисто)",
+        "Explosive pull-ups / chest-to-bar 6×2–4",
+        "Archer/Typewriter 4×3–6/страна",
+        "Incline DB press 4×8–12",
+        "Seated cable row 3×10–15",
+        "Curls 3×10–15",
+        "Triceps pushdown 3×10–15",
+        "Farmer/Suitcase carry 6×20–40 м"
+      ],
+      note:"Пази свежест за уикенда"
+    },
+    { day:"Събота", focus:"Футбол + кратък Skill/прехаб (леко)",
+      items:[
+        "Футбол",
+        "Handstand: 8–12 мин лесни опита (или стена)",
+        "Planche: leans 3×15–25 сек + PPPU 3×8 (леки)",
+        "Flag: 1–3 опита × 5–8 сек (само ако си свеж)",
+        "Face pulls 2×20 + External rotations 2×20",
+        "Разтягане 5–10 мин"
+      ],
+      note:"Ако мачът е тежък → само мобилност"
+    },
+    { day:"Неделя", focus:"Футбол + възстановяване",
+      items:[
+        "Футбол",
+        "Zone 2 20–40 мин (по желание)",
+        "Мобилност 10–15 мин (прасци/бедра/таз/гръб/рамене)"
+      ],
+      note:"Цел: възстановяване"
+    }
+  ];
+
 (function(){
   const PANEL_IDS = ["home","spending","nutritiondash","workoutsDash","plan","log","charts","nutrition","finance","calendar","settings"];
 
@@ -1734,3 +1817,894 @@ document.addEventListener("click", (e)=>{
     if(map[id] && document.getElementById("tab-"+map[id])) showPanel(map[id]);
   }
 }, true);
+
+
+// ===== V496_APP: BottomNav + CRUD + Live Dashboard =====
+(function(){
+  const FIN_KEY = "bl_fin_v1";
+  const NUT_KEY2 = "bl_nut_v1";
+  const LOG_KEY = "bl_log_v1";
+
+  const $ = (s)=>document.querySelector(s);
+  const $$ = (s)=>Array.from(document.querySelectorAll(s));
+
+  function todayISO(){
+    const d = new Date(Date.now() - new Date().getTimezoneOffset()*60000);
+    return d.toISOString().slice(0,10);
+  }
+  function uid(){
+    return Math.random().toString(36).slice(2) + Date.now().toString(36);
+  }
+  function load(key, fallback){
+    try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch(e){ return fallback; }
+  }
+  function save(key, value){
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  // ---------- Finance ----------
+  function renderFinanceCRUD(){
+    const list = document.getElementById("finList");
+    if(!list) return;
+    const items = load(FIN_KEY, []);
+    list.innerHTML = "";
+    items.slice().reverse().slice(0,50).forEach(it=>{
+      const row = document.createElement("div");
+      row.className = "itemRow";
+      row.innerHTML = `
+        <div class="itemMain">
+          <div class="itemTitle">${escapeHtml(it.desc)} <span class="itemMeta">(${it.type === "income" ? "приход" : "разход"})</span></div>
+          <div class="itemMeta">${it.date} • ${formatMoney(it.amount)}</div>
+        </div>
+        <div class="itemBtns">
+          <button class="smallBtn" data-del="fin" data-id="${it.id}">✕</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  // ---------- Nutrition ----------
+  function renderNutritionCRUD(){
+    const list = document.getElementById("nutList");
+    if(!list) return;
+    const items = load(NUT_KEY2, []);
+    list.innerHTML = "";
+    items.slice().reverse().slice(0,50).forEach(it=>{
+      const row = document.createElement("div");
+      row.className = "itemRow";
+      row.innerHTML = `
+        <div class="itemMain">
+          <div class="itemTitle">${escapeHtml(it.food)}</div>
+          <div class="itemMeta">${it.date} • ${Math.round(it.kcal||0)} kcal${it.protein?(" • "+it.protein+"g P"):""}</div>
+        </div>
+        <div class="itemBtns">
+          <button class="smallBtn" data-del="nut" data-id="${it.id}">✕</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  // ---------- Log ----------
+  function renderLogCRUD(){
+    const list = document.getElementById("logList");
+    if(!list) return;
+    const items = load(LOG_KEY, []);
+    list.innerHTML = "";
+    items.slice().reverse().slice(0,50).forEach(it=>{
+      const row = document.createElement("div");
+      row.className = "itemRow";
+      row.innerHTML = `
+        <div class="itemMain">
+          <div class="itemTitle">${escapeHtml(it.exercise)}</div>
+          <div class="itemMeta">${it.date} • ${it.value} ${it.unit}</div>
+        </div>
+        <div class="itemBtns">
+          <button class="smallBtn" data-del="log" data-id="${it.id}">✕</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  // ---------- Dashboard live data ----------
+  function computeDashboard(){
+    const fin = load(FIN_KEY, []);
+    const nut = load(NUT_KEY2, []);
+    const log = load(LOG_KEY, []);
+
+    const iso = todayISO();
+
+    let spent = 0, income = 0;
+    fin.forEach(it=>{
+      if(it.date === iso){
+        if(it.type === "expense") spent += Number(it.amount)||0;
+        if(it.type === "income") income += Number(it.amount)||0;
+      }
+    });
+
+    let kcal = 0;
+    nut.forEach(it=>{ if(it.date === iso) kcal += Number(it.kcal)||0; });
+
+    // workouts minutes today: sum entries where unit=min OR exercise contains "workout" etc.
+    let workMin = 0;
+    log.forEach(it=>{
+      if(it.date !== iso) return;
+      if(it.unit === "min") workMin += Number(it.value)||0;
+      // if unit is reps/sec/kg we don't count minutes; user can log minutes entries explicitly
+    });
+
+    const budgetTarget = Number(localStorage.getItem("bl_budget_daily") || 60) || 60;
+    const kcalTarget = Number(localStorage.getItem("bl_kcal_target") || 2100) || 2100;
+    const workTarget = Number(localStorage.getItem("bl_work_target") || 60) || 60;
+
+    const pMoney = Math.min(100, (spent / budgetTarget) * 100);
+    const pKcal = Math.min(100, (kcal / kcalTarget) * 100);
+    const pWork = Math.min(100, (workMin / workTarget) * 100);
+
+    // Energy heuristic
+    const e1 = 100 - pMoney;                  // less spending is better
+    const e2 = 100 - Math.abs(100 - pKcal);   // closer to target is better
+    const e3 = pWork;                         // more workout minutes is better
+    let energy = Math.round((e1*0.35 + e2*0.35 + e3*0.30));
+    energy = Math.max(0, Math.min(100, energy));
+
+    return {spent, income, kcal, workMin, budgetTarget, kcalTarget, workTarget, energy};
+  }
+
+  function renderDashboardLive(){
+    // Only if dashboard elements exist
+    const ringPct = document.getElementById("ringPct");
+    if(!ringPct) return;
+
+    const d = computeDashboard();
+
+    // Text
+    setTextSafe("ringMoney", formatMoney(d.spent) + " / " + formatMoney(d.budgetTarget));
+    setTextSafe("ringKcal", Math.round(d.kcal).toLocaleString() + " kcal");
+    setTextSafe("ringPct", d.energy + "%");
+
+    // Bars (if exist)
+    setWidthSafe("barMoney", (d.spent/d.budgetTarget)*100);
+    setWidthSafe("barKcal", (d.kcal/d.kcalTarget)*100);
+    setWidthSafe("barWork", (d.workMin/d.workTarget)*100);
+
+    // SVG ring
+    if(typeof setRingProgressV49 === "function") setRingProgressV49(d.energy);
+  }
+
+  function setTextSafe(id, t){
+    const el = document.getElementById(id);
+    if(el) el.textContent = t;
+  }
+  function setWidthSafe(id, pct){
+    const el = document.getElementById(id);
+    if(!el) return;
+    const p = Math.max(0, Math.min(100, pct||0));
+    el.style.width = p + "%";
+  }
+
+  function formatMoney(n){
+    const v = Number(n)||0;
+    try{ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(v); }
+    catch(e){ return "$"+Math.round(v); }
+  }
+
+  function escapeHtml(s){
+    return String(s||"").replace(/[&<>"']/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  // ---------- Bottom nav behavior ----------
+  function bindBottomNav(){
+    const nav = document.querySelector(".bottomNav");
+    if(!nav) return;
+    nav.addEventListener("click", (e)=>{
+      const btn = e.target.closest("button[data-open]");
+      if(!btn) return;
+      const id = btn.getAttribute("data-open");
+      if(typeof showPanel === "function") showPanel(id);
+      nav.querySelectorAll(".bnItem").forEach(b=>b.classList.remove("active"));
+      if(btn.classList.contains("bnItem")) btn.classList.add("active");
+    });
+
+    const add = document.getElementById("bnAdd");
+    if(add){
+      add.addEventListener("click", ()=>{
+        // Quick add -> open a simple chooser by routing to finance (fastest) and focusing input
+        if(typeof showPanel === "function") showPanel("finance");
+        setTimeout(()=>{ const el = document.getElementById("finDesc"); if(el) el.focus(); }, 250);
+      });
+    }
+  }
+
+  // ---------- Bind forms ----------
+  function bindForms(){
+    // dates default to today
+    ["finDate","nutDate","logDate"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el && !el.value) el.value = todayISO();
+    });
+
+    const finForm = document.getElementById("finForm");
+    if(finForm){
+      finForm.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        const desc = (document.getElementById("finDesc").value || "").trim();
+        const amount = Number((document.getElementById("finAmount").value || "").replace(",", "."));
+        const type = document.getElementById("finType").value;
+        const date = document.getElementById("finDate").value || todayISO();
+        if(!desc || !isFinite(amount)) return;
+        const items = load(FIN_KEY, []);
+        items.push({id:uid(), desc, amount, type, date});
+        save(FIN_KEY, items);
+        finForm.reset();
+        document.getElementById("finType").value = type;
+        document.getElementById("finDate").value = date;
+        renderFinanceCRUD();
+        renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497();
+      });
+    }
+
+    const nutForm = document.getElementById("nutForm");
+    if(nutForm){
+      nutForm.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        const food = (document.getElementById("nutFood").value || "").trim();
+        const kcal = Number((document.getElementById("nutKcal").value || "").replace(",", "."));
+        const protein = (document.getElementById("nutProtein").value || "").trim();
+        const date = document.getElementById("nutDate").value || todayISO();
+        if(!food || !isFinite(kcal)) return;
+        const items = load(NUT_KEY2, []);
+        items.push({id:uid(), food, kcal, protein, date});
+        save(NUT_KEY2, items);
+        nutForm.reset();
+        document.getElementById("nutDate").value = date;
+        renderNutritionCRUD();
+        renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497();
+      });
+    }
+
+    const logForm = document.getElementById("logForm");
+    if(logForm){
+      logForm.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        const exercise = (document.getElementById("logExercise").value || "").trim();
+        const value = (document.getElementById("logValue").value || "").trim();
+        const unit = document.getElementById("logUnit").value;
+        const date = document.getElementById("logDate").value || todayISO();
+        if(!exercise || !value) return;
+        const items = load(LOG_KEY, []);
+        items.push({id:uid(), exercise, value, unit, date});
+        save(LOG_KEY, items);
+        logForm.reset();
+        document.getElementById("logUnit").value = unit;
+        document.getElementById("logDate").value = date;
+        renderLogCRUD();
+        renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497();
+      });
+    }
+
+    // Clear buttons
+    const finClear = document.getElementById("finClear");
+    if(finClear) finClear.addEventListener("click", ()=>{ save(FIN_KEY, []); renderFinanceCRUD(); renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497(); });
+    const nutClear = document.getElementById("nutClear");
+    if(nutClear) nutClear.addEventListener("click", ()=>{ save(NUT_KEY2, []); renderNutritionCRUD(); renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497(); });
+    const logClear = document.getElementById("logClear");
+    if(logClear) logClear.addEventListener("click", ()=>{ save(LOG_KEY, []); renderLogCRUD(); renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497(); });
+
+    // Delete handlers
+    document.addEventListener("click", (e)=>{
+      const del = e.target.closest("button[data-del]");
+      if(!del) return;
+      const kind = del.getAttribute("data-del");
+      const id = del.getAttribute("data-id");
+      if(!id) return;
+      if(kind === "fin"){
+        const items = load(FIN_KEY, []).filter(x=>x.id !== id);
+        save(FIN_KEY, items);
+        renderFinanceCRUD(); renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497();
+      }
+      if(kind === "nut"){
+        const items = load(NUT_KEY2, []).filter(x=>x.id !== id);
+        save(NUT_KEY2, items);
+        renderNutritionCRUD(); renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497();
+      }
+      if(kind === "log"){
+        const items = load(LOG_KEY, []).filter(x=>x.id !== id);
+        save(LOG_KEY, items);
+        renderLogCRUD(); renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497();
+      }
+    }, true);
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    bindBottomNav();
+    bindForms();
+    renderFinanceCRUD();
+    renderNutritionCRUD();
+    renderLogCRUD();
+    // update dashboard once on load and whenever we go back home
+    renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497();
+  });
+
+  // Hook into existing showPanel to refresh dashboard when navigating
+  const oldShow = window.showPanel;
+  if(typeof oldShow === "function"){
+    window.showPanel = function(name, opts){
+      oldShow(name, opts);
+      if(name === "home") renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497();
+      if(name === "finance") renderFinanceCRUD();
+      if(name === "nutrition") renderNutritionCRUD();
+      if(name === "log") renderLogCRUD();
+    };
+  }
+})();
+
+
+// ===== V497_PLAN_DATA (from v4.2 plan) =====
+const WEEK_PLAN_V42 = [
+  { day:"Понеделник", focus:"Push + Planche (тежко) + Handstand",
+    items:[
+      "Загрявка: 8–12 мин (рамена/китки/лопатки) + 2 леки серии",
+      "Handstand: Chest-to-wall 5×30–45 сек + 6–10 kick-up опита",
+      "Planche: 6–10×6–12 сек (tuck/frog) + leans 3×20 сек",
+      "Паралелни: 4×6–10 (или кофички с тежест)",
+      "Гимнастически лицеви / PPPU: 3×6–10",
+      "Core: Hollow 3×30–45 сек + L-sit 4×10–20 сек",
+      "Финиш: 5–10 мин въже (леко) или мобилност"
+    ]
+  },
+  { day:"Вторник", focus:"Pull (тежко) + Flag + Набирания",
+    items:[
+      "Загрявка: лопатки + ластик 8–10 мин",
+      "Flag: 6–10×5–10 сек (tuck/ластик)",
+      "Flag negatives: 4×3–6 сек",
+      "Набирания тежко: 5×3–6 (тежест ако можеш)",
+      "Набирания вариации: archer/commando 3×6–10",
+      "Гребане (халка/скрипец): 4×8–12",
+      "Biceps + forearms: 3×10–15",
+      "Handstand: scap shrugs 3×10 + 3–5 леки опита"
+    ]
+  },
+  { day:"Сряда", focus:"Cardio + футбол/бокс + въже (лека сила)",
+    items:[
+      "Въже: 10×1 мин (30 сек почивка)",
+      "Сянка/лапи: 6×2–3 мин (лека интензивност)",
+      "Футбол: техника/спринтове 30–60 мин",
+      "Лека сила: push-ups 3×15 + pull-ups 3×6–10",
+      "Мобилност: 10–15 мин (рамена/бедра/глезени)"
+    ]
+  },
+  { day:"Четвъртък", focus:"Lower body + gym (силова) + core",
+    items:[
+      "Клек (или лег преса): 5×5",
+      "Румънска тяга: 4×6–10",
+      "Напади/Български клек: 3×8–12",
+      "Прасци: 4×12–20",
+      "Core: hanging leg raises 4×8–12",
+      "Кондиция: 8–12 мин леко кардио (по избор)"
+    ]
+  },
+  { day:"Петък", focus:"Upper (обем/умение) + Planche + Pull-up вариации",
+    items:[
+      "Handstand: 6–10 опита × 10–25 сек + wall line 2×30 сек",
+      "Planche: holds 6–8×6–12 сек + leans 3×20 сек",
+      "Набирания: wide/close/grip switch 4×6–12",
+      "Кофички: 4×8–12",
+      "Раменна преса (дъмбели): 3×8–12",
+      "Core: hollow rocks 3×20 + side plank 3×30 сек"
+    ]
+  },
+  { day:"Събота", focus:"Футбол + умения (леко)",
+    items:[
+      "Футбол: мач/тренировка 60–90 мин",
+      "Handstand: 8–12 мин лесни опита (или стена)",
+      "Planche: leans 3×15–25 сек + PPPU 3×8 (леки)",
+      "Мобилност: 10 мин"
+    ]
+  },
+  { day:"Неделя", focus:"Recovery / бокс / леко въже + флаг",
+    items:[
+      "Леко въже: 10–15 мин",
+      "Бокс техника: 20–30 мин",
+      "Flag: 1–3 опита × 5–8 сек (само ако си свеж)",
+      "Разтягане/ролер: 15–20 мин"
+    ]
+  }
+];
+
+function renderPlanV497(){
+  const wrap = document.getElementById("planWeek");
+  if(!wrap) return;
+  wrap.innerHTML = "";
+  WEEK_PLAN_V42.forEach((d, i)=>{
+    const card = document.createElement("div");
+    card.className = "dayCard";
+    card.innerHTML = `
+      <div class="dayTop">
+        <div>
+          <div class="dayName">${d.day}</div>
+          <div class="dayFocus">${d.focus}</div>
+        </div>
+        <button class="dayToggle" type="button" data-plan-toggle="${i}">Покажи</button>
+      </div>
+      <ul class="dayList">
+        ${d.items.map(x=>`<li>${x}</li>`).join("")}
+      </ul>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+document.addEventListener("click", (e)=>{
+  const btn = e.target.closest("button[data-plan-toggle]");
+  if(!btn) return;
+  const card = btn.closest(".dayCard");
+  if(!card) return;
+  card.classList.toggle("open");
+  btn.textContent = card.classList.contains("open") ? "Скрий" : "Покажи";
+}, true);
+
+
+// ===== V497_QUICK_MIN =====
+document.addEventListener("click", (e)=>{
+  const b = e.target.closest("button[data-quickmin]");
+  if(!b) return;
+  const mins = Number(b.getAttribute("data-quickmin")||0);
+  if(!mins) return;
+
+  const key = "bl_log_v1";
+  const iso = (function(){
+    const d = new Date(Date.now() - new Date().getTimezoneOffset()*60000);
+    return d.toISOString().slice(0,10);
+  })();
+  const uid = Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+  let items = [];
+  try{ items = JSON.parse(localStorage.getItem(key) || "[]"); }catch(e){ items=[]; }
+  items.push({ id: uid, exercise: "Workout", value: String(mins), unit: "min", date: iso });
+  localStorage.setItem(key, JSON.stringify(items));
+
+  // refresh UI if functions exist
+  try{
+    if(typeof renderLogCRUD === "function") renderLogCRUD();
+  }catch(e){}
+  try{
+    if(typeof renderDashboardLive === "function") renderDashboardLive();
+    if(typeof renderPlanV497==='function') renderPlanV497();
+  }catch(e){}
+
+  // feedback
+  b.textContent = "✓ " + mins + " мин";
+  setTimeout(()=>{ b.textContent = "+" + mins + " мин"; }, 800);
+}, true);
+
+
+// ===== V496_CRUD + LIVE_DASH =====
+(function(){
+  // Targets (editable via localStorage; defaults are sensible)
+  function getNum(key, def){
+    var v = Number(localStorage.getItem(key));
+    return isFinite(v) && v>0 ? v : def;
+  }
+  function todayISO2(){
+    return (new Date(Date.now() - new Date().getTimezoneOffset()*60000)).toISOString().slice(0,10);
+  }
+
+  // ---------- Finance CRUD (edit) ----------
+  function finLoadAll(){
+    try{ return (typeof loadArr==="function") ? loadArr(FIN_KEY) : JSON.parse(localStorage.getItem(FIN_KEY)||"[]"); }
+    catch(e){ return []; }
+  }
+  function finSaveAll(arr){
+    try{ if (typeof saveArr==="function") return saveArr(FIN_KEY, arr); }
+    catch(e){}
+    try{ localStorage.setItem(FIN_KEY, JSON.stringify(arr)); }catch(e){}
+  }
+
+  function enableFinEdit(it){
+    var tsEl = document.getElementById("finEditTs");
+    if (tsEl) tsEl.value = it.ts || "";
+    var t = document.getElementById("finType"); if (t) t.value = it.type || "expense";
+    var a = document.getElementById("finAmount"); if (a) a.value = it.amount || "";
+    var c = document.getElementById("finCat"); if (c) c.value = it.cat || "";
+    var n = document.getElementById("finNote"); if (n) n.value = it.note || "";
+    var btn = document.getElementById("finSave");
+    if (btn) btn.textContent = "Обнови";
+  }
+  function resetFinEdit(){
+    var tsEl = document.getElementById("finEditTs");
+    if (tsEl) tsEl.value = "";
+    var btn = document.getElementById("finSave");
+    if (btn) btn.textContent = "Запази";
+  }
+
+  // Patch existing finance save handler: wrap click and do update if editing
+  document.addEventListener("click", function(e){
+    var btn = e.target.closest("#finSave");
+    if (!btn) return;
+    // let existing handler run first; we'll override by stopping default and performing our own
+    e.preventDefault(); e.stopPropagation();
+
+    var type = (document.getElementById("finType")||{}).value || "expense";
+    var amount = Number(((document.getElementById("finAmount")||{}).value||"").toString().replace(",", "."));
+    if (!isFinite(amount) || amount <= 0) return alert("Въведи сума > 0");
+    var rec = {
+      type: type,
+      amount: Math.round(amount*100)/100,
+      cat: ((document.getElementById("finCat")||{}).value||"").trim(),
+      note: ((document.getElementById("finNote")||{}).value||"").trim(),
+      date: (typeof todayISO==="function") ? todayISO() : todayISO2(),
+      ts: new Date().toISOString()
+    };
+
+    var tsEl = document.getElementById("finEditTs");
+    var editTs = tsEl ? (tsEl.value||"") : "";
+    var all = finLoadAll();
+    if (editTs){
+      var idx = all.findIndex(x=>x.ts===editTs);
+      if (idx>=0){
+        rec.ts = editTs; // keep identity
+        all[idx] = rec;
+      } else {
+        all.push(rec);
+      }
+      resetFinEdit();
+    } else {
+      all.push(rec);
+    }
+    finSaveAll(all);
+
+    // clear inputs
+    var a = document.getElementById("finAmount"); if (a) a.value="";
+    var c = document.getElementById("finCat"); if (c) c.value="";
+    var n = document.getElementById("finNote"); if (n) n.value="";
+    // refresh UI
+    try{ if (typeof renderFinance==="function") renderFinance(); }catch(err){}
+    try{ if (typeof initDashboard==="function") initDashboard(); }catch(err){}
+  }, true);
+
+  // Add edit buttons to finance list rows (after render)
+  var _oldRenderFinance = (typeof renderFinance==="function") ? renderFinance : null;
+  if (_oldRenderFinance){
+    window.renderFinance = function(){
+      _oldRenderFinance();
+      var list = document.getElementById("finList");
+      if (!list) return;
+      var items = finLoadAll().slice().sort((a,b)=> (b.ts||"").localeCompare(a.ts||""));
+      var rows = Array.from(list.querySelectorAll(".item"));
+      rows.forEach((row, i)=>{
+        var it = items[i];
+        if (!it) return;
+        var right = row.querySelector(".right");
+        if (!right) return;
+        if (right.querySelector(".editBtn")) return;
+        var edit = document.createElement("button");
+        edit.type="button";
+        edit.className="iconBtn editBtn";
+        edit.textContent="✏️";
+        edit.addEventListener("click", function(ev){
+          ev.preventDefault(); ev.stopPropagation();
+          enableFinEdit(it);
+          // scroll to form
+          var amt = document.getElementById("finAmount");
+          if (amt) amt.scrollIntoView({behavior:"smooth", block:"center"});
+        });
+        right.insertBefore(edit, right.firstChild);
+      });
+    };
+  }
+
+  // ---------- Nutrition CRUD (edit + delete) ----------
+  function nutLoadAll(){
+    try{ return (typeof nutLoad==="function") ? nutLoad() : JSON.parse(localStorage.getItem(NUT_KEY)||"[]"); }
+    catch(e){ return []; }
+  }
+  function nutSaveAll(arr){
+    try{ if (typeof nutSaveArr==="function") return nutSaveArr(arr); }
+    catch(e){}
+    try{ localStorage.setItem(NUT_KEY, JSON.stringify(arr)); }catch(e){}
+  }
+
+  function enableNutEdit(it){
+    var tsEl = document.getElementById("nutEditTs");
+    if (tsEl) tsEl.value = it.ts || "";
+    var f = document.getElementById("nutFood"); if (f) f.value = it.food || "";
+    var k = document.getElementById("nutKcal"); if (k) k.value = (it.kcal!=null? it.kcal : "");
+    // photo not auto restored into input; keep cached photo
+    if (typeof _nutPhotoCache !== "undefined") _nutPhotoCache = it.photo || "";
+    var wrap = document.getElementById("nutPreviewWrap");
+    var img = document.getElementById("nutPreview");
+    if (wrap && img && it.photo){
+      img.src = it.photo;
+      wrap.style.display="block";
+    }
+    var btn = document.getElementById("nutSave");
+    if (btn) btn.textContent="Обнови";
+  }
+  function resetNutEdit(){
+    var tsEl = document.getElementById("nutEditTs");
+    if (tsEl) tsEl.value="";
+    var btn = document.getElementById("nutSave");
+    if (btn) btn.textContent="Запази";
+  }
+
+  // Override nut save click for edit support
+  document.addEventListener("click", function(e){
+    var btn = e.target.closest("#nutSave");
+    if (!btn) return;
+    e.preventDefault(); e.stopPropagation();
+
+    var food = ((document.getElementById("nutFood")||{}).value||"").trim();
+    if (!food) return alert("Въведи храна.");
+    var kcal = Number(((document.getElementById("nutKcal")||{}).value||"").toString().replace(",", "."));
+    if (!isFinite(kcal) || kcal < 0) kcal = null;
+
+    var rec = {
+      date: (typeof todayISO==="function") ? todayISO() : todayISO2(),
+      food: food,
+      kcal: kcal ? Math.round(kcal) : null,
+      photo: (typeof _nutPhotoCache !== "undefined" ? (_nutPhotoCache || null) : null),
+      ts: new Date().toISOString()
+    };
+
+    var tsEl = document.getElementById("nutEditTs");
+    var editTs = tsEl ? (tsEl.value||"") : "";
+    var all = nutLoadAll();
+    if (editTs){
+      var idx = all.findIndex(x=>x.ts===editTs);
+      if (idx>=0){
+        rec.ts = editTs;
+        all[idx] = rec;
+      } else {
+        all.push(rec);
+      }
+      resetNutEdit();
+    } else {
+      all.push(rec);
+    }
+    nutSaveAll(all);
+
+    // clear fields
+    var f = document.getElementById("nutFood"); if (f) f.value="";
+    var k = document.getElementById("nutKcal"); if (k) k.value="";
+    if (typeof _nutPhotoCache !== "undefined") _nutPhotoCache="";
+    var p = document.getElementById("nutPhoto"); if (p) p.value="";
+    var wrap = document.getElementById("nutPreviewWrap"); if (wrap) wrap.style.display="none";
+    var img = document.getElementById("nutPreview"); if (img) img.src="";
+
+    try{ if (typeof renderNutrition==="function") renderNutrition(); }catch(err){}
+    try{ if (typeof initDashboard==="function") initDashboard(); }catch(err){}
+  }, true);
+
+  // Enhance nutrition list with edit/delete
+  var _oldRenderNut = (typeof renderNutrition==="function") ? renderNutrition : null;
+  if (_oldRenderNut){
+    window.renderNutrition = function(){
+      _oldRenderNut();
+      var list = document.getElementById("nutList");
+      if (!list) return;
+
+      var items = nutLoadAll().slice().reverse(); // render order used
+      var rows = Array.from(list.querySelectorAll(".item"));
+      rows.forEach((row, i)=>{
+        var it = items[i];
+        if (!it) return;
+
+        if (row.querySelector(".rightActions")) return;
+        var actions = document.createElement("div");
+        actions.className = "rightActions";
+        actions.style.marginTop = "10px";
+
+        var edit = document.createElement("button");
+        edit.type="button";
+        edit.className="iconBtn";
+        edit.textContent="✏️";
+        edit.addEventListener("click", function(ev){
+          ev.preventDefault(); ev.stopPropagation();
+          enableNutEdit(it);
+          var foodEl = document.getElementById("nutFood");
+          if (foodEl) foodEl.scrollIntoView({behavior:"smooth", block:"center"});
+        });
+
+        var del = document.createElement("button");
+        del.type="button";
+        del.className="iconBtn";
+        del.textContent="🗑️";
+        del.addEventListener("click", function(ev){
+          ev.preventDefault(); ev.stopPropagation();
+          if (!confirm("Да изтрия ли този запис за хранене?")) return;
+          var all = nutLoadAll().filter(x=>x.ts !== it.ts);
+          nutSaveAll(all);
+          try{ window.renderNutrition(); }catch(err){}
+          try{ if (typeof initDashboard==="function") initDashboard(); }catch(err){}
+        });
+
+        actions.appendChild(edit);
+        actions.appendChild(del);
+        row.appendChild(actions);
+      });
+    };
+  }
+
+  // ---------- Live Dashboard ring ----------
+  // Override initDashboard to compute from real local data (finance, nutrition, workouts)
+  var _oldDash = (typeof initDashboard==="function") ? initDashboard : null;
+  if (_oldDash){
+    window.initDashboard = function(){
+      _oldDash();
+
+      var iso = todayISO2();
+
+      // finance: sum today's expense
+      var fin = finLoadAll();
+      var spent = 0;
+      for (var i=0;i<fin.length;i++){
+        var it = fin[i];
+        if ((it.date||"") === iso && (it.type||"") === "expense") spent += Number(it.amount)||0;
+      }
+      var budget = getNum("balanced_life_budget_target", 60);
+
+      // nutrition: today's kcal
+      var nut = nutLoadAll();
+      var kcal = 0;
+      for (var j=0;j<nut.length;j++){
+        var it2 = nut[j];
+        if ((it2.date||"") === iso) kcal += Number(it2.kcal)||0;
+      }
+      kcal = Math.round(kcal);
+      var kcalTarget = getNum("balanced_life_kcal_target", 2100);
+
+      // workouts: if there is log module with entries in LS_KEY structure, try to read minutes/done.
+      var workMin = 0;
+      try{
+        var state = JSON.parse(localStorage.getItem("balanced_life_v1")||"{}");
+        var entries = state.entries || state.log || state.items || [];
+        for (var k=0;k<entries.length;k++){
+          var e = entries[k];
+          if ((e.date||"") === iso && (e.done||"") === "yes"){
+            workMin += Number(e.minutes||e.duration||45)||0;
+          }
+        }
+      }catch(e){}
+      var workTarget = getNum("balanced_life_work_target", 60);
+
+      // Update visible numbers if present
+      var rm = document.getElementById("ringMoney");
+      if (rm) rm.textContent = `${spent.toFixed(0)} / ${budget.toFixed(0)} лв`;
+      var rk = document.getElementById("ringKcal");
+      if (rk) rk.textContent = `${kcal} / ${kcalTarget} kcal`;
+
+      // bars
+      function setW(id, pct){
+        var el = document.getElementById(id);
+        if (el) el.style.width = Math.max(0, Math.min(100, pct)) + "%";
+      }
+      setW("barMoney", budget ? (spent/budget*100) : 0);
+      setW("barKcal", kcalTarget ? (kcal/kcalTarget*100) : 0);
+      setW("barWork", workTarget ? (workMin/workTarget*100) : 0);
+
+      // Energy score: low spend + good kcal alignment + workouts
+      var pMoney = budget ? (spent/budget*100) : 0;
+      var pK = kcalTarget ? (kcal/kcalTarget*100) : 0;
+      var pW = workTarget ? (workMin/workTarget*100) : 0;
+
+      var e1 = 100 - Math.min(100, pMoney);
+      var e2 = 100 - Math.abs(100 - Math.min(200, pK));
+      var e3 = Math.min(100, pW);
+      var energy = Math.round((e1*0.35 + e2*0.35 + e3*0.30));
+      energy = Math.max(0, Math.min(100, energy));
+
+      var rp = document.getElementById("ringPct");
+      if (rp) rp.textContent = energy + "%";
+      if (typeof setRingProgressV49 === "function") setRingProgressV49(energy);
+    };
+  }
+})();
+
+
+// ===== V497_TARGETS_AND_PLAN =====
+(function(){
+  function num(v, def){
+    const n = Number(String(v||"").replace(",", "."));
+    return (isFinite(n) && n>0) ? n : def;
+  }
+
+  function loadTargetsToUI(){
+    const b = document.getElementById("tBudget");
+    const k = document.getElementById("tKcal");
+    const w = document.getElementById("tWork");
+    if(!b || !k || !w) return;
+    b.value = localStorage.getItem("balanced_life_budget_target") || "60";
+    k.value = localStorage.getItem("balanced_life_kcal_target") || "2100";
+    w.value = localStorage.getItem("balanced_life_work_target") || "60";
+  }
+
+  function bindTargets(){
+    const form = document.getElementById("targetsForm");
+    if(!form) return;
+    form.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      const b = document.getElementById("tBudget");
+      const k = document.getElementById("tKcal");
+      const w = document.getElementById("tWork");
+      if(!b || !k || !w) return;
+      localStorage.setItem("balanced_life_budget_target", String(num(b.value, 60)));
+      localStorage.setItem("balanced_life_kcal_target", String(num(k.value, 2100)));
+      localStorage.setItem("balanced_life_work_target", String(num(w.value, 60)));
+      try{ if(typeof initDashboard==="function") initDashboard(); }catch(err){}
+      alert("Запазено ✅");
+    });
+  }
+
+  function renderPlanFull(){
+    const root = document.getElementById("planFullV42");
+    if(!root) return;
+    if(typeof WEEKLY_PLAN_FULL_V42 === "undefined" || !Array.isArray(WEEKLY_PLAN_FULL_V42)){
+      root.innerHTML = '<div class="muted">Липсват данни за плана.</div>';
+      return;
+    }
+    root.innerHTML = "";
+    WEEKLY_PLAN_FULL_V42.forEach(day=>{
+      const card = document.createElement("div");
+      card.className = "planDay";
+      const head = document.createElement("div");
+      head.className = "planDayHead";
+      head.innerHTML = `
+        <div class="planDayTitle">${day.day || ""}</div>
+        <div class="planDayFocus">${day.focus || ""}</div>
+      `;
+      card.appendChild(head);
+
+      const list = document.createElement("div");
+      list.className = "planItems";
+      (day.items||[]).forEach(txt=>{
+        const row = document.createElement("div");
+        row.className = "planItem";
+        row.innerHTML = `<span class="planDot"></span><div class="planTxt">${escapeHtml(txt)}</div>`;
+        list.appendChild(row);
+      });
+      card.appendChild(list);
+
+      if(day.note){
+        const note = document.createElement("div");
+        note.className = "planNote";
+        note.textContent = day.note;
+        card.appendChild(note);
+      }
+      root.appendChild(card);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s||"").replace(/[&<>"']/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    loadTargetsToUI();
+    bindTargets();
+    renderPlanFull();
+  });
+
+  const oldShow = window.showPanel;
+  if(typeof oldShow === "function"){
+    window.showPanel = function(name, opts){
+      oldShow(name, opts);
+      if(name === "settings") loadTargetsToUI();
+      if(name === "plan") renderPlanFull();
+    };
+  }
+})();

@@ -1637,7 +1637,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 // ===== SPA_ROUTER_V49 =====
 (function(){
-  const PANEL_IDS = ["home","plan","log","charts","nutrition","finance","calendar","settings"];
+  const PANEL_IDS = ["home","spending","nutritiondash","workoutsDash","plan","log","charts","nutrition","finance","calendar","settings"];
 
   function panelEl(name){ return document.getElementById("tab-" + name); }
 

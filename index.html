@@ -29,7 +29,7 @@
     <div class="brand">
       <div class="logo" aria-hidden="true">BL</div>
       <div>
-        <div class="title">Balanced life <span class="ver">v4.9 (SPA)</span></div>
+        <div class="title">Balanced life <span class="ver">v4.9.1 (SPA+)</span></div>
         <div class="subtitle" id="streakLine">Офлайн • данните са на телефона</div>
       </div>
     </div>
@@ -569,7 +569,102 @@
       </div>
     </section>
 
-  </main>
+  
+    <!-- ===== Weekly overview sub-dash panels (v4.9.1) ===== -->
+    <section class="panel hidden" id="tab-spending" data-panel="spending">
+      <div class="panelTop">
+        <button class="btn backBtn" data-open="home" aria-label="Back">← Назад</button>
+        <div class="panelHead">
+          <div class="panelTitle">Spending</div>
+          <div class="panelSub">Финанси и календар</div>
+        </div>
+      </div>
+      <div class="cardsGrid">
+        <button class="cardLink" data-open="finance">
+          <div class="cardIcon">💰</div>
+          <div class="cardText">
+            <div class="cardTitle">Финанси</div>
+            <div class="cardDesc">Приходи, разходи, баланс</div>
+          </div>
+        </button>
+        <button class="cardLink" data-open="calendar">
+          <div class="cardIcon">🗓️</div>
+          <div class="cardText">
+            <div class="cardTitle">Календар</div>
+            <div class="cardDesc">Събития и напомняния</div>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <section class="panel hidden" id="tab-nutritiondash" data-panel="nutritiondash">
+      <div class="panelTop">
+        <button class="btn backBtn" data-open="home" aria-label="Back">← Назад</button>
+        <div class="panelHead">
+          <div class="panelTitle">Nutrition</div>
+          <div class="panelSub">Хранене, календар и прогрес</div>
+        </div>
+      </div>
+      <div class="cardsGrid">
+        <button class="cardLink" data-open="nutrition">
+          <div class="cardIcon">🥗</div>
+          <div class="cardText">
+            <div class="cardTitle">Хранене</div>
+            <div class="cardDesc">Храни, калории, снимки</div>
+          </div>
+        </button>
+        <button class="cardLink" data-open="calendar">
+          <div class="cardIcon">🗓️</div>
+          <div class="cardText">
+            <div class="cardTitle">Календар</div>
+            <div class="cardDesc">Планирай хранения</div>
+          </div>
+        </button>
+        <button class="cardLink" data-open="log">
+          <div class="cardIcon">📈</div>
+          <div class="cardText">
+            <div class="cardTitle">Прогрес</div>
+            <div class="cardDesc">Записи и стойности</div>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <section class="panel hidden" id="tab-workoutsDash" data-panel="workoutsDash">
+      <div class="panelTop">
+        <button class="btn backBtn" data-open="home" aria-label="Back">← Назад</button>
+        <div class="panelHead">
+          <div class="panelTitle">Workouts</div>
+          <div class="panelSub">Тренировки, графики и календар</div>
+        </div>
+      </div>
+      <div class="cardsGrid">
+        <button class="cardLink" data-open="plan">
+          <div class="cardIcon">🏋️‍♂️</div>
+          <div class="cardText">
+            <div class="cardTitle">Тренировки</div>
+            <div class="cardDesc">План и упражнения</div>
+          </div>
+        </button>
+        <button class="cardLink" data-open="charts">
+          <div class="cardIcon">📊</div>
+          <div class="cardText">
+            <div class="cardTitle">PR/Графики</div>
+            <div class="cardDesc">Прогрес във времето</div>
+          </div>
+        </button>
+        <button class="cardLink" data-open="calendar">
+          <div class="cardIcon">🗓️</div>
+          <div class="cardText">
+            <div class="cardTitle">Календар</div>
+            <div class="cardDesc">Тренировки и напомняния</div>
+          </div>
+        </button>
+      </div>
+    </section>
+    <!-- ===== end weekly overview panels ===== -->
+
+</main>
 
   <footer class="foot muted">Balanced life • offline-first</footer>
 

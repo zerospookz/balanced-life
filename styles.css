@@ -410,3 +410,36 @@ body::before, body::after,
 .ringCaption{ color: #444 !important; }
 .barMeta{ color:#444 !important; }
 
+
+
+/* ===== v4.9 SPA: panel routing + SVG ring ===== */
+.hidden{ display:none !important; }
+
+/* SVG ring */
+.ringWrap{ display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center; padding:6px; }
+.ringSvgWrap{ position:relative; width:240px; height:240px; }
+.ringSvg{ width:100%; height:100%; filter: drop-shadow(0 18px 55px rgba(0,0,0,.25)); }
+.ringBg{
+  fill: none;
+  stroke: rgba(0,0,0,0.10);
+  stroke-width: 12;
+}
+.ringFg{
+  fill:none;
+  stroke: url(#ringGrad);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 60px 60px;
+  stroke-dasharray: 289.0265; /* 2*pi*46 */
+  stroke-dashoffset: 289.0265;
+  transition: stroke-dashoffset 900ms cubic-bezier(.2,.8,.2,1);
+}
+.ringCenter{
+  position:absolute; inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+}

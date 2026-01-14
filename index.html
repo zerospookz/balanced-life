@@ -29,7 +29,7 @@
     <div class="brand">
       <div class="logo" aria-hidden="true">BL</div>
       <div>
-        <div class="title">Balanced life <span class="ver">v4.8 (Dashboard)</span></div>
+        <div class="title">Balanced life <span class="ver">v4.9 (SPA)</span></div>
         <div class="subtitle" id="streakLine">Офлайн • данните са на телефона</div>
       </div>
     </div>
@@ -71,12 +71,25 @@
 
           <div class="heroBody">
             <div class="ringWrap">
-              <div class="ring" id="energyRing" style="--p:82;">
-                <div class="ringInner">
+              <div class="ringSvgWrap" aria-label="Energy ring">
+                <svg class="ringSvg" viewBox="0 0 120 120" role="img" aria-label="Energy progress">
+                  <defs>
+                    <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="rgba(94,234,212,1)"/>
+                      <stop offset="50%" stop-color="rgba(96,165,250,1)"/>
+                      <stop offset="100%" stop-color="rgba(251,191,36,1)"/>
+                    </linearGradient>
+                  </defs>
+                  <circle class="ringBg" cx="60" cy="60" r="46"></circle>
+                  <circle class="ringFg" id="energyRingCircle" cx="60" cy="60" r="46"></circle>
+                </svg>
+                <div class="ringCenter">
                   <div class="ringBig" id="ringMoney">$0 / $0</div>
                   <div class="ringSmall" id="ringKcal">0 kcal</div>
                 </div>
               </div>
+              <div class="ringCaption"><span class="dot g"></span> Energy <b id="ringPct">82%</b></div>
+
               <div class="ringCaption"><span class="dot g"></span> Energy <b id="ringPct">82%</b></div>
             </div>
 

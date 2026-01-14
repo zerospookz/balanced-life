@@ -1556,6 +1556,7 @@
     setText('ringPct', energy + "%");
 
     var ring = document.getElementById('energyRing');
+    setRingProgressV49(energy);
     if (ring) ring.style.setProperty('--p', energy);
 
     setText('miniSpend', fmtMoney(sumLast7("expense")));
@@ -1632,3 +1633,88 @@
 document.addEventListener("DOMContentLoaded", function(){
   // no-op if app already initialized
 });
+
+
+// ===== SPA_ROUTER_V49 =====
+(function(){
+  const PANEL_IDS = ["home","plan","log","charts","nutrition","finance","calendar","settings"];
+
+  function panelEl(name){ return document.getElementById("tab-" + name); }
+
+  function setActiveNav(name){
+    const nav = document.querySelector(".bottomNav");
+    if (!nav) return;
+    const items = nav.querySelectorAll(".bnItem");
+    items.forEach(i => i.classList.remove("active"));
+    const btn = nav.querySelector(`.bnItem[data-open="${name}"]`);
+    if (btn) btn.classList.add("active");
+  }
+
+  window.showPanel = function(name, opts){
+    opts = opts || {};
+    if (!PANEL_IDS.includes(name)) name = "home";
+
+    PANEL_IDS.forEach(id=>{
+      const el = panelEl(id);
+      if (el) el.classList.toggle("hidden", id !== name);
+    });
+
+    setActiveNav(name);
+
+    // refresh dynamic sections
+    try{
+      if (name === "home" && typeof initDashboard === "function") initDashboard();
+      if (name === "nutrition" && typeof renderNutrition === "function") renderNutrition();
+      if (name === "finance" && typeof renderFinance === "function") renderFinance();
+      if (name === "calendar" && typeof renderCalendar === "function") renderCalendar();
+    }catch(e){}
+
+    if (!opts.silent){
+      // Use hash routing for GitHub Pages friendliness
+      const h = "#/" + name;
+      if (location.hash !== h) history.pushState({panel:name}, "", h);
+    }
+  };
+
+  function routeFromURL(){
+    const h = location.hash || "";
+    const m = h.match(/^#\/([a-z]+)/i);
+    const name = m ? m[1].toLowerCase() : "home";
+    window.showPanel(name, {silent:true});
+  }
+
+  window.addEventListener("popstate", routeFromURL);
+  window.addEventListener("hashchange", routeFromURL);
+
+  document.addEventListener("DOMContentLoaded", function(){
+    // Ensure every panel exists; if not, don't crash
+    PANEL_IDS.forEach(id=>{
+      const el = panelEl(id);
+      if (el && id !== "home") el.classList.add("hidden");
+    });
+
+    // Delegate navigation clicks (tiles, bottom nav, buttons)
+    document.addEventListener("click", (e)=>{
+      const el = e.target.closest("[data-open]");
+      if (!el) return;
+      e.preventDefault();
+      const id = el.getAttribute("data-open");
+      if (id) window.showPanel(id);
+    });
+
+    routeFromURL();
+  });
+})();
+
+
+
+function setRingProgressV49(pct){
+  const c = document.getElementById("energyRingCircle");
+  if (!c) return;
+  const r = 46;
+  const C = 2 * Math.PI * r; // ~289.03
+  const p = Math.max(0, Math.min(100, pct));
+  const off = C * (1 - p/100);
+  c.style.strokeDasharray = String(C);
+  c.style.strokeDashoffset = String(off);
+}

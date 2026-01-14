@@ -1300,7 +1300,6 @@
   bindBottomNav();
   setEditMode(false);
   showPanel("home");
-})();
 
   // ---- Nutrition (offline) ----
   var NUT_KEY = "balanced_life_nut_v1";

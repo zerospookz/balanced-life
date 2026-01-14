@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="bg">
 <head>
+  <base href="./">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#e9eaee" />
@@ -28,7 +29,7 @@
     <div class="brand">
       <div class="logo" aria-hidden="true">BL</div>
       <div>
-        <div class="title">Balanced life <span class="ver">v4.7.3 FINAL</span></div>
+        <div class="title">Balanced life <span class="ver">v4.8 (Dashboard)</span></div>
         <div class="subtitle" id="streakLine">Офлайн • данните са на телефона</div>
       </div>
     </div>
@@ -46,9 +47,100 @@
           <div class="muted">Плочките се местят само в режим „Подреди“.</div>
         </div>
         
-        <div id="tilesGrid" class="tiles" aria-label="Плочки за навигация">
-          <button class="tile" type="button" data-open="plan">
-            <div class="ticon">🏋️</div>
+        
+      <div class="dash">
+        <div class="dashTop">
+          <div>
+            <div class="dashTitle">Dashboard</div>
+            <div class="dashDate" id="dashDate">—</div>
+          </div>
+          <button class="avatarBtn" id="avatarBtn" type="button" title="Профил">
+            <span class="avatarDot"></span>
+          </button>
+        </div>
+
+        <div class="weekStrip" id="weekStrip" aria-label="Седмица"></div>
+
+        <div class="heroCard glass">
+          <div class="heroHead">
+            <div>
+              <div class="heroLabel">Balanced</div>
+              <div class="heroSub">Днес: бюджет • хранене • тренировки</div>
+            </div>
+          </div>
+
+          <div class="heroBody">
+            <div class="ringWrap">
+              <div class="ring" id="energyRing" style="--p:82;">
+                <div class="ringInner">
+                  <div class="ringBig" id="ringMoney">$0 / $0</div>
+                  <div class="ringSmall" id="ringKcal">0 kcal</div>
+                </div>
+              </div>
+              <div class="ringCaption"><span class="dot g"></span> Energy <b id="ringPct">82%</b></div>
+            </div>
+
+            <div class="heroBars">
+              <div class="barRow">
+                <div class="barMeta"><span class="ico">💰</span><span>Бюджет</span></div>
+                <div class="barLine"><div class="barFill" id="barMoney" style="width:0%"></div></div>
+              </div>
+              <div class="barRow">
+                <div class="barMeta"><span class="ico">🥗</span><span>Калории</span></div>
+                <div class="barLine"><div class="barFill warm" id="barKcal" style="width:0%"></div></div>
+              </div>
+              <div class="barRow">
+                <div class="barMeta"><span class="ico">🏋️</span><span>Тренировки</span></div>
+                <div class="barLine"><div class="barFill cool" id="barWork" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="weekly glass">
+          <div class="weeklyHead">
+            <div>
+              <div class="weeklyTitle">Weekly overview</div>
+              <div class="weeklySub">Бърз поглед за последните 7 дни</div>
+            </div>
+            <button class="iconBtn" id="weeklyMore" type="button" title="Още">›</button>
+          </div>
+
+          <div class="miniGrid">
+            <button class="miniCard" type="button" data-open="finance">
+              <div class="miniTop"><span class="miniIco">💰</span><span class="miniName">Spending</span></div>
+              <div class="miniVal" id="miniSpend">—</div>
+              <div class="spark" id="sparkMoney"></div>
+            </button>
+
+            <button class="miniCard" type="button" data-open="nutrition">
+              <div class="miniTop"><span class="miniIco">🥗</span><span class="miniName">Nutrition</span></div>
+              <div class="miniVal" id="miniKcal">—</div>
+              <div class="spark" id="sparkKcal"></div>
+            </button>
+
+            <button class="miniCard" type="button" data-open="log">
+              <div class="miniTop"><span class="miniIco">🏋️</span><span class="miniName">Workouts</span></div>
+              <div class="miniVal" id="miniWork">—</div>
+              <div class="spark" id="sparkWork"></div>
+            </button>
+          </div>
+        </div>
+
+        <div class="quickActions">
+          <div class="qaTitle">Quick actions</div>
+          <div id="tilesGrid" class="tiles" aria-label="Плочки за навигация">
+            <button class="tile" type="button" data-open="plan"><div class="ticon">🏋️</div><div class="tname">Тренировки</div><div class="tdesc">Пълният 7-дневен план</div></button>
+            <button class="tile" type="button" data-open="log"><div class="ticon">📊</div><div class="tname">Прогрес</div><div class="tdesc">Записвай резултати и стойности</div></button>
+            <button class="tile" type="button" data-open="nutrition"><div class="ticon">🥗</div><div class="tname">Хранене</div><div class="tdesc">Храни, калории и снимки</div></button>
+            <button class="tile" type="button" data-open="finance"><div class="ticon">💰</div><div class="tname">Финанси</div><div class="tdesc">Приходи и разходи</div></button>
+            <button class="tile" type="button" data-open="calendar"><div class="ticon">🗓️</div><div class="tname">Календар</div><div class="tdesc">Събития и напомняния</div></button>
+            <button class="tile" type="button" data-open="charts"><div class="ticon">📈</div><div class="tname">PR/Графики</div><div class="tdesc">Прогрес във времето</div></button>
+            <button class="tile" type="button" data-open="settings"><div class="ticon">⚙️</div><div class="tname">Настройки</div><div class="tdesc">Експорт/импорт/нулиране</div></button>
+          </div>
+        </div>
+      </div>
+
             <div class="tname">Тренировки</div>
             <div class="tdesc">Пълният 7-дневен план</div>
             <div class="handle">⠿</div>
@@ -476,5 +568,14 @@
       });
     }
   </script>
+
+  <nav class="bottomNav" aria-label="Навигация">
+    <button class="bnItem active" data-open="home" type="button"><span class="bnIco">🏠</span><span class="bnTxt">Home</span></button>
+    <button class="bnItem" data-open="plan" type="button"><span class="bnIco">🏋️</span><span class="bnTxt">Трен</span></button>
+    <button class="bnAdd" id="bnAdd" type="button" title="Добави">＋</button>
+    <button class="bnItem" data-open="nutrition" type="button"><span class="bnIco">🥗</span><span class="bnTxt">Хран</span></button>
+    <button class="bnItem" data-open="finance" type="button"><span class="bnIco">💰</span><span class="bnTxt">Фин</span></button>
+  </nav>
+
 </body>
 </html>

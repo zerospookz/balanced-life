@@ -148,6 +148,7 @@
 
     if (name === "charts") renderCharts();
     if (name === "plan") renderPlanPage();
+    if (name === "home") initDashboard();
     if (name === "nutrition") renderNutrition();
     if (name === "finance") renderFinance();
     if (name === "calendar") { renderCalendar(); scheduleAllReminders(); }
@@ -1254,6 +1255,8 @@
   initFinance();
   initCalendar();
   initNutrition();
+  initDashboard();
+  bindBottomNav();
   setEditMode(false);
   showPanel("home");
 })();
@@ -1385,4 +1388,201 @@
     });
 
     renderNutrition();
+  }
+
+
+  // ---- Dashboard (v4.8) ----
+  function fmtMoney(n){
+    try { return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n); }
+    catch(e){ return '$' + Math.round(n); }
+  }
+  function todayISO2(){
+    return (new Date(Date.now() - new Date().getTimezoneOffset()*60000)).toISOString().slice(0,10);
+  }
+  function setText(id, t){ var el = document.getElementById(id); if (el) el.textContent = t; }
+  function setWidth(id, pct){ var el = document.getElementById(id); if (el) el.style.width = Math.max(0, Math.min(100, pct)) + '%'; }
+
+  function buildWeekStrip(){
+    var wrap = document.getElementById('weekStrip');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    var d = new Date();
+    var day = d.getDay(); // 0 Sun
+    var mondayOffset = (day + 6) % 7;
+    var start = new Date(d); start.setDate(d.getDate() - mondayOffset);
+
+    var names = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    for (var i=0;i<7;i++){
+      var x = new Date(start); x.setDate(start.getDate()+i);
+      var pill = document.createElement('div');
+      pill.className = 'dayPill' + (x.toDateString()===d.toDateString() ? ' active':'');
+
+      var b = document.createElement('b'); b.textContent = x.getDate();
+      var s = document.createElement('span'); s.textContent = names[i];
+      pill.appendChild(b); pill.appendChild(s);
+      wrap.appendChild(pill);
+    }
+  }
+
+  function readFinance(){
+    var keys = ["balanced_life_fin_v1","balanced_life_finance_v1","balanced_life_fin_v2","balanced_life_finance_v2"];
+    for (var i=0;i<keys.length;i++){
+      try{
+        var raw = localStorage.getItem(keys[i]);
+        if (raw){ return JSON.parse(raw) || {}; }
+      }catch(e){}
+    }
+    return {};
+  }
+
+  function sumNutrition7d(){
+    var key = (typeof NUT_KEY !== 'undefined') ? NUT_KEY : "balanced_life_nut_v1";
+    var items = [];
+    try { items = JSON.parse(localStorage.getItem(key) || "[]"); } catch(e){ items=[]; }
+    var now = new Date();
+    var cut = new Date(now); cut.setDate(now.getDate()-6);
+    var sum = 0;
+    for (var i=0;i<items.length;i++){
+      var it = items[i];
+      var ts = it.ts ? new Date(it.ts) : null;
+      if (ts && ts >= cut){ sum += Number(it.kcal)||0; }
+    }
+    return Math.round(sum);
+  }
+
+  function sumLast7(kind){
+    var now = new Date();
+    var cut = new Date(now); cut.setDate(now.getDate()-6);
+    if (kind === "expense"){
+      var fin = readFinance();
+      var expenses = fin.expenses || fin.items || [];
+      var sum = 0;
+      for (var i=0;i<expenses.length;i++){
+        var it = expenses[i];
+        var dt = it.date ? new Date(it.date) : null;
+        if (!dt || isNaN(dt.getTime())) continue;
+        if (dt >= cut){
+          if ((it.type||it.kind) === "expense" || it.isExpense) sum += Number(it.amount)||0;
+        }
+      }
+      return Math.round(sum);
+    }
+    if (kind === "work"){
+      var key2 = "balanced_life_log_v1";
+      var log = [];
+      try { log = JSON.parse(localStorage.getItem(key2) || "[]"); } catch(e){ log=[]; }
+      var sum2 = 0;
+      for (var j=0;j<log.length;j++){
+        var r = log[j];
+        var dt2 = r.date ? new Date(r.date) : null;
+        if (!dt2 || isNaN(dt2.getTime())) continue;
+        if (dt2 >= cut) sum2 += Number(r.minutes||r.duration||0)||0;
+      }
+      return Math.round(sum2);
+    }
+    return 0;
+  }
+
+  function initDashboard(){
+    if (!document.getElementById('dashDate')) return;
+
+    try{
+      var d = new Date();
+      var opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+      setText('dashDate', d.toLocaleDateString('en-US', opts));
+    }catch(e){
+      setText('dashDate', todayISO2());
+    }
+
+    buildWeekStrip();
+
+    var fin = readFinance();
+    var spentToday = 0, budget = 0;
+    try{
+      var iso = todayISO2();
+      var expenses = fin.expenses || fin.items || [];
+      for (var i=0;i<expenses.length;i++){
+        var it = expenses[i];
+        if ((it.date||"") === iso && ((it.type||it.kind) === "expense" || it.isExpense)) spentToday += Number(it.amount)||0;
+      }
+      budget = Number(fin.dailyBudget || fin.budgetDaily || fin.budget || 0) || 0;
+    }catch(e){}
+
+    var kcalToday = 0;
+    try{
+      var key = (typeof NUT_KEY !== 'undefined') ? NUT_KEY : "balanced_life_nut_v1";
+      var items = JSON.parse(localStorage.getItem(key) || "[]");
+      var iso2 = todayISO2();
+      for (var j=0;j<items.length;j++){
+        if ((items[j].date||"") === iso2) kcalToday += Number(items[j].kcal)||0;
+      }
+      kcalToday = Math.round(kcalToday);
+    }catch(e){ kcalToday = 0; }
+
+    var workMinToday = 0;
+    try{
+      var key2 = "balanced_life_log_v1";
+      var log = JSON.parse(localStorage.getItem(key2) || "[]");
+      var iso3 = todayISO2();
+      for (var k=0;k<log.length;k++){
+        var r = log[k];
+        if ((r.date||"") === iso3){
+          workMinToday += Number(r.minutes||r.duration||0)||0;
+        }
+      }
+      workMinToday = Math.round(workMinToday);
+    }catch(e){ workMinToday = 0; }
+
+    var budgetTarget = budget || 60;
+    var kcalTarget = Number(localStorage.getItem("balanced_life_kcal_target") || 2100) || 2100;
+    var workTarget = Number(localStorage.getItem("balanced_life_work_target") || 60) || 60;
+
+    var pMoney = budgetTarget ? (spentToday / budgetTarget) * 100 : 0;
+    var pKcal = kcalTarget ? (kcalToday / kcalTarget) * 100 : 0;
+    var pWork = workTarget ? (workMinToday / workTarget) * 100 : 0;
+
+    setText('ringMoney', fmtMoney(spentToday) + " / " + fmtMoney(budgetTarget));
+    setText('ringKcal', kcalToday.toLocaleString() + " kcal");
+
+    setWidth('barMoney', Math.min(100, pMoney));
+    setWidth('barKcal', Math.min(100, pKcal));
+    setWidth('barWork', Math.min(100, pWork));
+
+    var e1 = 100 - Math.min(100, pMoney);
+    var e2 = 100 - Math.abs(100 - Math.min(200, pKcal));
+    var e3 = Math.min(100, pWork);
+    var energy = Math.round((e1*0.35 + e2*0.35 + e3*0.30));
+    energy = Math.max(0, Math.min(100, energy));
+    setText('ringPct', energy + "%");
+
+    var ring = document.getElementById('energyRing');
+    if (ring) ring.style.setProperty('--p', energy);
+
+    setText('miniSpend', fmtMoney(sumLast7("expense")));
+    setText('miniKcal', sumNutrition7d().toLocaleString() + " kcal");
+    setText('miniWork', sumLast7("work") + " min");
+  }
+
+  function bindBottomNav(){
+    var nav = document.querySelector('.bottomNav');
+    if (!nav) return;
+    nav.addEventListener('click', function(e){
+      var btn = e.target.closest('button[data-open]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-open');
+      if (!id) return;
+      showPanel(id);
+      var items = nav.querySelectorAll('.bnItem');
+      for (var i=0;i<items.length;i++) items[i].classList.remove('active');
+      if (btn.classList.contains('bnItem')) btn.classList.add('active');
+    });
+
+    var add = document.getElementById('bnAdd');
+    if (add){
+      add.addEventListener('click', function(){
+        showPanel('log');
+        var items = nav.querySelectorAll('.bnItem');
+        for (var i=0;i<items.length;i++) items[i].classList.remove('active');
+      });
+    }
   }

@@ -29,7 +29,7 @@
     <div class="brand">
       <div class="logo" aria-hidden="true">BL</div>
       <div>
-        <div class="title">Balanced life <span class="ver">v5.4 (Unified Progress)</span></div>
+        <div class="title">Balanced life <span class="ver">v5.4.1 (Click Fix)</span></div>
         <div class="subtitle" id="streakLine">Офлайн • данните са на телефона</div>
       </div>
     </div>
@@ -1058,68 +1058,36 @@
     <button class="btn backBtn" data-open="home">← Home</button>
     <div class="panelHead">
       <div class="panelTitle">Progress</div>
-      <div class="panelSub">Един екран за всичко</div>
+      <div class="panelSub">Всичко на едно място</div>
     </div>
   </div>
 
   <div class="crudWrap">
-    <div class="crudTitle">Последни 30 дни</div>
-    <div class="muted">Тренировки • Хранене • Финанси</div>
-    <div class="segRow">
-      <button class="seg active" type="button" data-range="7">7d</button>
-      <button class="seg" type="button" data-range="30">30d</button>
-      <button class="seg" type="button" data-range="90">90d</button>
+    <div class="crudTitle">Период</div>
+    <div class="segRow" role="tablist" aria-label="Период">
+      <button class="segBtn active" type="button" data-range="7">7 дни</button>
+      <button class="segBtn" type="button" data-range="30">30 дни</button>
     </div>
   </div>
 
-  <div class="sectionCard">
-    <div class="secHead">
-      <div class="secTitle">🏋️ Training</div>
-      <div class="secMeta" id="trMeta">—</div>
-    </div>
-    <svg class="bigSpark" viewBox="0 0 320 80" preserveAspectRatio="none">
-      <path id="trLine" d="" fill="none" stroke="rgba(30,58,138,0.65)" stroke-width="3" stroke-linecap="round"></path>
-    </svg>
-    <div class="kpiRow">
-      <div class="kpi"><div class="kpiLabel">Workouts</div><div class="kpiVal" id="kpiWorkouts">0</div></div>
-      <div class="kpi"><div class="kpiLabel">Minutes</div><div class="kpiVal" id="kpiMinutes">0</div></div>
-      <div class="kpi"><div class="kpiLabel">Skill PR</div><div class="kpiVal" id="kpiPR">—</div></div>
-    </div>
+  <div class="progSection">
+    <div class="progHeader"><div class="progH">🏋️ Training</div><div class="muted" id="trMeta">—</div></div>
+    <div class="progGrid" id="trGrid"></div>
   </div>
 
-  <div class="sectionCard">
-    <div class="secHead">
-      <div class="secTitle">🥗 Nutrition</div>
-      <div class="secMeta" id="nuMeta">—</div>
-    </div>
-    <svg class="bigSpark" viewBox="0 0 320 80" preserveAspectRatio="none">
-      <path id="nuLine" d="" fill="none" stroke="rgba(30,58,138,0.65)" stroke-width="3" stroke-linecap="round"></path>
-    </svg>
-    <div class="kpiRow">
-      <div class="kpi"><div class="kpiLabel">Avg kcal</div><div class="kpiVal" id="kpiAvgKcal">0</div></div>
-      <div class="kpi"><div class="kpiLabel">On target</div><div class="kpiVal" id="kpiKcalDays">0</div></div>
-      <div class="kpi"><div class="kpiLabel">Logs</div><div class="kpiVal" id="kpiNutLogs">0</div></div>
-    </div>
+  <div class="progSection">
+    <div class="progHeader"><div class="progH">🥗 Nutrition</div><div class="muted" id="nuMeta">—</div></div>
+    <div class="progGrid" id="nuGrid"></div>
   </div>
 
-  <div class="sectionCard">
-    <div class="secHead">
-      <div class="secTitle">💰 Finance</div>
-      <div class="secMeta" id="fiMeta">—</div>
-    </div>
-    <svg class="bigSpark" viewBox="0 0 320 80" preserveAspectRatio="none">
-      <path id="fiLine" d="" fill="none" stroke="rgba(30,58,138,0.65)" stroke-width="3" stroke-linecap="round"></path>
-    </svg>
-    <div class="kpiRow">
-      <div class="kpi"><div class="kpiLabel">Spent</div><div class="kpiVal" id="kpiSpent">0</div></div>
-      <div class="kpi"><div class="kpiLabel">Saved</div><div class="kpiVal" id="kpiSaved">0</div></div>
-      <div class="kpi"><div class="kpiLabel">Days OK</div><div class="kpiVal" id="kpiBudgetDays">0</div></div>
-    </div>
+  <div class="progSection">
+    <div class="progHeader"><div class="progH">💰 Finance</div><div class="muted" id="fiMeta">—</div></div>
+    <div class="progGrid" id="fiGrid"></div>
   </div>
 
-  <div class="crudWrap">
-    <div class="crudTitle">Highlights</div>
-    <div class="list" id="hiList"></div>
+  <div class="progSection">
+    <div class="progHeader"><div class="progH">🧠 Review</div><div class="muted">Quick insights</div></div>
+    <div class="insightsCard" id="progInsights">—</div>
   </div>
 </section>
 

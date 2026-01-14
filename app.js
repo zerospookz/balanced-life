@@ -1,3 +1,41 @@
+
+// ===== V541_CLICK_DELEGATION (fix: tiles/buttons not clickable when rendered dynamically) =====
+(function(){
+  function openPanel(name){
+    if(!name) return;
+    if(typeof window.showPanel === "function"){
+      window.showPanel(name);
+    }else{
+      window.__pendingOpen = name;
+      // try again soon
+      setTimeout(()=>{ if(typeof window.showPanel==="function" && window.__pendingOpen){ window.showPanel(window.__pendingOpen); window.__pendingOpen=null; } }, 50);
+    }
+  }
+
+  // Delegate ALL clicks for elements with data-open (tiles, pills, buttons)
+  document.addEventListener("click", function(ev){
+    const el = ev.target.closest && ev.target.closest("[data-open]");
+    if(!el) return;
+    const target = el.getAttribute("data-open");
+    if(!target) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    openPanel(target);
+  }, true);
+
+  // Delegate "reorder" button (supports id or data-action)
+  document.addEventListener("click", function(ev){
+    const btn = ev.target.closest && ev.target.closest("#reorderBtn,[data-action='reorder']");
+    if(!btn) return;
+    // do not block if JS below owns it; just ensure it fires even if dynamically injected
+    if(typeof window.toggleReorderMode === "function"){
+      ev.preventDefault();
+      ev.stopPropagation();
+      window.toggleReorderMode();
+    }
+  }, true);
+})();
+
 (() => {
   const LS_KEY = "balanced_life_v1";
   const LEGACY_KEYS = ["calis_progress_v1", "calis_progress"];
@@ -3417,36 +3455,38 @@ document.addEventListener("click", (e)=>{
 })();
 
 
-// ===== V54_PROGRESS =====
+// ===== V54_PROGRESS (Unified Progress screen) =====
 (function(){
+  const CHECKIN_KEY = "bl_checkin_v1";
   const FIN_KEY = "bl_fin_v1";
   const NUT_KEY = "bl_nut_v1";
   const SKILL_KEY = "bl_skills_v1";
-  const CHECKIN_KEY = "bl_checkin_v1";
+
+  let RANGE = 7;
 
   const $ = (s)=>document.querySelector(s);
   const $$ = (s)=>Array.from(document.querySelectorAll(s));
 
-  function iso(d){
-    const dt = new Date(d);
-    const x = new Date(dt.getTime() - dt.getTimezoneOffset()*60000);
-    return x.toISOString().slice(0,10);
-  }
-  function today(){ return iso(Date.now()); }
-  function daysAgo(n){
-    const d = new Date(); d.setDate(d.getDate()-n);
-    return iso(d);
-  }
   function load(key, fallback){
     try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
     catch(e){ return fallback; }
   }
-  function num(v, def){
-    const n = Number(String(v||"").replace(",", "."));
-    return (isFinite(n)) ? n : def;
+  function isoDate(d){
+    const dt = new Date(d);
+    const x = new Date(dt.getTime() - dt.getTimezoneOffset()*60000);
+    return x.toISOString().slice(0,10);
+  }
+  function daysBack(n){
+    const arr = [];
+    for(let i=n-1;i>=0;i--){
+      const d = new Date();
+      d.setDate(d.getDate()-i);
+      arr.push(isoDate(d));
+    }
+    return arr;
   }
 
-  function sparkPath(values, w=320, h=80, pad=6){
+  function sparkPath(values, w=260, h=54, pad=6){
     if(!values.length) return "";
     const min = Math.min(...values), max = Math.max(...values);
     const span = (max-min) || 1;
@@ -3458,119 +3498,127 @@ document.addEventListener("click", (e)=>{
     }).join(" ");
   }
 
-  function collectRange(days){
-    const dates = [];
-    for(let i=days-1;i>=0;i--) dates.push(daysAgo(i));
-    return dates;
+  function kpiCard(title, value, sub, series){
+    const d = sparkPath(series||[]);
+    return `
+      <div class="kpiCard">
+        <div class="kpiTop">
+          <div class="kpiTitle">${title}</div>
+          <div class="kpiValue">${value}</div>
+        </div>
+        <div class="kpiSub">${sub}</div>
+        <svg class="kpiSvg" viewBox="0 0 260 54" preserveAspectRatio="none" aria-label="sparkline">
+          <path d="${d}" fill="none" stroke="rgba(30,58,138,0.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </div>
+    `;
   }
 
-  function renderProgress(days){
-    const dates = collectRange(days);
+  function prFor(items, name){
+    const arr = items.filter(x=>x.name===name);
+    let pr = 0;
+    arr.forEach(x=>{ const v = Number(x.value)||0; if(v>pr) pr=v; });
+    return pr;
+  }
+
+  function renderProgress(){
+    const root = document.getElementById("tab-progress");
+    if(!root) return;
+
+    const days = daysBack(RANGE);
+    const today = days[days.length-1];
+
+    const checkins = load(CHECKIN_KEY, {});
     const fin = load(FIN_KEY, []);
     const nut = load(NUT_KEY, []);
     const skills = load(SKILL_KEY, []);
-    const checkin = load(CHECKIN_KEY, {});
 
-    const budgetTarget = num(localStorage.getItem("balanced_life_budget_target"), 60);
-    const kcalTarget = num(localStorage.getItem("balanced_life_kcal_target"), 2100);
+    // ---------- Training ----------
+    const wSeries = days.map(d => (checkins[d] && checkins[d].workout) ? 1 : 0);
+    const wCount = wSeries.reduce((a,b)=>a+b,0);
+    const wPct = Math.round((wCount / RANGE) * 100);
+    const hsPR = prFor(skills, "handstand");
+    const plPR = prFor(skills, "planche");
+    const flPR = prFor(skills, "flag");
 
-    // Training: from checkin workout + skills entries (proxy minutes if checkin true = 45)
-    const trainVals = dates.map(d=> (checkin[d] && checkin[d].workout) ? 1 : 0);
-    const workouts = trainVals.reduce((a,b)=>a+b,0);
-    const minutes = workouts * 45;
-
-    // Skill PR overall (max value across all skills)
-    const pr = skills.reduce((m,x)=>Math.max(m, num(x.value,0)), 0);
-
-    // Nutrition: daily kcal sum
-    const kcalPerDay = dates.map(d=> nut.filter(x=>x.date===d).reduce((a,b)=>a+num(b.kcal,0),0));
-    const nutLogs = nut.filter(x=> dates.includes(x.date)).length;
-    const avgKcal = kcalPerDay.length ? Math.round(kcalPerDay.reduce((a,b)=>a+b,0)/kcalPerDay.length) : 0;
-    const kcalDays = kcalPerDay.filter(k=> k>0 && k>=kcalTarget*0.7 && k<=kcalTarget*1.3).length;
-
-    // Finance: daily spent
-    const spentPerDay = dates.map(d=> fin.filter(x=>x.date===d && x.type==="expense").reduce((a,b)=>a+num(b.amount,0),0));
-    const spent = Math.round(spentPerDay.reduce((a,b)=>a+b,0));
-    const budgetDays = spentPerDay.filter(s=> s>0 && s<=budgetTarget).length;
-    const saved = Math.round(spentPerDay.reduce((a,b)=>a + Math.max(0, budgetTarget - b),0));
-
-    // Paths
-    const trLine = $("#trLine"); if(trLine) trLine.setAttribute("d", sparkPath(trainVals, 320, 80, 6));
-    const nuLine = $("#nuLine"); if(nuLine) nuLine.setAttribute("d", sparkPath(kcalPerDay.map(x=>x||0), 320, 80, 6));
-    const fiLine = $("#fiLine"); if(fiLine) fiLine.setAttribute("d", sparkPath(spentPerDay.map(x=>x||0), 320, 80, 6));
-
-    // Meta
-    setText("trMeta", `${workouts} тренировки`);
-    setText("nuMeta", `avg ${avgKcal} kcal`);
-    setText("fiMeta", `${spent} лв за периода`);
-
-    // KPIs
-    setText("kpiWorkouts", workouts);
-    setText("kpiMinutes", minutes);
-    setText("kpiPR", pr ? pr : "—");
-
-    setText("kpiAvgKcal", avgKcal);
-    setText("kpiKcalDays", `${kcalDays}/${days}`);
-    setText("kpiNutLogs", nutLogs);
-
-    setText("kpiSpent", spent);
-    setText("kpiSaved", saved);
-    setText("kpiBudgetDays", `${budgetDays}/${days}`);
-
-    // Highlights list
-    const hi = $("#hiList");
-    if(hi){
-      hi.innerHTML = "";
-      const items = [];
-      items.push(`🏋️ Workouts: ${workouts}/${days}`);
-      items.push(`🥗 On target days: ${kcalDays}/${days} (avg ${avgKcal} kcal)`);
-      items.push(`💰 Budget OK days: ${budgetDays}/${days} (spent ${spent} лв, saved ~${saved} лв)`);
-      if(pr) items.push(`🤸 Skill PR: ${pr}`);
-      // best day (lowest spend among days with spend>0)
-      const spendPairs = dates.map((d,i)=>({d, v: spentPerDay[i]})).filter(x=>x.v>0).sort((a,b)=>a.v-b.v);
-      if(spendPairs[0]) items.push(`✅ Най-добър финансов ден: ${spendPairs[0].d} (${Math.round(spendPairs[0].v)} лв)`);
-      const kcalPairs = dates.map((d,i)=>({d, v: kcalPerDay[i]})).filter(x=>x.v>0).sort((a,b)=>Math.abs(a.v-kcalTarget)-Math.abs(b.v-kcalTarget));
-      if(kcalPairs[0]) items.push(`✅ Най-добър nutrition ден: ${kcalPairs[0].d} (${Math.round(kcalPairs[0].v)} kcal)`);
-      items.forEach(t=>{
-        const row = document.createElement("div");
-        row.className = "catRow";
-        row.innerHTML = `<div class="catName">${t}</div>`;
-        hi.appendChild(row);
-      });
+    const trGrid = document.getElementById("trGrid");
+    if(trGrid){
+      trGrid.innerHTML =
+        kpiCard("Consistency", `${wCount}/${RANGE}`, `${wPct}% дни с тренировка`, wSeries) +
+        kpiCard("Handstand PR", hsPR ? `${hsPR}` : "—", "най-добро (сек/бр)", skills.filter(x=>x.name==="handstand").slice(-RANGE).map(x=>Number(x.value)||0)) +
+        kpiCard("Planche PR", plPR ? `${plPR}` : "—", "най-добро (сек/бр)", skills.filter(x=>x.name==="planche").slice(-RANGE).map(x=>Number(x.value)||0)) +
+        kpiCard("Flag PR", flPR ? `${flPR}` : "—", "най-добро (сек/бр)", skills.filter(x=>x.name==="flag").slice(-RANGE).map(x=>Number(x.value)||0));
     }
+    const trMeta = document.getElementById("trMeta");
+    if(trMeta) trMeta.textContent = `Последни ${RANGE} дни • ${wPct}% consistency`;
+
+    // ---------- Nutrition ----------
+    const kcalTarget = Number(localStorage.getItem("balanced_life_kcal_target")||"2100") || 2100;
+    const kcalSeries = days.map(d => Math.round(nut.filter(x=>x.date===d).reduce((a,b)=>a+(Number(b.kcal)||0),0)));
+    const kcalAvg = Math.round(kcalSeries.reduce((a,b)=>a+b,0) / (kcalSeries.length||1));
+    const onTarget = kcalSeries.filter(v=> v>0 && v>=kcalTarget*0.7 && v<=kcalTarget*1.3).length;
+
+    const nuGrid = document.getElementById("nuGrid");
+    if(nuGrid){
+      nuGrid.innerHTML =
+        kpiCard("Avg kcal", `${kcalAvg}`, `Target ${kcalTarget} • on-target дни: ${onTarget}`, kcalSeries) +
+        kpiCard("Today kcal", `${kcalSeries[kcalSeries.length-1]||0}`, `днес (${today})`, kcalSeries.slice(-Math.min(14,kcalSeries.length)));
+    }
+    const nuMeta = document.getElementById("nuMeta");
+    if(nuMeta) nuMeta.textContent = `Средно ${kcalAvg} kcal • On-target ${onTarget}/${RANGE}`;
+
+    // ---------- Finance ----------
+    const budgetTarget = Number(localStorage.getItem("balanced_life_budget_target")||"60") || 60;
+    const spendSeries = days.map(d => Math.round(fin.filter(x=>x.date===d && x.type==="expense").reduce((a,b)=>a+(Number(b.amount)||0),0)));
+    const spendSum = spendSeries.reduce((a,b)=>a+b,0);
+    const spendAvg = Math.round(spendSum / (spendSeries.length||1));
+    const underDays = spendSeries.filter(v=> v>0 && v<=budgetTarget).length;
+
+    const fiGrid = document.getElementById("fiGrid");
+    if(fiGrid){
+      fiGrid.innerHTML =
+        kpiCard("Avg spent", `${spendAvg} лв`, `Target ${budgetTarget} • under дни: ${underDays}`, spendSeries) +
+        kpiCard("Total spent", `${Math.round(spendSum)} лв`, `последни ${RANGE} дни`, spendSeries);
+    }
+    const fiMeta = document.getElementById("fiMeta");
+    if(fiMeta) fiMeta.textContent = `Общо ${Math.round(spendSum)} лв • Avg ${spendAvg} лв/ден`;
+
+    // ---------- Insights ----------
+    const insights = [];
+    if(wCount < Math.max(2, Math.round(RANGE*0.35))) insights.push("🏋️ Добави 2 кратки тренировки (20–30 мин) за да вдигнеш consistency.");
+    if(onTarget < Math.max(2, Math.round(RANGE*0.45))) insights.push("🥗 Ползвай Templates по-често за дни без време – важно е да имаш базови kcal.");
+    if(underDays < Math.max(2, Math.round(RANGE*0.45))) insights.push("💰 Пиши разходите веднага (Quick Add) – така няма скрити дни със “0”, които после изненадват.");
+    if(!insights.length) insights.push("✅ Стабилна седмица. Следваща цел: 1 нов PR + 1 ден с пълен check-in.");
+
+    const elIns = document.getElementById("progInsights");
+    if(elIns) elIns.textContent = insights.join("  •  ");
   }
 
-  function setText(id, v){
-    const el = document.getElementById(id);
-    if(el) el.textContent = String(v);
-  }
+  // Segmented control
+  document.addEventListener("click",(e)=>{
+    const b = e.target.closest(".segBtn[data-range]");
+    if(!b) return;
+    $$(".segBtn[data-range]").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    RANGE = Number(b.getAttribute("data-range")||"7") || 7;
+    renderProgress();
+  }, true);
 
-  function bindSeg(){
-    document.addEventListener("click",(e)=>{
-      const b = e.target.closest("[data-range]");
-      if(!b) return;
-      $$(".seg").forEach(x=>x.classList.remove("active"));
-      b.classList.add("active");
-      const d = Number(b.getAttribute("data-range")||"30");
-      renderProgress(d);
-    }, true);
-  }
+  // Alias: if something opens "charts", route to progress
+  document.addEventListener("click",(e)=>{
+    const t = e.target.closest('[data-open="charts"]');
+    if(!t) return;
+    e.preventDefault();
+    if(typeof showPanel==="function") showPanel("progress");
+  }, true);
 
-  document.addEventListener("DOMContentLoaded", ()=>{
-    bindSeg();
-    renderProgress(30);
-  });
+  document.addEventListener("DOMContentLoaded", renderProgress);
 
-  // refresh when opening progress panel
   const oldShow = window.showPanel;
   if(typeof oldShow === "function"){
     window.showPanel = function(name, opts){
       oldShow(name, opts);
-      if(name==="progress"){
-        const active = document.querySelector(".seg.active");
-        const d = active ? Number(active.getAttribute("data-range")||"30") : 30;
-        renderProgress(d);
-      }
+      if(name==="progress") renderProgress();
     };
   }
 })();

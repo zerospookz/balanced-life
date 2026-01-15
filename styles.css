@@ -560,3 +560,16 @@ body{
 
 /* ===== end v6.3.0 ===== */
 
+
+/* ===== v6.3.1 Dashboard radial fixes ===== */
+.donut{width:220px;height:220px}
+.donut svg{width:220px;height:220px; transform:none !important;} /* text upright */
+@media (max-width:820px){
+  .donut{width:200px;height:200px}
+  .donut svg{width:200px;height:200px}
+}
+/* make the 3 rings feel like "graphics" not tiles */
+.donutCard{background: transparent; border-color: rgba(255,255,255,0.10);}
+:root[data-theme="light"] .donutCard{background: rgba(255,255,255,0.25);}
+/* ===== end v6.3.1 ===== */
+

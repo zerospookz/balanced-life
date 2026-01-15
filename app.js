@@ -61,7 +61,7 @@
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.3.0";
+const APP_VERSION = "6.3.1";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -305,7 +305,7 @@ function viewHome() {
       <section class="card section featured">
         <div class="h1">Dashboard</div>
         <div class="sub">Днес: бюджет • хранене • тренировки</div>
-<div class="donutRow">
+        <div class="donutRow">
   <div class="donutCard">
     ${(()=>{
       const goal = Number(state.workoutGoalMin||state.goals?.workoutMin||180);
@@ -313,49 +313,6 @@ function viewHome() {
       return radialBarsSVG({id:"w", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel:"Workouts"});
     })()}
   </div>
-
-  <div class="donutCard">
-    ${(()=>{
-      const inc = Math.max(0, Number(d.income||0));
-      const exp = Math.max(0, Number(d.expense||0));
-      const total = inc + exp;
-      const share = total ? inc/total : 0;
-      // show net in center like finance dashboards
-      const net = inc - exp;
-      const netTxt = (total? `${Math.round(share*100)}%` : "—");
-      return radialBarsSVG({id:"f", value: share, centerValue: netTxt, centerLabel:"Finances"});
-    })()}
-  </div>
-
-  <div class="donutCard">
-    ${(()=>{
-      const goal = Number(state.kcalGoal||state.goals?.kcal||2000);
-      const prog = donutProgress(d.kcal, goal);
-      return radialBarsSVG({id:"k", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel:"Calories"});
-    })()}
-  </div>
-</div>
-
-<div style="flex:1;min-width:240px">
-            <div class="grid2">
-              <div class="kpi">
-                <div class="l">Бюджет (месец)</div>
-                <div class="v">${money(d.budget)} лв</div>
-                <div class="small">Приходи: ${money(d.income)} • Разходи: ${money(d.expense)}</div>
-              </div>
-              <div class="kpi">
-                <div class="l">Калории (днес)</div>
-                <div class="v">${Math.round(d.kcal)} kcal</div>
-                <div class="small">Добави храна в Nutrition</div>
-              </div>
-              <div class="kpi">
-                <div class="l">Тренировки (7 дни)</div>
-                <div class="v">${Math.round(d.wmin)} мин</div>
-                <div class="small">Планът е в Workouts → План</div>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section class="card section featured">
@@ -1039,7 +996,7 @@ function _hash01(str){
 }
 
 function radialBarsSVG({id, value=0.5, centerValue="0", centerLabel="", mode="single"}={}){
-  const size = 170;
+  const size = 220;
   const cx = size/2, cy = size/2;
   const innerR = 42;
   const baseR = 62;
@@ -1132,7 +1089,7 @@ function radialBarsSVG({id, value=0.5, centerValue="0", centerLabel="", mode="si
 
   return `
     <div class="donut">
-      <svg viewBox="0 0 ${size} ${size}" width="170" height="170" aria-label="${escapeHtml(centerLabel)}">
+      <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-label="${escapeHtml(centerLabel)}">
         ${defs}
         ${ticks}
         ${shapes}

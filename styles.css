@@ -511,3 +511,52 @@ body{
 .donutArc{stroke-linecap:round; filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.25));}
 /* ===== end v6.2.9 ===== */
 
+
+/* ===== v6.3.0 Glass background (like reference) ===== */
+body{
+  /* warm bokeh-ish background without images */
+  background:
+    radial-gradient(1200px 700px at 10% 15%, rgba(255,190,120,0.55), rgba(255,190,120,0.0) 60%),
+    radial-gradient(900px 520px at 80% 20%, rgba(255,120,90,0.35), rgba(255,120,90,0.0) 58%),
+    radial-gradient(900px 650px at 65% 80%, rgba(120,190,255,0.30), rgba(120,190,255,0.0) 60%),
+    radial-gradient(1000px 700px at 20% 85%, rgba(200,160,255,0.24), rgba(200,160,255,0.0) 62%),
+    linear-gradient(180deg, #050814 0%, #071321 45%, #050814 100%);
+  background-attachment: fixed;
+}
+/* keep themes but give "glass" top overlay */
+:root[data-theme="light"] body{
+  background:
+    radial-gradient(1100px 680px at 15% 15%, rgba(255,210,150,0.65), rgba(255,210,150,0.0) 60%),
+    radial-gradient(900px 520px at 80% 22%, rgba(255,150,120,0.40), rgba(255,150,120,0.0) 58%),
+    radial-gradient(900px 650px at 70% 78%, rgba(130,200,255,0.38), rgba(130,200,255,0.0) 60%),
+    radial-gradient(1000px 700px at 25% 85%, rgba(210,190,255,0.30), rgba(210,190,255,0.0) 62%),
+    linear-gradient(180deg, #EAF2FF 0%, #F7FAFF 60%, #EAF2FF 100%);
+}
+
+/* Glass shell: blur only on main wrapper like reference */
+.wrap{
+  background: rgba(8, 16, 28, 0.28);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 26px;
+  box-shadow: 0px 18px 60px rgba(0,0,0,0.35);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+:root[data-theme="light"] .wrap{
+  background: rgba(255,255,255,0.58);
+  border-color: rgba(15,23,42,0.10);
+  box-shadow: 0px 18px 60px rgba(2, 6, 23, 0.14);
+}
+
+/* make cards a bit more glassy to match reference */
+.card{
+  background: rgba(11,28,45,0.55);
+  border-color: rgba(255,255,255,0.10);
+}
+:root[data-theme="light"] .card{
+  background: rgba(255,255,255,0.65);
+  border-color: rgba(15,23,42,0.08);
+}
+
+/* ===== end v6.3.0 ===== */
+

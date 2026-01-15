@@ -61,7 +61,7 @@
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.2.9";
+const APP_VERSION = "6.3.0";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -310,7 +310,7 @@ function viewHome() {
     ${(()=>{
       const goal = Number(state.workoutGoalMin||state.goals?.workoutMin||180);
       const prog = donutProgress(d.wmin, goal);
-      return donutSVG({pct:prog.pct, title:"Тренировки", valueText:prog.txt, subText:prog.sub});
+      return radialBarsSVG({id:"w", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel:"Workouts"});
     })()}
   </div>
 
@@ -319,17 +319,11 @@ function viewHome() {
       const inc = Math.max(0, Number(d.income||0));
       const exp = Math.max(0, Number(d.expense||0));
       const total = inc + exp;
-      const pInc = total? inc/total : 0;
-      const pExp = total? exp/total : 0;
-      return donutSVG({
-        title:"Финанси",
-        valueText: total? `${Math.round((inc/total)*100)}%` : "—",
-        subText: `+${money(inc)} / -${money(exp)}`,
-        arcs:[
-          {pct:pInc, color:"#34D399"},
-          {pct:pExp, color:"#60A5FA"},
-        ]
-      });
+      const share = total ? inc/total : 0;
+      // show net in center like finance dashboards
+      const net = inc - exp;
+      const netTxt = (total? `${Math.round(share*100)}%` : "—");
+      return radialBarsSVG({id:"f", value: share, centerValue: netTxt, centerLabel:"Finances"});
     })()}
   </div>
 
@@ -337,7 +331,7 @@ function viewHome() {
     ${(()=>{
       const goal = Number(state.kcalGoal||state.goals?.kcal||2000);
       const prog = donutProgress(d.kcal, goal);
-      return donutSVG({pct:prog.pct, title:"Калории", valueText:prog.txt, subText:prog.sub});
+      return radialBarsSVG({id:"k", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel:"Calories"});
     })()}
   </div>
 </div>
@@ -1030,5 +1024,123 @@ function donutProgress(current, goal){
   return {pct:p, txt:`${Math.round(p*100)}%`, sub:`${Math.round(c)} / ${Math.round(g)}`};
 }
 // ===== end donuts =====
+
+
+
+// ===== v6.3.0 Radial bars (reference-like) =====
+function _hash01(str){
+  // deterministic pseudo-rand 0..1
+  let h = 2166136261;
+  for(let i=0;i<str.length;i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return ((h >>> 0) % 10000) / 10000;
+}
+
+function radialBarsSVG({id, value=0.5, centerValue="0", centerLabel="", mode="single"}={}){
+  const size = 170;
+  const cx = size/2, cy = size/2;
+  const innerR = 42;
+  const baseR = 62;
+  const maxExtra = 26;
+  const bars = 56;
+  const gapDeg = 2.4; // gap between bars
+  const barDeg = (360 / bars) - gapDeg;
+
+  // palette close to reference (purple/pink/orange/blue)
+  const pal = ["#60A5FA", "#8B5CF6", "#D946EF", "#FB7185", "#FB923C"];
+  const bgRing = "rgba(255,255,255,0.10)";
+
+  // create bar heights with a subtle wave pattern + deterministic noise
+  const seed = _hash01(id);
+  const wave = (i)=> (0.55 + 0.45*Math.sin((i/bars)*Math.PI*2 + seed*6.28));
+  const noise = (i)=> (0.75 + 0.25*Math.sin((i*12.9898 + seed*78.233)*0.6));
+  const activeBars = Math.round(clamp01(value) * bars);
+
+  const defs = `
+    <defs>
+      <linearGradient id="rg-${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#60A5FA"/>
+        <stop offset="35%" stop-color="#8B5CF6"/>
+        <stop offset="65%" stop-color="#D946EF"/>
+        <stop offset="82%" stop-color="#FB7185"/>
+        <stop offset="100%" stop-color="#FB923C"/>
+      </linearGradient>
+      <filter id="rbglow-${id}" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="3.0" result="blur"/>
+        <feColorMatrix in="blur" type="matrix"
+          values="1 0 0 0 0
+                  0 1 0 0 0
+                  0 0 1 0 0
+                  0 0 0 0.7 0" result="glow"/>
+        <feMerge>
+          <feMergeNode in="glow"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+  `;
+
+  const toRad = (deg)=> (deg*Math.PI/180);
+  const polar = (r, deg)=> ({ x: cx + r*Math.cos(toRad(deg)), y: cy + r*Math.sin(toRad(deg)) });
+
+  function arcPath(r1, r2, startDeg, endDeg){
+    const p1 = polar(r2, startDeg);
+    const p2 = polar(r2, endDeg);
+    const p3 = polar(r1, endDeg);
+    const p4 = polar(r1, startDeg);
+    const large = (endDeg-startDeg) > 180 ? 1 : 0;
+    return [
+      `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}`,
+      `A ${r2} ${r2} 0 ${large} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`,
+      `L ${p3.x.toFixed(2)} ${p3.y.toFixed(2)}`,
+      `A ${r1} ${r1} 0 ${large} 0 ${p4.x.toFixed(2)} ${p4.y.toFixed(2)}`,
+      "Z"
+    ].join(" ");
+  }
+
+  let shapes = "";
+  for(let i=0;i<bars;i++){
+    const start = (i*(360/bars)) + (gapDeg/2) - 90;
+    const end = start + barDeg;
+    const h = wave(i)*noise(i); // 0..~1
+    const r2 = baseR + (h*maxExtra);
+    const r1 = innerR + 18; // thickness
+    const active = i < activeBars;
+
+    const fill = active ? `url(#rg-${id})` : bgRing;
+    const op = active ? 1 : 0.35;
+    shapes += `<path d="${arcPath(r1, r2, start, end)}" fill="${fill}" opacity="${op}" ${active?`filter="url(#rbglow-${id})"`:""} />`;
+  }
+
+  // extra outer ticks ring (faint)
+  let ticks = "";
+  const tickBars = 84;
+  for(let i=0;i<tickBars;i++){
+    const ang = (i*(360/tickBars)) - 90;
+    const p1 = polar(baseR + maxExtra + 8, ang);
+    const p2 = polar(baseR + maxExtra + 14, ang);
+    ticks += `<line x1="${p1.x.toFixed(2)}" y1="${p1.y.toFixed(2)}" x2="${p2.x.toFixed(2)}" y2="${p2.y.toFixed(2)}" stroke="rgba(255,255,255,0.10)" stroke-width="2" stroke-linecap="round" />`;
+  }
+
+  const center = `
+    <circle cx="${cx}" cy="${cy}" r="${innerR+8}" fill="rgba(0,0,0,0.25)" />
+    <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="30" font-weight="900" fill="rgba(255,255,255,0.92)">${escapeHtml(centerValue)}</text>
+    <text x="${cx}" y="${cy+22}" text-anchor="middle" font-size="12" font-weight="800" fill="rgba(255,255,255,0.60)">${escapeHtml(centerLabel)}</text>
+  `;
+
+  return `
+    <div class="donut">
+      <svg viewBox="0 0 ${size} ${size}" width="170" height="170" aria-label="${escapeHtml(centerLabel)}">
+        ${defs}
+        ${ticks}
+        ${shapes}
+        ${center}
+      </svg>
+    </div>
+  `;
+}
+// ===== end v6.3.0 =====
 
 })();

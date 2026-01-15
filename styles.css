@@ -10,39 +10,7 @@
   --radius:18px;
   --radius2:14px;
   --accent:#2563eb;
-
-  /* Typography (v6.1.1) */
-  --fs-title:22px;
-  --fs-sub:13px;
-  --fs-body:14px;
-  --fs-small:12px;
-  --lh:1.35;
-
-  /* Sky theme tokens (v6.1.1) */
-  --sky1: rgba(37,99,235,.10);
-  --sky2: rgba(16,185,129,.10);
-  --sky3: rgba(245,158,11,.10);
-  --bgSolid: var(--bg);
 }
-
-:root[data-sky="sunrise"]{
-  --sky1: rgba(251,146,60,.22);
-  --sky2: rgba(250,204,21,.18);
-  --sky3: rgba(56,189,248,.16);
-}
-
-:root[data-sky="day"]{
-  --sky1: rgba(37,99,235,.12);
-  --sky2: rgba(16,185,129,.12);
-  --sky3: rgba(245,158,11,.12);
-}
-
-:root[data-sky="night"]{
-  --sky1: rgba(99,102,241,.18);
-  --sky2: rgba(56,189,248,.12);
-  --sky3: rgba(168,85,247,.14);
-}
-
 
 @media (prefers-color-scheme: dark){
   :root{
@@ -61,14 +29,13 @@
 html,body{height:100%}
 body{
   margin:0;
-  line-height: var(--lh);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
   color:var(--text);
   background:
-    radial-gradient(1200px 700px at 15% 10%, var(--sky1), transparent 60%),
-    radial-gradient(900px 700px at 85% 20%, var(--sky2), transparent 60%),
-    radial-gradient(1000px 800px at 50% 95%, var(--sky3), transparent 60%),
-    var(--bgSolid);
+    radial-gradient(1200px 700px at 15% 10%, rgba(37,99,235,.10), transparent 60%),
+    radial-gradient(900px 700px at 85% 20%, rgba(16,185,129,.10), transparent 60%),
+    radial-gradient(1000px 800px at 50% 95%, rgba(245,158,11,.10), transparent 60%),
+    var(--bg);
 }
 
 .app{max-width:980px;margin:0 auto;min-height:100%;padding:14px 14px 96px}
@@ -262,7 +229,77 @@ textarea{min-height:90px;resize:vertical}
 }
 
 
-/* v6.1.1 typography unify (does NOT affect bottom nav style) */
-.h1{font-size:var(--fs-title)}
-.sub{font-size:var(--fs-sub)}
-.small,.brandSub{font-size:var(--fs-small)}
+/* ===== Balanced Life v6.1.2 (design pass) =====
+   - 3 auto "sky" themes (sunrise/day/night) driven by JS via :root[data-sky]
+   - Controlled typography (titles/sub/small) without touching buttons/nav layout
+*/
+
+:root{
+  /* Typography tokens */
+  --fs-title: 20px;
+  --fs-sub: 13px;
+  --fs-small: 12px;
+  --lh: 1.35;
+
+  /* Sky tokens (default = day) */
+  --sky1: rgba(59,130,246,.20);
+  --sky2: rgba(16,185,129,.18);
+  --sky3: rgba(245,158,11,.18);
+  --bgSolid: var(--bg);
+}
+
+/* Sunrise 06-10 */
+:root[data-sky="sunrise"]{
+  --sky1: rgba(251,146,60,.36);
+  --sky2: rgba(250,204,21,.26);
+  --sky3: rgba(56,189,248,.22);
+}
+
+/* Day 10-18 */
+:root[data-sky="day"]{
+  --sky1: rgba(59,130,246,.20);
+  --sky2: rgba(16,185,129,.18);
+  --sky3: rgba(245,158,11,.18);
+}
+
+/* Night 18-06 */
+:root[data-sky="night"]{
+  --bg:#0b1020;
+  --card:#121a2f;
+  --text:#eef2ff;
+  --sub:#93c5fd;
+  --muted:#94a3b8;
+  --shadow: 0 18px 55px rgba(0,0,0,.45);
+  --shadow2: 0 12px 32px rgba(0,0,0,.35);
+  --accent:#60a5fa;
+  --bgSolid: var(--bg);
+
+  --sky1: rgba(99,102,241,.26);
+  --sky2: rgba(56,189,248,.18);
+  --sky3: rgba(168,85,247,.22);
+}
+
+/* Apply sky background (override safely) */
+body{
+  line-height: var(--lh);
+  background:
+    radial-gradient(1200px 700px at 15% 10%, var(--sky1), transparent 60%),
+    radial-gradient(900px 700px at 85% 20%, var(--sky2), transparent 60%),
+    radial-gradient(1000px 800px at 50% 95%, var(--sky3), transparent 60%),
+    var(--bgSolid);
+}
+
+/* Typography (scoped to your existing UI classes) */
+.h1{ font-size: var(--fs-title); font-weight: 900; letter-spacing: -0.01em; }
+.brandTitle{ font-size: 16px; font-weight: 900; }
+.sub{ font-size: var(--fs-sub); font-weight: 700; }
+.small, .brandSub{ font-size: var(--fs-small); }
+
+/* Ensure KPI values stay prominent */
+.kpi .v{ font-size: 22px; font-weight: 900; }
+.kpi .l{ font-size: var(--fs-small); font-weight: 800; }
+
+/* Keep bottom nav style intact; only refine text sizing */
+.bottomnav .tab span:last-child{ font-size: 11px; font-weight: 700; }
+
+/* ===== end v6.1.2 ===== */

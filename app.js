@@ -75,21 +75,17 @@
   }
   applyTheme(localStorage.getItem(THEME_KEY) || "system");
 
-  // ---------- SKY THEMES (v6.1.1) ----------
+  // ===== SKY_THEME v6.1.2 (auto by hour) =====
   function applySkyTheme(){
     const h = new Date().getHours();
     const root = document.documentElement;
-    if(h >= 6 && h < 10){
-      root.setAttribute("data-sky","sunrise");
-    }else if(h >= 10 && h < 18){
-      root.setAttribute("data-sky","day");
-    }else{
-      root.setAttribute("data-sky","night");
-    }
+    // 06:00–10:00 sunrise, 10:00–18:00 day, 18:00–06:00 night
+    const mode = (h >= 6 && h < 10) ? "sunrise" : (h >= 10 && h < 18) ? "day" : "night";
+    root.setAttribute("data-sky", mode);
   }
-
   applySkyTheme();
-  setInterval(applySkyTheme, 60000);
+  // Re-check every minute (covers midnight transitions)
+  setInterval(applySkyTheme, 60_000);
 
 function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -172,7 +168,7 @@ function saveState() {
         </circle>
         <rect x="47" y="47" width="56" height="56" rx="14" fill="rgba(0,0,0,.04)" stroke="rgba(0,0,0,.05)"/>
         <text x="75" y="78" text-anchor="middle" font-size="18" font-weight="900" fill="var(--text)">${Math.round(p*100)}%</text>
-        <text x="75" y="98" text-anchor="middle" font-size="12" font-weight="800" fill="var(--sub)">Ефикасност</text>
+        <text x="75" y="98" text-anchor="middle" font-size="12" font-weight="800" fill="var(--sub)">Energy</text>
       </svg>
     `;
   }

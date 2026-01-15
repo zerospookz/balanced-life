@@ -74,19 +74,6 @@
     localStorage.setItem(THEME_KEY, mode);
   }
   applyTheme(localStorage.getItem(THEME_KEY) || "system");
-
-  // ===== SKY_THEME v6.1.2 (auto by hour) =====
-  function applySkyTheme(){
-    const h = new Date().getHours();
-    const root = document.documentElement;
-    // 06:00–10:00 sunrise, 10:00–18:00 day, 18:00–06:00 night
-    const mode = (h >= 6 && h < 10) ? "sunrise" : (h >= 10 && h < 18) ? "day" : "night";
-    root.setAttribute("data-sky", mode);
-  }
-  applySkyTheme();
-  // Re-check every minute (covers midnight transitions)
-  setInterval(applySkyTheme, 60_000);
-
 function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     render(); // keep UI consistent after any write
@@ -225,7 +212,7 @@ function saveState() {
       <section class="card" style="margin-top:16px">
         <div class="cardHead">
           <div>
-            <div class="cardTitle">Habit tracker</div>
+            <div class="habitTitle">Habit tracker</div>
             <div class="muted"><span class="habitPeriod">Тази седмица</span> • ${start} → ${days[6]}</div>
           </div>
           <button class="btn" type="button" data-action="addHabit">+ Навик</button>
@@ -303,16 +290,42 @@ function viewHome() {
         </div>
       </section>
 
+      
       <section class="card section">
         <div class="h1">Weekly overview</div>
         <div class="sub">Бърз поглед за последните 7 дни</div>
-        <div class="row" style="margin-top:12px">
-          <button class="btn ghost" data-route="finances" type="button">💰 Finances</button>
-          <button class="btn ghost" data-route="nutrition" type="button">🥗 Nutrition</button>
-          <button class="btn ghost" data-route="workouts" type="button">🏋️ Workouts</button>
+
+        <div class="weekTiles">
+          <button class="weekTile" type="button" data-route="finances" aria-label="Finances tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Finances</div>
+              <div class="weekTileIcon">💰</div>
+            </div>
+            <div class="weekTileValue">${money(d.budget)} лв</div>
+            <div class="weekTileSub">Месец: +${money(d.income)} • -${money(d.expense)}</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="nutrition" aria-label="Nutrition tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Nutrition</div>
+              <div class="weekTileIcon">🥗</div>
+            </div>
+            <div class="weekTileValue">${Math.round(d.kcal)} kcal</div>
+            <div class="weekTileSub">Днес • бързо добавяне от Nutrition</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="workouts" aria-label="Workouts tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Workouts</div>
+              <div class="weekTileIcon">🏋️</div>
+            </div>
+            <div class="weekTileValue">${Math.round(d.wmin)} мин</div>
+            <div class="weekTileSub">Последни 7 дни • планът е вътре</div>
+          </button>
         </div>
       </section>
       ${viewHabitTracker()}
+
       </div>
     `;
   }
@@ -765,57 +778,108 @@ function viewHome() {
   }
 
   
+  
   function openAddHabit(){
+    const presets = [
+      {name:"Тренировки", icon:"🏋️", color:"#10B981", hint:"Сила/умения"},
+      {name:"Хранене", icon:"🥗", color:"#F59E0B", hint:"Калории/качество"},
+      {name:"Финанси", icon:"💰", color:"#2563EB", hint:"Контрол на разходи"},
+      {name:"Разходка", icon:"🚶", color:"#06B6D4", hint:"Стъпки/кардио"},
+      {name:"Сън", icon:"😴", color:"#8B5CF6", hint:"Рутина вечер"},
+      {name:"Кардио", icon:"🏃", color:"#EF4444", hint:"Zone 2/интервали"},
+      {name:"Вода", icon:"💧", color:"#38BDF8", hint:"Хидратация"},
+      {name:"Стречинг", icon:"🧘", color:"#A78BFA", hint:"Мобилност"},
+      {name:"Четене", icon:"📚", color:"#F97316", hint:"Фокус"},
+      {name:"Медитация", icon:"🧠", color:"#22C55E", hint:"Спокойствие"},
+    ];
+
     const habits = state.habits || [];
     const listHtml = habits.map(h=>`
       <div class="row" style="justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(15,23,42,.06)">
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:18px">${h.icon||"✅"}</span>
           <div>
-            <div style="font-weight:700">${escapeHtml(h.name||"Навик")}</div>
+            <div style="font-weight:800">${escapeHtml(h.name||"Навик")}</div>
             <div class="muted" style="font-size:12px">${h.id}</div>
           </div>
         </div>
-        <button class="btn danger" type="button" data-habit-del="${h.id}">Изтрий</button>
+        <button class="btn ghost" type="button" data-habit-del="${h.id}">Изтрий</button>
       </div>
     `).join("") || `<div class="muted">Нямаш навици.</div>`;
 
-    openModal(`
-      <div class="modalHeader">
-        <div>
-          <div class="modalTitle">Нови навици</div>
-          <div class="muted">Добави / изтрий навик за Habit tracker.</div>
+    const presetHtml = presets.map((p,i)=>`
+      <button class="presetBtn" type="button" data-preset="${i}">
+        <div class="presetLeft">
+          <div class="presetIcon">${p.icon}</div>
+          <div>
+            <div class="presetName">${escapeHtml(p.name)}</div>
+            <div class="presetMeta">${escapeHtml(p.hint)}</div>
+          </div>
         </div>
-        <button class="btn ghost" type="button" data-modal-close>✕</button>
-      </div>
+        <div class="presetAdd">+ Добави</div>
+      </button>
+    `).join("");
 
-      <form id="habitForm" class="form">
+    openModal("Навици", `
+      <div class="small">Бързо добавяне (preset)</div>
+      <div class="presetGrid">${presetHtml}</div>
+
+      <div style="height:12px"></div>
+      <div class="small">Ръчно добавяне</div>
+      <form id="habitForm" class="form" style="margin-top:6px">
         <div class="grid2">
           <label class="field">
             <span>Име</span>
-            <input id="habitName" required placeholder="Напр. Стречинг" />
+            <input id="habitName" required placeholder="Напр. Протеин" />
           </label>
           <label class="field">
             <span>Иконка (emoji)</span>
-            <input id="habitIcon" placeholder="🧘" maxlength="4" />
+            <input id="habitIcon" placeholder="✅" maxlength="4" />
           </label>
         </div>
+        <div class="grid2">
+          <label class="field">
+            <span>Цвят</span>
+            <input id="habitColor" type="color" value="#2563eb" />
+          </label>
+          <div class="field">
+            <span class="small">* Цветът се ползва за отметките.</span>
+          </div>
+        </div>
         <div class="row" style="justify-content:flex-end;gap:10px;margin-top:10px">
-          <button class="btn" type="submit">Добави</button>
+          <button class="btn primary" type="submit">Добави</button>
         </div>
       </form>
 
-      <div style="margin-top:12px">
-        <div class="muted" style="font-size:12px;margin-bottom:6px">Текущи навици</div>
+      <div style="margin-top:14px">
+        <div class="small" style="margin-bottom:6px">Текущи навици</div>
         ${listHtml}
       </div>
     `);
 
+    // preset add
+    document.querySelectorAll("[data-preset]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const i = Number(btn.getAttribute("data-preset"));
+        const p = presets[i];
+        if(!p) return;
+        // prevent duplicates by name (case-insensitive)
+        const exists = (state.habits||[]).some(h => String(h.name||"").toLowerCase() === p.name.toLowerCase());
+        if(exists){ toast("Този навик вече съществува."); return; }
+        const id = "h_" + Date.now().toString(36);
+        state.habits = [...(state.habits||[]), {id, name:p.name, icon:p.icon, color:p.color}];
+        saveState();
+        closeModal();
+        render();
+        toast("Навикът е добавен.");
+      });
+    });
+
+    // delete
     document.querySelectorAll("[data-habit-del]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const hid = btn.getAttribute("data-habit-del");
         state.habits = (state.habits||[]).filter(h=>h.id!==hid);
-        // clean logs
         const logs = state.habitLogs || {};
         Object.keys(logs).forEach(d=>{ if(logs[d]) delete logs[d][hid]; });
         saveState();
@@ -825,20 +889,25 @@ function viewHome() {
       });
     });
 
+    // manual form
     const form = document.getElementById("habitForm");
     form.addEventListener("submit", (e)=>{
       e.preventDefault();
       const name = document.getElementById("habitName").value.trim();
       const icon = document.getElementById("habitIcon").value.trim() || "✅";
+      const color = document.getElementById("habitColor").value || "#2563eb";
       if(!name) return;
+      const exists = (state.habits||[]).some(h => String(h.name||"").toLowerCase() === name.toLowerCase());
+      if(exists){ toast("Този навик вече съществува."); return; }
       const id = "h_" + Date.now().toString(36);
-      state.habits = [...(state.habits||[]), {id, name, icon}];
+      state.habits = [...(state.habits||[]), {id, name, icon, color}];
       saveState();
       closeModal();
       render();
       toast("Навикът е добавен.");
     });
   }
+
 
   function toggleHabit(hid, iso){
     if(!hid || !iso) return;

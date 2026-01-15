@@ -61,6 +61,7 @@
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
+const APP_VERSION = "6.2.8";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -515,6 +516,7 @@ function viewHome() {
     return `
       <section class="card section">
         <div class="h1">Settings</div>
+        <div class="sub">Build: <b>${APP_VERSION}</b></div>
         <div class="sub">Appearance</div>
         <div class="row" style="margin-top:10px;align-items:center">
           <div class="pill">🌓 Тема:

@@ -61,15 +61,38 @@
 
   
   // ===== THEME_MODE v6.0 =====
-  const THEME_KEY = "bl_theme_mode"; // system | light | dark
   
+  // ===== THEME SYSTEM v6.2.2 (clean) =====
+  const THEME_KEY = "bl_theme_mode"; // light | dark
+
   function applyTheme(mode){
     const root = document.documentElement;
-    // mode: light | dark  (we keep "system" internally but UI will use light/dark)
-    if(mode==="dark"){
+
+    if(mode === "dark"){
       root.setAttribute("data-theme","dark");
       root.setAttribute("data-sky","night"); // Deep Night Calm
-    }else if(mode==="light"){
+    } else {
+      root.setAttribute("data-theme","light");
+      root.setAttribute("data-sky","day");   // Sky Day
+    }
+
+    localStorage.setItem(THEME_KEY, mode);
+  }
+ // system | light | dark
+  
+  
+  else if(mode === "light"){
+      root.setAttribute("data-theme","light");
+      root.setAttribute("data-sky","day");   // Sky Day
+    }
+    else {
+      root.setAttribute("data-theme","light");
+      root.setAttribute("data-sky","day");
+    }
+
+    localStorage.setItem(THEME_KEY, mode);
+  }
+else if(mode==="light"){
       root.setAttribute("data-theme","light");
       root.setAttribute("data-sky","day");
     }else{
@@ -570,7 +593,7 @@ function viewHome() {
       state._workoutsTab = e.currentTarget.dataset.tab;
       return render();
     }
-    if(a==="setTheme") { applyTheme(e.currentTarget.value); return; }
+    if(a==="setTheme") { applyTheme(e.currentTarget.value); return; } }
     if(a==="selectPlanDay") {
       const v = e.currentTarget.value;
       state._selectedPlanDay = v;

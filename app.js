@@ -61,7 +61,7 @@
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.2.8";
+const APP_VERSION = "6.2.9";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -305,9 +305,44 @@ function viewHome() {
       <section class="card section featured">
         <div class="h1">Dashboard</div>
         <div class="sub">Днес: бюджет • хранене • тренировки</div>
-        <div class="row" style="margin-top:12px;align-items:center">
-          <div style="min-width:170px;display:flex;justify-content:center">${ringSVG(d.progress)}</div>
-          <div style="flex:1;min-width:240px">
+<div class="donutRow">
+  <div class="donutCard">
+    ${(()=>{
+      const goal = Number(state.workoutGoalMin||state.goals?.workoutMin||180);
+      const prog = donutProgress(d.wmin, goal);
+      return donutSVG({pct:prog.pct, title:"Тренировки", valueText:prog.txt, subText:prog.sub});
+    })()}
+  </div>
+
+  <div class="donutCard">
+    ${(()=>{
+      const inc = Math.max(0, Number(d.income||0));
+      const exp = Math.max(0, Number(d.expense||0));
+      const total = inc + exp;
+      const pInc = total? inc/total : 0;
+      const pExp = total? exp/total : 0;
+      return donutSVG({
+        title:"Финанси",
+        valueText: total? `${Math.round((inc/total)*100)}%` : "—",
+        subText: `+${money(inc)} / -${money(exp)}`,
+        arcs:[
+          {pct:pInc, color:"#34D399"},
+          {pct:pExp, color:"#60A5FA"},
+        ]
+      });
+    })()}
+  </div>
+
+  <div class="donutCard">
+    ${(()=>{
+      const goal = Number(state.kcalGoal||state.goals?.kcal||2000);
+      const prog = donutProgress(d.kcal, goal);
+      return donutSVG({pct:prog.pct, title:"Калории", valueText:prog.txt, subText:prog.sub});
+    })()}
+  </div>
+</div>
+
+<div style="flex:1;min-width:240px">
             <div class="grid2">
               <div class="kpi">
                 <div class="l">Бюджет (месец)</div>
@@ -930,4 +965,70 @@ function viewHome() {
   if("serviceWorker" in navigator){
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
+
+
+// ===== Dashboard Donuts v6.2.9 =====
+function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+
+function donutSVG({pct=0.5, title="Title", valueText="0%", subText="" , arcs=null}={}){
+  const size = 150;
+  const r = 58;
+  const c = 2*Math.PI*r;
+  const sw = 14;
+  const track = `<circle class="donutTrack" cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke-width="${sw}" />`;
+
+  let segs = "";
+  let offset = 0;
+  if(Array.isArray(arcs) && arcs.length){
+    for(const a of arcs){
+      const p = clamp01(a.pct||0);
+      const dash = (p*c).toFixed(2);
+      const gap = (c - p*c).toFixed(2);
+      segs += `<circle class="donutArc" cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${a.color}"
+                  stroke-width="${sw}" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${(-offset*c).toFixed(2)}" />`;
+      offset += p;
+    }
+  }else{
+    const p = clamp01(pct);
+    const dash = (p*c).toFixed(2);
+    const gap = (c - p*c).toFixed(2);
+    segs = `<circle class="donutArc" cx="${size/2}" cy="${size/2}" r="${r}" fill="none"
+              stroke="url(#grad)" stroke-width="${sw}" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="0" />`;
+  }
+
+  const defs = `
+    <defs>
+      <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#A78BFA"/>
+        <stop offset="55%" stop-color="#60A5FA"/>
+        <stop offset="100%" stop-color="#34D399"/>
+      </linearGradient>
+    </defs>
+  `;
+
+  return `
+    <div class="donut">
+      <svg viewBox="0 0 ${size} ${size}" aria-label="${escapeHtml(title)}">
+        ${defs}
+        ${track}
+        ${segs}
+      </svg>
+      <div class="center">
+        <div class="t">${escapeHtml(title)}</div>
+        <div class="v">${escapeHtml(valueText)}</div>
+        ${subText?`<div class="s">${escapeHtml(subText)}</div>`:""}
+      </div>
+    </div>
+  `;
+}
+
+function donutProgress(current, goal){
+  const g = Number(goal||0);
+  const c = Number(current||0);
+  if(g<=0) return {pct:0, txt:"0%", sub:`${Math.round(c)}`};
+  const p = clamp01(c/g);
+  return {pct:p, txt:`${Math.round(p*100)}%`, sub:`${Math.round(c)} / ${Math.round(g)}`};
+}
+// ===== end donuts =====
+
 })();

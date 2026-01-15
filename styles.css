@@ -492,3 +492,22 @@ body{
   font-weight: 800;
 }
 /* ===== end v6.2.6 ===== */
+
+
+/* ===== v6.2.9 Dashboard donuts ===== */
+.donutRow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+@media (max-width:820px){.donutRow{grid-template-columns:1fr;gap:12px}}
+.donutCard{display:flex;align-items:center;justify-content:center;padding:14px;border-radius:22px;border:1px solid rgba(255,255,255,0.10);background: rgba(255,255,255,0.06);box-shadow: var(--shadow2);}
+:root[data-sky="day"] .donutCard{background: rgba(255,255,255,.60); border-color: rgba(15,23,42,0.08);}
+:root[data-sky="night"] .donutCard{background: rgba(11,28,45,.60); border-color: rgba(255,255,255,0.10);}
+.donut{width:150px;height:150px; position:relative; display:grid; place-items:center;}
+.donut svg{width:150px;height:150px; transform: rotate(-90deg);}
+.donut .center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
+.donut .center .t{font-size:12px;font-weight:900;color:var(--muted);letter-spacing:-0.01em}
+.donut .center .v{font-size:34px;font-weight:950;line-height:1;color:var(--text)}
+.donut .center .s{font-size:12px;font-weight:800;color:var(--muted);margin-top:2px}
+.donutTrack{stroke: rgba(148,163,184,.18);}
+:root[data-sky="night"] .donutTrack{stroke: rgba(255,255,255,.10);}
+.donutArc{stroke-linecap:round; filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.25));}
+/* ===== end v6.2.9 ===== */
+

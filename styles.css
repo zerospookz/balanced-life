@@ -573,3 +573,24 @@ body{
 :root[data-theme="light"] .donutCard{background: rgba(255,255,255,0.25);}
 /* ===== end v6.3.1 ===== */
 
+
+/* ===== v6.3.2 Habit tracker + dashboard fixes ===== */
+.habitTitle{font-size:22px;font-weight:900;letter-spacing:-0.02em;color:var(--text)}
+.habitRange{font-size:13px;font-weight:800;color:var(--muted)}
+/* make habit boxes visible + fill on check */
+.habitBox{
+  width:28px;height:28px;border-radius:8px;
+  border:1px solid rgba(255,255,255,0.16);
+  background:rgba(255,255,255,0.06);
+}
+:root[data-theme="light"] .habitBox{
+  border:1px solid rgba(15,23,42,0.16);
+  background:rgba(15,23,42,0.04);
+}
+.habitBox.on{
+  background:rgba(37,99,235,0.55);
+  border-color:rgba(96,165,250,0.85);
+  box-shadow:0 10px 18px rgba(37,99,235,0.25);
+}
+/* ===== end v6.3.2 ===== */
+

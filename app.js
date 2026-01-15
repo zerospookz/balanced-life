@@ -61,7 +61,7 @@
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.3.1";
+const APP_VERSION = "6.3.2";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -313,6 +313,28 @@ function viewHome() {
       return radialBarsSVG({id:"w", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel:"Workouts"});
     })()}
   </div>
+
+  <div class="donutCard">
+    ${(()=>{
+      const inc = Math.max(0, Number(d.income||0));
+      const exp = Math.max(0, Number(d.expense||0));
+      const total = inc + exp;
+      const share = total ? inc/total : 0;
+      // show net in center like finance dashboards
+      const net = inc - exp;
+      const netTxt = (total? `${Math.round(share*100)}%` : "—");
+      return radialBarsSVG({id:"f", value: share, centerValue: netTxt, centerLabel:"Finances"});
+    })()}
+  </div>
+
+  <div class="donutCard">
+    ${(()=>{
+      const goal = Number(state.kcalGoal||state.goals?.kcal||2000);
+      const prog = donutProgress(d.kcal, goal);
+      return radialBarsSVG({id:"k", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel:"Calories"});
+    })()}
+  </div>
+</div>
       </section>
 
       <section class="card section featured">

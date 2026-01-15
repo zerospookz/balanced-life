@@ -62,11 +62,25 @@
   
   // ===== THEME_MODE v6.0 =====
   const THEME_KEY = "bl_theme_mode"; // system | light | dark
+  
   function applyTheme(mode){
     const root = document.documentElement;
+    // mode: light | dark  (we keep "system" internally but UI will use light/dark)
     if(mode==="dark"){
       root.setAttribute("data-theme","dark");
+      root.setAttribute("data-sky","night"); // Deep Night Calm
     }else if(mode==="light"){
+      root.setAttribute("data-theme","light");
+      root.setAttribute("data-sky","day");
+    }else{
+      // fallback: system
+      root.removeAttribute("data-theme");
+      // map system to current prefers-color-scheme
+      const isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      root.setAttribute("data-sky", isDark ? "night" : "day");
+    }
+    localStorage.setItem(THEME_KEY, mode);
+  }else if(mode==="light"){
       root.setAttribute("data-theme","light");
     }else{
       root.removeAttribute("data-theme"); // system via prefers-color-scheme
@@ -74,6 +88,14 @@
     localStorage.setItem(THEME_KEY, mode);
   }
   applyTheme(localStorage.getItem(THEME_KEY) || "system");
+  
+  function toggleThemeQuick(){
+    const cur = localStorage.getItem(THEME_KEY) || "light";
+    const next = (cur === "dark") ? "light" : "dark";
+    applyTheme(next);
+    render();
+  }
+
 function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     render(); // keep UI consistent after any write
@@ -193,7 +215,8 @@ function saveState() {
   // ---------- Views ----------
   
   function viewHabitTracker(){
-    const start = startOfWeekISO();
+    const offset = Number(state._habitWeekOffset||0);
+    const start = startOfWeekISO(isoFromDate(new Date(Date.now() + offset*7*24*3600*1000)));
     const days = weekISOs(start);
     const habits = state.habits || [];
     const logs = state.habitLogs || {};
@@ -209,14 +232,26 @@ function saveState() {
     const pct = totalPossible ? Math.round((totalDone/totalPossible)*100) : 0;
 
     return `
-      <section class="card" style="margin-top:16px">
+      <section class="card section habitSectionFix">
+        
         <div class="cardHead">
           <div>
-            <div class="cardTitle">Habit tracker</div>
+            <div class="habitTitle">Habit tracker</div>
             <div class="muted"><span class="habitPeriod">Тази седмица</span> • ${start} → ${days[6]}</div>
           </div>
-          <button class="btn" type="button" data-action="addHabit">+ Навик</button>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+            <div class="weekFilter" title="Седмица">
+              <span class="small" style="font-weight:900">Седмица</span>
+              <select data-action="setHabitWeek">
+                <option value="-1" ${offset===-1?"selected":""}>Минала</option>
+                <option value="0" ${offset===0?"selected":""}>Тази</option>
+                <option value="1" ${offset===1?"selected":""}>Следваща</option>
+              </select>
+            </div>
+            <button class="btn primary habitAddBtn" type="button" data-action="addHabit">+ Навик</button>
+          </div>
         </div>
+
 
         <div class="habitWrap" role="table" aria-label="Habit tracker">
           <div class="habitHeadRow" role="row">
@@ -454,7 +489,15 @@ function viewHome() {
     return `
       <section class="card section">
         <div class="h1">Settings</div>
-              <div class="sub">Appearance</div>
+        <div class="sub">Appearance</div>
+        <div class="row" style="margin-top:10px;align-items:center">
+          <div class="pill">🌓 Тема:
+            <select id="themeSelect" data-action="setTheme" style="padding:8px 10px;border-radius:12px">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
         <div class="sub">Импорт/експорт и нулиране</div>
 
         <div class="row" style="margin-top:12px">
@@ -496,7 +539,7 @@ function viewHome() {
     $$("[data-action='selectPlanDay']").forEach(el=>el.addEventListener("change", handleAction));
     $$("[data-action='setTheme']").forEach(el=>el.addEventListener("change", handleAction));
     // set selected theme value
-    const tSel = $("#themeSelect"); if(tSel){ tSel.value = localStorage.getItem("bl_theme_mode") || "system"; }
+    const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "light"; tSel.value = (v==="dark") ? "dark" : "light"; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
   }
@@ -841,6 +884,9 @@ function viewHome() {
 
 
 // ---------- Init ----------
+  const btnTheme = $("#btnTheme");
+  if(btnTheme){ btnTheme.addEventListener("click", toggleThemeQuick); }
+
   $("#btnReorder").addEventListener("click", () => {
     alert("Подреждане: в тази версия плочките са премахнати (ползва се долната навигация).");
   });
@@ -855,3 +901,6 @@ function viewHome() {
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
 })();
+
+
+// Balanced Life v6.2 – consolidated release

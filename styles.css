@@ -229,62 +229,105 @@ textarea{min-height:90px;resize:vertical}
 }
 
 
-/* ===== Deep Night Calm v6.1.5 =====
-   Night palette + no default blur. Blur only on .featured cards.
+/* ===== Balanced Life v6.1.4 (habits sizing + visibility) ===== */
+
+/* Make Habit tracker card match other sections (Dashboard/Weekly) */
+.habitSectionFix{ padding:16px; margin:12px 0; }
+
+/* Improve +Навик button visibility in dark / night */
+.habitAddBtn{ background: var(--accent) !important; color:#fff !important; border-color: transparent !important; }
+
+/* Week selector pill */
+.weekFilter{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.14);
+}
+:root[data-sky="night"] .weekFilter{
+  background: rgba(148,163,184,.10);
+  border-color: rgba(148,163,184,.18);
+}
+.weekFilter select{
+  padding:6px 10px;
+  border-radius:12px;
+}
+
+/* Habit grid contrast */
+.habitDay{ color: var(--muted); font-weight: 800; }
+.habitBox{
+  border-color: rgba(148,163,184,.55) !important;
+  background: rgba(148,163,184,.12) !important;
+}
+:root[data-sky="day"] .habitBox,
+:root[data-sky="sunrise"] .habitBox{
+  border-color: rgba(15,23,42,.22) !important;
+  background: rgba(255,255,255,.22) !important;
+}
+.habitBox.on{
+  box-shadow: 0 10px 22px rgba(0,0,0,.18) !important;
+}
+
+/* ===== end v6.1.4 ===== */
+
+
+/* ===== Deep Night Calm v6.1.5.1 =====
+   Applies when :root[data-sky="night"] is active.
+   No blur by default. Blur only on .featured cards.
 */
 
-/* NO blur by default */
-.topbar{ backdrop-filter: none !important; }
-.bottomnav{ backdrop-filter: none !important; }
+/* No blur by default */
+.topbar{ backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.bottomnav{ backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 
-/* Featured cards: allow blur */
+/* Featured cards only */
 .featured{
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
 
-/* Deep Night Calm palette for night sky */
+/* Deep Night Calm palette */
 :root[data-sky="night"]{
-  /* Base */
   --bg:#050814;
   --bgSolid:#050814;
 
-  /* Cards */
   --card:#0B1C2D;
-  --shadow: 0 8px 24px rgba(0,0,0,0.35);
-  --shadow2: 0 8px 24px rgba(0,0,0,0.35);
-
-  /* Text */
   --text:#eef2ff;
   --muted:#9aa7bf;
   --sub:#b7d8ff;
   --accent:#60a5fa;
 
-  /* Borders / dividers */
+  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+  --shadow2: 0 8px 24px rgba(0,0,0,0.35);
+
   --cardBorder: rgba(255,255,255,0.06);
   --cardDivider: rgba(255,255,255,0.04);
 
-  /* Gradients */
-  --sky1: rgba(15,58,79,.08);  /* Subtle Accent Glow 5–8% */
+  /* Your gradient + subtle glow */
+  --sky1: rgba(15,58,79,.08);  /* Accent glow 5–8% */
   --sky2: rgba(12,36,54,1);    /* Gradient Top */
   --sky3: rgba(5,8,20,1);      /* Gradient Bottom */
 }
 
-/* Use border tokens when present */
+/* Make background use sky tokens (safe override) */
+body{
+  background:
+    radial-gradient(1200px 700px at 15% 10%, var(--sky1), transparent 60%),
+    radial-gradient(900px 700px at 85% 20%, var(--sky2), transparent 60%),
+    radial-gradient(1000px 800px at 50% 95%, var(--sky3), transparent 60%),
+    var(--bgSolid, var(--bg));
+}
+
+/* Use border/divider tokens where available */
 .card{
-  border:1px solid var(--cardBorder, rgba(0,0,0,.06));
+  border: 1px solid var(--cardBorder, rgba(0,0,0,.06));
   box-shadow: var(--shadow);
 }
-.modalCard{
-  border:1px solid var(--cardBorder, rgba(0,0,0,.08));
-}
-.modalHead{
-  border-bottom:1px solid var(--cardDivider, rgba(0,0,0,.06));
-}
-.habitHeadRow{ border-bottom:1px solid var(--cardDivider, rgba(15,23,42,.08)); }
-.habitRow{ border-bottom:1px solid var(--cardDivider, rgba(15,23,42,.06)); }
+.modalCard{ border: 1px solid var(--cardBorder, rgba(0,0,0,.08)); }
+.modalHead{ border-bottom: 1px solid var(--cardDivider, rgba(0,0,0,.06)); }
 
-/* In night mode, make topbar/bottomnav look premium without blur */
+/* Night topbar/bottomnav without blur */
 :root[data-sky="night"] .topbar{
   background: linear-gradient(180deg, rgba(5,8,20,.92), rgba(5,8,20,.65));
 }
@@ -293,11 +336,57 @@ textarea{min-height:90px;resize:vertical}
   border: 1px solid rgba(255,255,255,0.08);
 }
 
-/* Optional: featured card style hint */
+/* Featured card surface */
 .featured{
   background: rgba(11,28,45,.70);
-  border:1px solid rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.10);
   box-shadow: 0 10px 28px rgba(0,0,0,0.42);
 }
 
-/* ===== end v6.1.5 ===== */
+/* ===== end v6.1.5.1 ===== */
+
+
+/* ===== Sky Day Premium v6.1.7 =====
+   Cleaner blue sky + subtle sun glow.
+   Featured blur ONLY in light mode.
+*/
+
+/* Sky Day refined palette */
+:root[data-sky="day"]{
+  --bg:#eef5ff;
+  --bgSolid:#eef5ff;
+
+  /* cleaner blue sky */
+  --sky1: rgba(56,189,248,.22);   /* soft blue */
+  --sky2: rgba(59,130,246,.18);   /* sky blue */
+  --sky3: rgba(250,204,21,.16);   /* sun glow */
+
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --sub:#1e40af;
+
+  --shadow: 0 12px 28px rgba(15,23,42,.12);
+  --shadow2: 0 8px 20px rgba(15,23,42,.10);
+}
+
+/* Ensure no blur by default in light */
+:root[data-sky="day"] .topbar,
+:root[data-sky="day"] .bottomnav{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+/* Featured cards: very subtle blur in light */
+:root[data-sky="day"] .featured{
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(15,23,42,.08);
+  box-shadow: 0 14px 32px rgba(15,23,42,.16);
+}
+
+/* ===== end v6.1.7 ===== */
+
+
+/* Balanced Life v6.2 – consolidated design & features */

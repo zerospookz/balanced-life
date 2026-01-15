@@ -60,9 +60,8 @@
   }
 
   
-  // ===== THEME_MODE v6.2.3 (manual light/dark) =====
-  const THEME_KEY = "bl_theme_mode"; // light | dark
-
+  // ===== THEME_MODE v6.0 =====
+  const THEME_KEY = "bl_theme_mode"; // system | light | dark
   function applyTheme(mode){
     const root = document.documentElement;
     const m = (mode === "dark") ? "dark" : "light";
@@ -70,12 +69,8 @@
     root.setAttribute("data-sky", m === "dark" ? "night" : "day");
     localStorage.setItem(THEME_KEY, m);
   }
-
-  // Apply saved theme on boot
   applyTheme(localStorage.getItem(THEME_KEY) || "light");
-
 function saveState() {
-
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     render(); // keep UI consistent after any write
   }
@@ -194,8 +189,7 @@ function saveState() {
   // ---------- Views ----------
   
   function viewHabitTracker(){
-    const offset = Number(state._habitWeekOffset||0);
-    const start = startOfWeekISO(isoFromDate(new Date(Date.now() + offset*7*24*3600*1000)));
+    const start = startOfWeekISO();
     const days = weekISOs(start);
     const habits = state.habits || [];
     const logs = state.habitLogs || {};
@@ -211,26 +205,14 @@ function saveState() {
     const pct = totalPossible ? Math.round((totalDone/totalPossible)*100) : 0;
 
     return `
-      <section class="card section habitSectionFix">
-        
+      <section class="card" style="margin-top:16px">
         <div class="cardHead">
           <div>
-            <div class="habitTitle">Habit tracker</div>
+            <div class="cardTitle">Habit tracker</div>
             <div class="muted"><span class="habitPeriod">Тази седмица</span> • ${start} → ${days[6]}</div>
           </div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-            <div class="weekFilter" title="Седмица">
-              <span class="small" style="font-weight:900">Седмица</span>
-              <select data-action="setHabitWeek">
-                <option value="-1" ${offset===-1?"selected":""}>Минала</option>
-                <option value="0" ${offset===0?"selected":""}>Тази</option>
-                <option value="1" ${offset===1?"selected":""}>Следваща</option>
-              </select>
-            </div>
-            <button class="btn primary habitAddBtn" type="button" data-action="addHabit">+ Навик</button>
-          </div>
+          <button class="btn" type="button" data-action="addHabit">+ Навик</button>
         </div>
-
 
         <div class="habitWrap" role="table" aria-label="Habit tracker">
           <div class="habitHeadRow" role="row">
@@ -277,7 +259,7 @@ function viewHome() {
     const d = computeDashboard();
     return `
       <div class="pageStack">
-      <section class="card section featured">
+      <section class="card section">
         <div class="h1">Dashboard</div>
         <div class="sub">Днес: бюджет • хранене • тренировки</div>
         <div class="row" style="margin-top:12px;align-items:center">
@@ -304,15 +286,41 @@ function viewHome() {
         </div>
       </section>
 
+      
       <section class="card section featured">
         <div class="h1">Weekly overview</div>
         <div class="sub">Бърз поглед за последните 7 дни</div>
-        <div class="row" style="margin-top:12px">
-          <button class="btn ghost" data-route="finances" type="button">💰 Finances</button>
-          <button class="btn ghost" data-route="nutrition" type="button">🥗 Nutrition</button>
-          <button class="btn ghost" data-route="workouts" type="button">🏋️ Workouts</button>
+
+        <div class="weekTiles">
+          <button class="weekTile" type="button" data-route="finances" aria-label="Finances tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Finances</div>
+              <div class="weekTileIcon">💰</div>
+            </div>
+            <div class="weekTileValue">${money(d.budget)} лв</div>
+            <div class="weekTileSub">Месец: +${money(d.income)} • -${money(d.expense)}</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="nutrition" aria-label="Nutrition tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Nutrition</div>
+              <div class="weekTileIcon">🥗</div>
+            </div>
+            <div class="weekTileValue">${Math.round(d.kcal)} kcal</div>
+            <div class="weekTileSub">Днес • бързо добавяне от Nutrition</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="workouts" aria-label="Workouts tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Workouts</div>
+              <div class="weekTileIcon">🏋️</div>
+            </div>
+            <div class="weekTileValue">${Math.round(d.wmin)} мин</div>
+            <div class="weekTileSub">Последни 7 дни • планът е вътре</div>
+          </button>
         </div>
       </section>
+
       ${viewHabitTracker()}
       </div>
     `;
@@ -468,15 +476,7 @@ function viewHome() {
     return `
       <section class="card section">
         <div class="h1">Settings</div>
-        <div class="sub">Appearance</div>
-        <div class="row" style="margin-top:10px;align-items:center">
-          <div class="pill">🌓 Тема:
-            <select id="themeSelect" data-action="setTheme" style="padding:8px 10px;border-radius:12px">
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </div>
-        </div>
+              <div class="sub">Appearance</div>
         <div class="sub">Импорт/експорт и нулиране</div>
 
         <div class="row" style="margin-top:12px">
@@ -518,7 +518,7 @@ function viewHome() {
     $$("[data-action='selectPlanDay']").forEach(el=>el.addEventListener("change", handleAction));
     $$("[data-action='setTheme']").forEach(el=>el.addEventListener("change", handleAction));
     // set selected theme value
-    const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "light"; tSel.value = (v==="dark") ? "dark" : "light"; }
+    const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem(THEME_KEY) || "light"; tSel.value = (v==="dark") ? "dark" : "light"; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
   }
@@ -549,7 +549,7 @@ function viewHome() {
       state._workoutsTab = e.currentTarget.dataset.tab;
       return render();
     }
-    if(a==="setTheme") { applyTheme(e.currentTarget.value); return; } }
+    if(a==="setTheme") { applyTheme(e.currentTarget.value); return; }
     if(a==="selectPlanDay") {
       const v = e.currentTarget.value;
       state._selectedPlanDay = v;
@@ -863,18 +863,14 @@ function viewHome() {
 
 
 // ---------- Init ----------
-
+  
   function toggleThemeQuick(){
     const cur = localStorage.getItem(THEME_KEY) || "light";
     const next = (cur === "dark") ? "light" : "dark";
     applyTheme(next);
     render();
   }
-
-  const btnTheme = $("#btnTheme");
-  if(btnTheme){ btnTheme.addEventListener("click", toggleThemeQuick); }
-
-  const btnTheme = document.getElementById("btnTheme");
+const btnTheme = $("#btnTheme");
   if(btnTheme){ btnTheme.addEventListener("click", toggleThemeQuick); }
 
   $("#btnReorder").addEventListener("click", () => {
@@ -891,6 +887,3 @@ function viewHome() {
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
 })();
-
-
-// Balanced Life v6.2 – consolidated release

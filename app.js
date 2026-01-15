@@ -31,12 +31,12 @@
     nutrition: [],
     workouts: [], // workout logs (sessions)
     habits: [
-      {id:"h_workouts", name:"Тренировки", icon:"🏋️", color:"#10B981"},
-      {id:"h_nutrition", name:"Хранене", icon:"🥗", color:"#F59E0B"},
-      {id:"h_finances", name:"Финанси", icon:"💰", color:"#2563EB"},
-      {id:"h_steps", name:"Разходка", icon:"🚶", color:"#06B6D4"},
-      {id:"h_sleep", name:"Сън", icon:"😴", color:"#8B5CF6"},
-      {id:"h_cardio", name:"Кардио", icon:"🏃", color:"#EF4444"},
+      {id:"h_workouts", name:"Тренировки", icon:"🏋️"},
+      {id:"h_nutrition", name:"Хранене", icon:"🥗"},
+      {id:"h_finances", name:"Финанси", icon:"💰"},
+      {id:"h_steps", name:"Разходка", icon:"🚶"},
+      {id:"h_mobility", name:"Мобилност", icon:"🧘"},
+      {id:"h_rope", name:"Въже/Кардио", icon:"🪢"},
     ],
     habitLogs: {},
     workoutPlan: {"Понеделник": {"Фокус": "Push + Planche (тежко) + Handstand", "Skill: Handstand (15–20 мин)": ["Chest-to-wall 5×30–45 сек (линия)", "Kick-ups 6–10 опита ×10–25 сек", "Scap shrugs в стойка 3×10"], "Skill: Planche (8–12 мин)": ["Tuck/Frog holds 6–10×6–12 сек", "Planche leans 3×20 сек"], "Skill: Flag (8–12 мин)": ["(по желание) 2–4 леки опита"], "Сила — Блок A (тежко)": ["Bench press ИЛИ Weighted dips 4×4–6", "Overhead press 3×5–8"], "Сила — Блок B": ["Pseudo planche push-ups 4×6–10", "Hollow hold 4×20–40 сек"], "Аксесоари / Прехаб": ["Lateral raise 3×12–20", "Китки: wrist rocks 2×10"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "RPE 7–8; спри при разпад на форма"}, "Вторник": {"Фокус": "Pull (тежко) + Flag + Набирания", "Skill: Handstand (15–20 мин)": ["(кратко: 3–5 леки опита по 10–15 сек)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": ["Tuck/ластик 6–10×5–10 сек", "Негативи 4×3–6 сек (контрол)"], "Сила — Блок A (тежко)": ["Weighted pull-ups 5×3–5", "Chin-ups 3×6–10"], "Сила — Блок B": ["Row (щанга/опора) 4×6–10", "Lat pulldown 3×10–15"], "Аксесоари / Прехаб": ["Face pulls 3×15–20", "External rotations 3×15–20", "Side plank/Copenhagen 4×20–40 сек/страна"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Фокус: стабилни рамене, лакът без болка"}, "Сряда": {"Фокус": "Крака (фитнес) + Core + лека стойка", "Skill: Handstand (15–20 мин)": ["Scap shrugs 3×10", "3–5 леки опита стойка (без борба)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": ["Squat (back/front) 4×3–6", "RDL 4×5–8"], "Сила — Блок B": ["Bulgarian split squat 3×8–12/крак", "Leg curl ИЛИ Nordic прогресия 3×8–12"], "Аксесоари / Прехаб": ["Calves 4×10–20", "Ab wheel ИЛИ Hanging knee raises 4×8–15"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Не до отказ (за да пазиш краката)"}, "Четвъртък": {"Фокус": "Кондиция: Бокс + Въже + Мобилност", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Прехаб 10 мин: scap push-ups 2×10", "Wrist rocks 2×10", "External rotations 3×15–20"], "Кондиция / Спорт": ["Въже 12×(40/40)", "Бокс 8–12 рунда × 2–3 мин"], "Център време (мин)": "45–75", "Бележки": "Дръж умерено (техника + дишане)"}, "Петък": {"Фокус": "Upper (обем/умение) + Planche + Pull-up вариации", "Skill: Handstand (15–20 мин)": ["6–10 опита ×10–25 сек (контрол)", "Wall line 2×30 сек"], "Skill: Planche (8–12 мин)": ["Holds 6–8×8–12 сек", "Lean 3×20 сек"], "Skill: Flag (8–12 мин)": ["4–6 леки опита ×5–8 сек (само чисто)"], "Сила — Блок A (тежко)": ["Explosive pull-ups / chest-to-bar 6×2–4", "Archer / Typewriter 4×3–6/страна"], "Сила — Блок B": ["Incline DB press 4×8–12", "Seated cable row 3×10–15"], "Аксесоари / Прехаб": ["Curls 3×10–15", "Triceps pushdown 3×10–15", "Farmer/Suitcase carry 6×20–40 м"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Пази свежест за уикенда (без отказ)"}, "Събота": {"Фокус": "Футбол + кратък Skill/прехаб (леко)", "Skill: Handstand (15–20 мин)": ["8–12 мин лесни опита (или стена)"], "Skill: Planche (8–12 мин)": ["Lean 3×15–25 сек", "PPPUs 3×8 (леки)"], "Skill: Flag (8–12 мин)": ["Само ако си свеж: 1–3 опита ×5–8 сек"], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Face pulls 2×20", "External rotations 2×20", "Разтягане 5–10 мин"], "Кондиция / Спорт": ["Футбол (трен./мач)"], "Център време (мин)": "20–45 + футбол", "Бележки": "Ако мачът е тежък → само мобилност"}, "Неделя": {"Фокус": "Футбол + възстановяване", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Мобилност 10–15 мин (грасци/бедра/таз/гръб/рамене)"], "Кондиция / Спорт": ["Футбол", "Zone 2 20–40 мин (по желание)"], "Център време (мин)": "20–40 + футбол", "Бележки": "Цел: възстановяване"}},
@@ -59,22 +59,7 @@
     }
   }
 
-  
-  // ===== THEME_MODE v6.0 =====
-  const THEME_KEY = "bl_theme_mode"; // system | light | dark
-  function applyTheme(mode){
-    const root = document.documentElement;
-    if(mode==="dark"){
-      root.setAttribute("data-theme","dark");
-    }else if(mode==="light"){
-      root.setAttribute("data-theme","light");
-    }else{
-      root.removeAttribute("data-theme"); // system via prefers-color-scheme
-    }
-    localStorage.setItem(THEME_KEY, mode);
-  }
-  applyTheme(localStorage.getItem(THEME_KEY) || "system");
-function saveState() {
+  function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     render(); // keep UI consistent after any write
   }
@@ -213,7 +198,7 @@ function saveState() {
         <div class="cardHead">
           <div>
             <div class="cardTitle">Habit tracker</div>
-            <div class="muted"><span class="habitPeriod">Тази седмица</span> • ${start} → ${days[6]}</div>
+            <div class="muted">Тази седмица • ${start} → ${days[6]}</div>
           </div>
           <button class="btn" type="button" data-action="addHabit">+ Навик</button>
         </div>
@@ -229,13 +214,13 @@ function saveState() {
               <div class="habitName" role="cell">
                 <div class="habitNameInner">
                   <span class="habitIcon">${h.icon||"✅"}</span>
-                  <span class="habitText" style="color:${h.color||"#1e3a8a"}">${escapeHtml(h.name||"Навик")}</span>
+                  <span class="habitText">${escapeHtml(h.name||"Навик")}</span>
                   <span class="chip">${weekCounts[idx]}/7</span>
                 </div>
               </div>
               ${days.map(d=>{
                 const on = !!(logs[d] && logs[d][h.id]);
-                return `<button class="habitBox ${on?"on":""}" style="--hc:${h.color||'#1e3a8a'}" type="button" aria-label="${h.name} ${d}" data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
+                return `<button class="habitDot ${on?"on":""}" type="button" aria-label="${h.name} ${d}" data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
               }).join("")}
             </div>
           `).join("") : `<div class="muted" style="padding:10px 6px">Нямаш навици. Натисни “+ Навик”.</div>`}
@@ -454,7 +439,6 @@ function viewHome() {
     return `
       <section class="card section">
         <div class="h1">Settings</div>
-              <div class="sub">Appearance</div>
         <div class="sub">Импорт/експорт и нулиране</div>
 
         <div class="row" style="margin-top:12px">
@@ -491,12 +475,9 @@ function viewHome() {
     $$(".bottomnav .tab").forEach(t=>t.classList.toggle("active", t.dataset.route===route));
 
     // actions
-    $$("[data-action]").forEach(el=>{ if(el.dataset.action==="selectPlanDay" && el.tagName==="SELECT") return; el.addEventListener("click", handleAction); });
+    $$("[data-action]").forEach(el=> el.addEventListener("click", handleAction));
     // change actions
     $$("[data-action='selectPlanDay']").forEach(el=>el.addEventListener("change", handleAction));
-    $$("[data-action='setTheme']").forEach(el=>el.addEventListener("change", handleAction));
-    // set selected theme value
-    const tSel = $("#themeSelect"); if(tSel){ tSel.value = localStorage.getItem("bl_theme_mode") || "system"; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
   }
@@ -527,7 +508,6 @@ function viewHome() {
       state._workoutsTab = e.currentTarget.dataset.tab;
       return render();
     }
-    if(a==="setTheme") { applyTheme(e.currentTarget.value); return; }
     if(a==="selectPlanDay") {
       const v = e.currentTarget.value;
       state._selectedPlanDay = v;

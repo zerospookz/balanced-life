@@ -161,7 +161,7 @@ function saveState() {
         </circle>
         <rect x="47" y="47" width="56" height="56" rx="14" fill="rgba(0,0,0,.04)" stroke="rgba(0,0,0,.05)"/>
         <text x="75" y="78" text-anchor="middle" font-size="18" font-weight="900" fill="var(--text)">${Math.round(p*100)}%</text>
-        <text x="75" y="98" text-anchor="middle" font-size="12" font-weight="800" fill="var(--sub)">Energy</text>
+        <text x="75" y="98" text-anchor="middle" font-size="12" font-weight="800" fill="var(--sub)"<span class="energyLabel">Energy</span>/text>
       </svg>
     `;
   }
@@ -199,11 +199,30 @@ function saveState() {
   // ---------- Views ----------
   
   function viewHabitTracker(){
-    const offset = Number(state._habitWeekOffset||0);
-    const start = startOfWeekISO(isoFromDate(new Date(Date.now() + offset*7*24*3600*1000)));
+    const now = new Date();
+    const isoNow = (typeof getISOWeek === "function") ? getISOWeek(now) : {year: now.getFullYear(), week: 1};
+    const year = isoNow.year || now.getFullYear();
+    const weeks = (typeof buildISOWeeksForYear === "function") ? buildISOWeeksForYear(year) : [];
+    const fallbackVal = `${year}-W${String(isoNow.week||1).padStart(2,"0")}`;
+    const saved = state._habitWeekFull || fallbackVal;
+    const selWeek = Number(saved.split("W")[1] || (isoNow.week||1));
+
+    const startDate = (typeof startOfISOWeekFromYearWeek === "function")
+      ? startOfISOWeekFromYearWeek(year, selWeek)
+      : new Date(now.getTime() - ((now.getDay()+6)%7)*86400000);
+
+    const start = isoFromDate(startDate);
     const days = weekISOs(start);
+
+    const weekOptions = weeks.length ? weeks.map(w=>{
+      const val = `${year}-W${String(w.week).padStart(2,"0")}`;
+      const label = `W${String(w.week).padStart(2,"0")} • ${w.start} → ${w.end}`;
+      return `<option value="${val}" ${val===saved?"selected":""}>${label}</option>`;
+    }).join("") : `<option value="${saved}">${saved}</option>`;
+
     const habits = state.habits || [];
     const logs = state.habitLogs || {};
+
     const weekCounts = habits.map(h=>{
       let c=0;
       for(const iso of days){
@@ -211,36 +230,35 @@ function saveState() {
       }
       return c;
     });
+
     const totalDone = weekCounts.reduce((a,b)=>a+b,0);
     const totalPossible = habits.length * days.length;
     const pct = totalPossible ? Math.round((totalDone/totalPossible)*100) : 0;
 
     return `
       <section class="card section habitSectionFix">
-        
         <div class="cardHead">
           <div>
             <div class="habitTitle">Habit tracker</div>
-            <div class="muted"><span class="habitPeriod">Тази седмица</span> • ${start} → ${days[6]}</div>
+            <div class="habitRange">
+              <span class="mutedInline">Тази седмица</span> • ${start} → ${days[6]}
+            </div>
           </div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
             <div class="weekFilter" title="Седмица">
               <span class="small" style="font-weight:900">Седмица</span>
-              <select data-action="setHabitWeek">
-                <option value="-1" ${offset===-1?"selected":""}>Минала</option>
-                <option value="0" ${offset===0?"selected":""}>Тази</option>
-                <option value="1" ${offset===1?"selected":""}>Следваща</option>
+              <select data-action="setHabitWeekFull">
+                ${weekOptions}
               </select>
             </div>
-            <button class="btn primary habitAddBtn" type="button" data-action="addHabit" class="btn primary habitAddBtn" type="button" class="btn primary habitAddBtn" type="button">+ Навик</button>
+            <button class="btn primary habitAddBtn" type="button" data-action="addHabit">+ Навик</button>
           </div>
         </div>
 
-
-        <div class="habitWrap" role="table" aria-label="Habit tracker">
+        <div class="habitWrap">
           <div class="habitHeadRow" role="row">
-            <div class="habitName" role="columnheader">Навик</div>
-            ${days.map(d=>`<div class="habitDay" role="columnheader">${dayLabel(d)}</div>`).join("")}
+            <div class="habitHeadName" role="columnheader">Навик</div>
+            ${days.map((d,i)=>`<div class="habitDay" role="columnheader">${"ПВСЧПСН"[i]}</div>`).join("")}
           </div>
 
           ${habits.length ? habits.map((h,idx)=>`
@@ -248,33 +266,34 @@ function saveState() {
               <div class="habitName" role="cell">
                 <div class="habitNameInner">
                   <span class="habitIcon">${h.icon||"✅"}</span>
-                  <span class="habitText" style="color:${h.color||"#1e3a8a"}">${escapeHtml(h.name||"Навик")}</span>
+                  <span class="habitText" style="color:${h.color||"#60a5fa"}">${escapeHtml(h.name||"Навик")}</span>
                   <span class="chip">${weekCounts[idx]}/7</span>
                 </div>
               </div>
               ${days.map(d=>{
                 const on = !!(logs[d] && logs[d][h.id]);
-                return `<button class="habitBox ${on?"on":""}" style="--hc:${h.color||'#1e3a8a'}" type="button" aria-label="${h.name} ${d}" data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
+                return `<button class="habitBox ${on?"on":""}" type="button"
+                          data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
               }).join("")}
             </div>
           `).join("") : `<div class="muted" style="padding:10px 6px">Нямаш навици. Натисни “+ Навик”.</div>`}
         </div>
 
         <div class="habitStats">
-          <div class="statMini">
-            <div class="statLabel">Изпълнение</div>
-            <div class="statValue">${pct}%</div>
+          <div class="kpi">
+            <div class="l">Изпълнение</div>
+            <div class="v">${pct}%</div>
           </div>
-          <div class="statMini">
-            <div class="statLabel">Отметнати</div>
-            <div class="statValue">${totalDone}</div>
+          <div class="kpi">
+            <div class="l">Отметнати</div>
+            <div class="v">${totalDone}</div>
           </div>
-        <div class="statMini">
-          <div class="statLabel">Навици</div>
-          <div class="statValue">${habits.length}</div>
+          <div class="kpi">
+            <div class="l">Навици</div>
+            <div class="v">${habits.length}</div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
     `;
   }
 
@@ -312,12 +331,35 @@ function viewHome() {
       <section class="card section featured">
         <div class="h1">Weekly overview</div>
         <div class="sub">Бърз поглед за последните 7 дни</div>
-        <div class="row" style="margin-top:12px">
-          <button class="btn ghost" data-route="finances" type="button">💰 Finances</button>
-          <button class="btn ghost" data-route="nutrition" type="button">🥗 Nutrition</button>
-          <button class="btn ghost" data-route="workouts" type="button">🏋️ Workouts</button>
+        <div class="weekTiles">
+          <button class="weekTile" type="button" data-route="finances" aria-label="Finances tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Finances</div>
+              <div class="weekTileIcon">💰</div>
+            </div>
+            <div class="weekTileValue">${money(d.budget)} лв</div>
+            <div class="weekTileSub">Месец: +${money(d.income)} • -${money(d.expense)}<br/>Остава: ${money(d.budget + d.income - d.expense)} лв</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="nutrition" aria-label="Nutrition tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Nutrition</div>
+              <div class="weekTileIcon">🥗</div>
+            </div>
+            <div class="weekTileValue">${Math.round(d.kcal)} kcal</div>
+            <div class="weekTileSub">Днес • добави храна<br/>Цел: ${Math.round(d.kcalGoal||0)} kcal</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="workouts" aria-label="Workouts tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Workouts</div>
+              <div class="weekTileIcon">🏋️</div>
+            </div>
+            <div class="weekTileValue">${Math.round(d.wmin)} мин</div>
+            <div class="weekTileSub">Последни 7 дни • ${Math.round(d.wCount||0)} трен.<br/>Планът е вътре</div>
+          </button>
         </div>
-      </section>
+</section>
       ${viewHabitTracker()}
       </div>
     `;
@@ -522,6 +564,7 @@ function viewHome() {
     // change actions
     $$("[data-action='selectPlanDay']").forEach(el=>el.addEventListener("change", handleAction));
     $$("[data-action='setTheme']").forEach(el=>el.addEventListener("change", handleAction));
+    $$("[data-action='setHabitWeekFull']").forEach(el=>el.addEventListener("change", handleAction));
     // set selected theme value
     const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "light"; tSel.value = (v==="dark") ? "dark" : "light"; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
@@ -531,6 +574,7 @@ function viewHome() {
   function handleAction(e) {
     const a = e.currentTarget.dataset.action;
     if(a==="toggleHabit") return toggleHabit(e.currentTarget.dataset.habit, e.currentTarget.dataset.date);
+    if(a==="setHabitWeekFull") { state._habitWeekFull = e.currentTarget.value; saveState(); return render(); }
     if(a==="addHabit") return openAddHabit();
     if(a==="addFinance") return openAddFinance();
     if(a==="delFinance") {

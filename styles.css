@@ -438,3 +438,57 @@ body{
 .presetMeta{font-size:var(--fs-small);color:var(--muted);font-weight:700}
 .presetAdd{font-weight:950;opacity:.9}
 
+
+/* ===== v6.2.6 polish (energy ring + weekly tiles + week select readability) ===== */
+
+/* Energy ring visibility in night */
+:root[data-sky="night"] .kpiRing,
+:root[data-sky="night"] .ring,
+:root[data-sky="night"] svg circle{
+  /* safe: only affects inside widget due to inline attrs being stronger; we override via classes below too */
+}
+:root[data-sky="night"] .energyWrap{
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+:root[data-sky="night"] .energyLabel{
+  color: rgba(255,255,255,0.86);
+}
+
+/* Weekly tiles bigger */
+.weekTile{
+  padding:18px !important;
+  border-radius:20px !important;
+}
+.weekTileTitle{ font-size: 15px !important; }
+.weekTileValue{ font-size: 28px !important; }
+.weekTileSub{ font-size: 12px !important; line-height:1.25; }
+
+/* Week selector readability */
+.weekFilter{
+  background: rgba(255,255,255,.12) !important;
+  border-color: rgba(255,255,255,.18) !important;
+}
+.weekFilter select{
+  background: rgba(255,255,255,.16) !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  color: var(--text) !important;
+}
+:root[data-sky="night"] .weekFilter select{
+  background: rgba(255,255,255,.06) !important;
+  border-color: rgba(255,255,255,.14) !important;
+  color: rgba(255,255,255,.92) !important;
+}
+
+/* Habit tracker range typography: make digits match */
+.habitRange{
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing:-0.01em;
+  color: var(--text);
+}
+.habitRange .mutedInline{
+  color: var(--muted);
+  font-weight: 800;
+}
+/* ===== end v6.2.6 ===== */

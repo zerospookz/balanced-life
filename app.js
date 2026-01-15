@@ -26,6 +26,7 @@
   };
 
   const defaultState = {
+    lang: "en",
     route: "home",
     finances: [],
     nutrition: [],
@@ -41,6 +42,108 @@
     habitLogs: {},
     workoutPlan: {"Понеделник": {"Фокус": "Push + Planche (тежко) + Handstand", "Skill: Handstand (15–20 мин)": ["Chest-to-wall 5×30–45 сек (линия)", "Kick-ups 6–10 опита ×10–25 сек", "Scap shrugs в стойка 3×10"], "Skill: Planche (8–12 мин)": ["Tuck/Frog holds 6–10×6–12 сек", "Planche leans 3×20 сек"], "Skill: Flag (8–12 мин)": ["(по желание) 2–4 леки опита"], "Сила — Блок A (тежко)": ["Bench press ИЛИ Weighted dips 4×4–6", "Overhead press 3×5–8"], "Сила — Блок B": ["Pseudo planche push-ups 4×6–10", "Hollow hold 4×20–40 сек"], "Аксесоари / Прехаб": ["Lateral raise 3×12–20", "Китки: wrist rocks 2×10"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "RPE 7–8; спри при разпад на форма"}, "Вторник": {"Фокус": "Pull (тежко) + Flag + Набирания", "Skill: Handstand (15–20 мин)": ["(кратко: 3–5 леки опита по 10–15 сек)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": ["Tuck/ластик 6–10×5–10 сек", "Негативи 4×3–6 сек (контрол)"], "Сила — Блок A (тежко)": ["Weighted pull-ups 5×3–5", "Chin-ups 3×6–10"], "Сила — Блок B": ["Row (щанга/опора) 4×6–10", "Lat pulldown 3×10–15"], "Аксесоари / Прехаб": ["Face pulls 3×15–20", "External rotations 3×15–20", "Side plank/Copenhagen 4×20–40 сек/страна"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Фокус: стабилни рамене, лакът без болка"}, "Сряда": {"Фокус": "Крака (фитнес) + Core + лека стойка", "Skill: Handstand (15–20 мин)": ["Scap shrugs 3×10", "3–5 леки опита стойка (без борба)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": ["Squat (back/front) 4×3–6", "RDL 4×5–8"], "Сила — Блок B": ["Bulgarian split squat 3×8–12/крак", "Leg curl ИЛИ Nordic прогресия 3×8–12"], "Аксесоари / Прехаб": ["Calves 4×10–20", "Ab wheel ИЛИ Hanging knee raises 4×8–15"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Не до отказ (за да пазиш краката)"}, "Четвъртък": {"Фокус": "Кондиция: Бокс + Въже + Мобилност", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Прехаб 10 мин: scap push-ups 2×10", "Wrist rocks 2×10", "External rotations 3×15–20"], "Кондиция / Спорт": ["Въже 12×(40/40)", "Бокс 8–12 рунда × 2–3 мин"], "Център време (мин)": "45–75", "Бележки": "Дръж умерено (техника + дишане)"}, "Петък": {"Фокус": "Upper (обем/умение) + Planche + Pull-up вариации", "Skill: Handstand (15–20 мин)": ["6–10 опита ×10–25 сек (контрол)", "Wall line 2×30 сек"], "Skill: Planche (8–12 мин)": ["Holds 6–8×8–12 сек", "Lean 3×20 сек"], "Skill: Flag (8–12 мин)": ["4–6 леки опита ×5–8 сек (само чисто)"], "Сила — Блок A (тежко)": ["Explosive pull-ups / chest-to-bar 6×2–4", "Archer / Typewriter 4×3–6/страна"], "Сила — Блок B": ["Incline DB press 4×8–12", "Seated cable row 3×10–15"], "Аксесоари / Прехаб": ["Curls 3×10–15", "Triceps pushdown 3×10–15", "Farmer/Suitcase carry 6×20–40 м"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Пази свежест за уикенда (без отказ)"}, "Събота": {"Фокус": "Футбол + кратък Skill/прехаб (леко)", "Skill: Handstand (15–20 мин)": ["8–12 мин лесни опита (или стена)"], "Skill: Planche (8–12 мин)": ["Lean 3×15–25 сек", "PPPUs 3×8 (леки)"], "Skill: Flag (8–12 мин)": ["Само ако си свеж: 1–3 опита ×5–8 сек"], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Face pulls 2×20", "External rotations 2×20", "Разтягане 5–10 мин"], "Кондиция / Спорт": ["Футбол (трен./мач)"], "Център време (мин)": "20–45 + футбол", "Бележки": "Ако мачът е тежък → само мобилност"}, "Неделя": {"Фокус": "Футбол + възстановяване", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Мобилност 10–15 мин (грасци/бедра/таз/гръб/рамене)"], "Кондиция / Спорт": ["Футбол", "Zone 2 20–40 мин (по желание)"], "Център време (мин)": "20–40 + футбол", "Бележки": "Цел: възстановяване"}},
   };
+// ===== i18n v6.3.3 (EN/BG) =====
+const I18N = {
+  en: {
+    offlineSub: "Offline • data stays on your phone",
+    sort: "Sort",
+    dashboardToday: "Today: budget • nutrition • workouts",
+    weeklyOverview: "Weekly overview",
+    quickLook7: "Quick look for the last 7 days",
+    habitTracker: "Habit tracker",
+    thisWeek: "This week",
+    week: "Week",
+    addHabit: "+ Habit",
+    habit: "Habit",
+    completion: "Completion",
+    checked: "Checked",
+    habits: "Habits",
+    noHabits: "No habits yet. Tap “+ Habit”.",
+    workouts: "Workouts",
+    finances: "Finances",
+    nutrition: "Nutrition",
+    calories: "Calories",
+    walk: "Walk",
+    sleep: "Sleep",
+    cardio: "Cardio",
+    entry: "Entry",
+    food: "Food",
+    workout: "Workout",
+    noEntries: "No entries yet.",
+    noSections: "No sections.",
+  },
+  bg: {
+    offlineSub: "Офлайн • данните са на телефона",
+    sort: "Подреди",
+    dashboardToday: "Днес: бюджет • хранене • тренировки",
+    weeklyOverview: "Weekly overview",
+    quickLook7: "Бърз поглед за последните 7 дни",
+    habitTracker: "Habit tracker",
+    thisWeek: "Тази седмица",
+    week: "Седмица",
+    addHabit: "+ Навик",
+    habit: "Навик",
+    completion: "Изпълнение",
+    checked: "Отметнати",
+    habits: "Навици",
+    noHabits: "Нямаш навици. Натисни “+ Навик”.",
+    workouts: "Тренировки",
+    finances: "Финанси",
+    nutrition: "Хранене",
+    calories: "Калории",
+    walk: "Разходка",
+    sleep: "Сън",
+    cardio: "Кардио",
+    entry: "Запис",
+    food: "Храна",
+    workout: "Тренировка",
+    noEntries: "Няма записи.",
+    noSections: "Няма секции.",
+  }
+};
+
+function t(key){
+  const lang = state?.lang || "en";
+  return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+}
+
+function setLang(lang){
+  state.lang = (lang === "bg") ? "bg" : "en";
+  updateHeaderUI();
+  saveState();
+  render();
+}
+
+function updateHeaderUI(){
+  document.documentElement.setAttribute("lang", (state.lang||"en")==="bg" ? "bg" : "en");
+  const sub = document.querySelector(".brandSub");
+  if(sub) sub.textContent = t("offlineSub");
+  const r = document.getElementById("btnReorder");
+  if(r) r.textContent = t("sort");
+
+  const enBtn = document.getElementById("btnLangEN");
+  const bgBtn = document.getElementById("btnLangBG");
+  if(enBtn) enBtn.classList.toggle("isActive", (state.lang||"en") === "en");
+  if(bgBtn) bgBtn.classList.toggle("isActive", (state.lang||"en") === "bg");
+}
+
+function habitDisplayName(h){
+  if(!h) return "";
+  const id = h.id || "";
+  const lang = state.lang || "en";
+  const map = {
+    h_workouts: {en: I18N.en.workouts, bg: I18N.bg.workouts},
+    h_nutrition:{en: I18N.en.nutrition, bg: I18N.bg.nutrition},
+    h_finances: {en: I18N.en.finances, bg: I18N.bg.finances},
+    h_steps:   {en: I18N.en.walk, bg: I18N.bg.walk},
+    h_sleep:   {en: I18N.en.sleep, bg: I18N.bg.sleep},
+    h_cardio:  {en: I18N.en.cardio, bg: I18N.bg.cardio},
+  };
+  if(map[id]) return map[id][lang] || map[id].en;
+  return h.name || "";
+}
+// ===== end i18n =====
+
 
   function loadState() {
     try {
@@ -61,7 +164,7 @@
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.3.2";
+const APP_VERSION = "6.3.3";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -242,17 +345,17 @@ function saveState() {
           <div>
             <div class="habitTitle">Habit tracker</div>
             <div class="habitRange">
-              <span class="mutedInline">Тази седмица</span> • ${start} → ${days[6]}
+              <span class="mutedInline">${t("thisWeek")}</span> • ${start} → ${days[6]}
             </div>
           </div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-            <div class="weekFilter" title="Седмица">
-              <span class="small" style="font-weight:900">Седмица</span>
+            <div class="weekFilter" title="${t("week")}">
+              <span class="small" style="font-weight:900">${t("week")}</span>
               <select data-action="setHabitWeekFull">
                 ${weekOptions}
               </select>
             </div>
-            <button class="btn primary habitAddBtn" type="button" data-action="addHabit">+ Навик</button>
+            <button class="btn primary habitAddBtn" type="button" data-action="addHabit">${t("addHabit")}</button>
           </div>
         </div>
 
@@ -267,7 +370,7 @@ function saveState() {
               <div class="habitName" role="cell">
                 <div class="habitNameInner">
                   <span class="habitIcon">${h.icon||"✅"}</span>
-                  <span class="habitText" style="color:${h.color||"#60a5fa"}">${escapeHtml(h.name||"Навик")}</span>
+                  <span class="habitText" style="color:${h.color||"#60a5fa"}">${escapeHtml(habitDisplayName(h)||t("habit"))}</span>
                   <span class="chip">${weekCounts[idx]}/7</span>
                 </div>
               </div>
@@ -277,20 +380,20 @@ function saveState() {
                           data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
               }).join("")}
             </div>
-          `).join("") : `<div class="muted" style="padding:10px 6px">Нямаш навици. Натисни “+ Навик”.</div>`}
+          `).join("") : `<div class="muted" style="padding:10px 6px">Нямаш навици. Натисни “${t("addHabit")}”.</div>`}
         </div>
 
         <div class="habitStats">
           <div class="kpi">
-            <div class="l">Изпълнение</div>
+            <div class="l">${t("completion")}</div>
             <div class="v">${pct}%</div>
           </div>
           <div class="kpi">
-            <div class="l">Отметнати</div>
+            <div class="l">${t("checked")}</div>
             <div class="v">${totalDone}</div>
           </div>
           <div class="kpi">
-            <div class="l">Навици</div>
+            <div class="l">${t("habits")}</div>
             <div class="v">${habits.length}</div>
           </div>
         </div>
@@ -304,7 +407,7 @@ function viewHome() {
       <div class="pageStack">
       <section class="card section featured">
         <div class="h1">Dashboard</div>
-        <div class="sub">Днес: бюджет • хранене • тренировки</div>
+        <div class="sub">${t("dashboardToday")}</div>
         <div class="donutRow">
   <div class="donutCard">
     ${(()=>{
@@ -339,7 +442,7 @@ function viewHome() {
 
       <section class="card section featured">
         <div class="h1">Weekly overview</div>
-        <div class="sub">Бърз поглед за последните 7 дни</div>
+        <div class="sub">${t("quickLook7")}</div>
         <div class="weekTiles">
           <button class="weekTile" type="button" data-route="finances" aria-label="Finances tile">
             <div class="weekTileTop">
@@ -397,7 +500,7 @@ function viewHome() {
         </div>
         <div style="margin-top:10px" class="small">Съхранява се локално (offline-first).</div>
         <table class="table" style="margin-top:10px">
-          <tbody>${rows || `<tr><td class="small">Няма записи. Натисни “+ Запис”.</td></tr>`}</tbody>
+          <tbody>${rows || `<tr><td class="small">No entries yet. Tap “+ Entry”.</td></tr>`}</tbody>
         </table>
       </section>
     `;
@@ -426,7 +529,7 @@ function viewHome() {
         </div>
         <div style="margin-top:10px" class="small">* Автоматично калкулиране от снимка изисква AI/външен API. Тук е ръчно въвеждане.</div>
         <table class="table" style="margin-top:10px">
-          <tbody>${rows || `<tr><td class="small">Няма записи. Натисни “+ Храна”.</td></tr>`}</tbody>
+          <tbody>${rows || `<tr><td class="small">No entries yet. Tap “+ Food”.</td></tr>`}</tbody>
         </table>
       </section>
     `;
@@ -453,7 +556,7 @@ function viewHome() {
           <div class="l" style="margin-bottom:8px">${escapeHtml(sec)}</div>
           <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">${lis}</ul>
           <div style="margin-top:10px">
-            <button class="btn ghost" data-action="addPlanItem" data-day="${escapeHtml(selected)}" data-sec="${escapeHtml(sec)}" type="button">+ Добави</button>
+            <button class="btn ghost" data-action="addPlanItem" data-day="${escapeHtml(selected)}" data-sec="${escapeHtml(sec)}" type="button">+ Add</button>
           </div>
         </div>
       `;
@@ -509,11 +612,11 @@ function viewHome() {
           </div>
 
           <div class="grid2" style="margin-top:12px">
-            ${sectionCards || `<div class="small">Няма секции.</div>`}
+            ${sectionCards || `<div class="small">No sections.</div>`}
           </div>
         ` : `
           <table class="table" style="margin-top:12px">
-            <tbody>${rows || `<tr><td class="small">Няма записи. Натисни “+ Тренировка”.</td></tr>`}</tbody>
+            <tbody>${rows || `<tr><td class="small">No entries yet. Tap “+ Workout”.</td></tr>`}</tbody>
           </table>
         `}
       </section>
@@ -802,7 +905,7 @@ function viewHome() {
   }
 
   function openAddPlanItem(day, sec) {
-    openModal("Добави упражнение", `
+    openModal("Add exercise", `
       <div class="field">
         <label>Ден</label>
         <input type="text" value="${escapeHtml(day)}" disabled />
@@ -840,7 +943,7 @@ function viewHome() {
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:18px">${h.icon||"✅"}</span>
           <div>
-            <div style="font-weight:700">${escapeHtml(h.name||"Навик")}</div>
+            <div style="font-weight:700">${escapeHtml(habitDisplayName(h)||t("habit"))}</div>
             <div class="muted" style="font-size:12px">${h.id}</div>
           </div>
         </div>
@@ -925,11 +1028,24 @@ function viewHome() {
   const btnTheme = $("#btnTheme");
   if(btnTheme){ btnTheme.addEventListener("click", toggleThemeQuick); }
 
-  $("#btnReorder").addEventListener("click", () => {
-    alert("Подреждане: в тази версия плочките са премахнати (ползва се долната навигация).");
+  const btnReorder = $("#btnReorder");
+if(btnReorder){
+  btnReorder.addEventListener("click", () => {
+    alert(state.lang==="bg"
+      ? "Подреждане: в тази версия плочките са премахнати (ползва се долната навигация)."
+      : "Sort: tiles were removed in this version (use the bottom navigation)."
+    );
   });
+}
 
-  // first route
+const btnLangEN = $("#btnLangEN");
+const btnLangBG = $("#btnLangBG");
+if(btnLangEN) btnLangEN.addEventListener("click", ()=>setLang("en"));
+if(btnLangBG) btnLangBG.addEventListener("click", ()=>setLang("bg"));
+
+updateHeaderUI();
+
+// first route
   const initial = (location.hash || "#home").replace("#","");
   state.route = initial || "home";
   render();

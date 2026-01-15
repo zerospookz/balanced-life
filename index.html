@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="bg">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
@@ -17,14 +17,20 @@
         <div class="logo">BL</div>
         <div>
           <div class="brandTitle">Balanced life</div>
-          <div class="brandSub">Офлайн • данните са на телефона</div>
+          <div class="brandSub">Offline • data stays on your phone</div>
         </div>
       </div>
-      <div style="display:flex;gap:10px;align-items:center">
-  <button id="btnTheme" class="btn ghost" type="button" aria-label="Theme">🌓</button>
-  <button id="btnReorder" class="btn ghost" type="button">Подреди</button>
-</div>
-    </header>
+      <div class="topActions">
+    <button id="btnTheme" class="btn ghost" type="button" aria-label="Theme">🌓</button>
+
+    <div class="langSwitch" role="group" aria-label="Language">
+      <button id="btnLangEN" class="btn ghost langBtn" type="button" aria-label="English">🇺🇸</button>
+      <button id="btnLangBG" class="btn ghost langBtn" type="button" aria-label="Bulgarian">🇧🇬</button>
+    </div>
+
+    <button id="btnReorder" class="btn ghost" type="button">Sort</button>
+  </div>
+</header>
 
     <main id="view" class="view"></main>
 

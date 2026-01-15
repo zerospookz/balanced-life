@@ -594,3 +594,16 @@ body{
 }
 /* ===== end v6.3.2 ===== */
 
+
+/* ===== v6.3.3 language switch ===== */
+.topActions{display:flex;gap:10px;align-items:center}
+.langSwitch{display:flex;gap:6px;align-items:center}
+.langBtn{min-width:44px}
+.langBtn.isActive{
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.18) inset, 0px 10px 24px rgba(0,0,0,0.25);
+}
+:root[data-theme="light"] .langBtn.isActive{
+  box-shadow: 0 0 0 2px rgba(15,23,42,0.12) inset, 0px 10px 24px rgba(2,6,23,0.12);
+}
+/* ===== end v6.3.3 ===== */
+

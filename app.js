@@ -193,8 +193,7 @@ function saveState() {
   // ---------- Views ----------
   
   function viewHabitTracker(){
-    const offset = Number(state._habitWeekOffset||0);
-    const start = startOfWeekISO(isoFromDate(new Date(Date.now() + offset*7*24*3600*1000)));
+    const start = startOfWeekISO();
     const days = weekISOs(start);
     const habits = state.habits || [];
     const logs = state.habitLogs || {};
@@ -210,26 +209,14 @@ function saveState() {
     const pct = totalPossible ? Math.round((totalDone/totalPossible)*100) : 0;
 
     return `
-      <section class="card section habitSectionFix">
-        
+      <section class="card" style="margin-top:16px">
         <div class="cardHead">
           <div>
-            <div class="habitTitle">Habit tracker</div>
+            <div class="cardTitle">Habit tracker</div>
             <div class="muted"><span class="habitPeriod">Тази седмица</span> • ${start} → ${days[6]}</div>
           </div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-            <div class="weekFilter" title="Седмица">
-              <span class="small" style="font-weight:900">Седмица</span>
-              <select data-action="setHabitWeek">
-                <option value="-1" ${offset===-1?"selected":""}>Минала</option>
-                <option value="0" ${offset===0?"selected":""}>Тази</option>
-                <option value="1" ${offset===1?"selected":""}>Следваща</option>
-              </select>
-            </div>
-            <button class="btn primary habitAddBtn" type="button" data-action="addHabit">+ Навик</button>
-          </div>
+          <button class="btn" type="button" data-action="addHabit">+ Навик</button>
         </div>
-
 
         <div class="habitWrap" role="table" aria-label="Habit tracker">
           <div class="habitHeadRow" role="row">
@@ -276,7 +263,7 @@ function viewHome() {
     const d = computeDashboard();
     return `
       <div class="pageStack">
-      <section class="card section">
+      <section class="card section featured">
         <div class="h1">Dashboard</div>
         <div class="sub">Днес: бюджет • хранене • тренировки</div>
         <div class="row" style="margin-top:12px;align-items:center">
@@ -303,7 +290,7 @@ function viewHome() {
         </div>
       </section>
 
-      <section class="card section">
+      <section class="card section featured">
         <div class="h1">Weekly overview</div>
         <div class="sub">Бърз поглед за последните 7 дни</div>
         <div class="row" style="margin-top:12px">

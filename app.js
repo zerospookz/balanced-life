@@ -29,6 +29,7 @@
     lang: "en",
     route: "home",
     finances: [],
+    finGoals: [], // {id,name,type:'auto'|'manual',target,period:'month'|'range',start,end,createdAt,archived:false,manualProgress?:number}
     nutrition: [],
     workouts: [], // workout logs (sessions)
     habits: [
@@ -43,6 +44,62 @@
     prefs: { haptics: false, sound: false },
     workoutPlan: {"Понеделник": {"Фокус": "Push + Planche (тежко) + Handstand", "Skill: Handstand (15–20 мин)": ["Chest-to-wall 5×30–45 сек (линия)", "Kick-ups 6–10 опита ×10–25 сек", "Scap shrugs в стойка 3×10"], "Skill: Planche (8–12 мин)": ["Tuck/Frog holds 6–10×6–12 сек", "Planche leans 3×20 сек"], "Skill: Flag (8–12 мин)": ["(по желание) 2–4 леки опита"], "Сила — Блок A (тежко)": ["Bench press ИЛИ Weighted dips 4×4–6", "Overhead press 3×5–8"], "Сила — Блок B": ["Pseudo planche push-ups 4×6–10", "Hollow hold 4×20–40 сек"], "Аксесоари / Прехаб": ["Lateral raise 3×12–20", "Китки: wrist rocks 2×10"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "RPE 7–8; спри при разпад на форма"}, "Вторник": {"Фокус": "Pull (тежко) + Flag + Набирания", "Skill: Handstand (15–20 мин)": ["(кратко: 3–5 леки опита по 10–15 сек)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": ["Tuck/ластик 6–10×5–10 сек", "Негативи 4×3–6 сек (контрол)"], "Сила — Блок A (тежко)": ["Weighted pull-ups 5×3–5", "Chin-ups 3×6–10"], "Сила — Блок B": ["Row (щанга/опора) 4×6–10", "Lat pulldown 3×10–15"], "Аксесоари / Прехаб": ["Face pulls 3×15–20", "External rotations 3×15–20", "Side plank/Copenhagen 4×20–40 сек/страна"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Фокус: стабилни рамене, лакът без болка"}, "Сряда": {"Фокус": "Крака (фитнес) + Core + лека стойка", "Skill: Handstand (15–20 мин)": ["Scap shrugs 3×10", "3–5 леки опита стойка (без борба)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": ["Squat (back/front) 4×3–6", "RDL 4×5–8"], "Сила — Блок B": ["Bulgarian split squat 3×8–12/крак", "Leg curl ИЛИ Nordic прогресия 3×8–12"], "Аксесоари / Прехаб": ["Calves 4×10–20", "Ab wheel ИЛИ Hanging knee raises 4×8–15"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Не до отказ (за да пазиш краката)"}, "Четвъртък": {"Фокус": "Кондиция: Бокс + Въже + Мобилност", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Прехаб 10 мин: scap push-ups 2×10", "Wrist rocks 2×10", "External rotations 3×15–20"], "Кондиция / Спорт": ["Въже 12×(40/40)", "Бокс 8–12 рунда × 2–3 мин"], "Център време (мин)": "45–75", "Бележки": "Дръж умерено (техника + дишане)"}, "Петък": {"Фокус": "Upper (обем/умение) + Planche + Pull-up вариации", "Skill: Handstand (15–20 мин)": ["6–10 опита ×10–25 сек (контрол)", "Wall line 2×30 сек"], "Skill: Planche (8–12 мин)": ["Holds 6–8×8–12 сек", "Lean 3×20 сек"], "Skill: Flag (8–12 мин)": ["4–6 леки опита ×5–8 сек (само чисто)"], "Сила — Блок A (тежко)": ["Explosive pull-ups / chest-to-bar 6×2–4", "Archer / Typewriter 4×3–6/страна"], "Сила — Блок B": ["Incline DB press 4×8–12", "Seated cable row 3×10–15"], "Аксесоари / Прехаб": ["Curls 3×10–15", "Triceps pushdown 3×10–15", "Farmer/Suitcase carry 6×20–40 м"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Пази свежест за уикенда (без отказ)"}, "Събота": {"Фокус": "Футбол + кратък Skill/прехаб (леко)", "Skill: Handstand (15–20 мин)": ["8–12 мин лесни опита (или стена)"], "Skill: Planche (8–12 мин)": ["Lean 3×15–25 сек", "PPPUs 3×8 (леки)"], "Skill: Flag (8–12 мин)": ["Само ако си свеж: 1–3 опита ×5–8 сек"], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Face pulls 2×20", "External rotations 2×20", "Разтягане 5–10 мин"], "Кондиция / Спорт": ["Футбол (трен./мач)"], "Център време (мин)": "20–45 + футбол", "Бележки": "Ако мачът е тежък → само мобилност"}, "Неделя": {"Фокус": "Футбол + възстановяване", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Мобилност 10–15 мин (грасци/бедра/таз/гръб/рамене)"], "Кондиция / Спорт": ["Футбол", "Zone 2 20–40 мин (по желание)"], "Център време (мин)": "20–40 + футбол", "Бележки": "Цел: възстановяване"}},
   };
+
+  // ---------- Finances helpers (v6.5.0) ----------
+  const uid = (p = "id") => `${p}_${Math.random().toString(36).slice(2, 8)}${Date.now().toString(36).slice(-4)}`;
+
+  function startOfMonthISO(iso = todayISO()){
+    return iso.slice(0,7) + "-01";
+  }
+
+  function endOfMonthISO(iso = todayISO()){
+    const d = new Date(iso + "T00:00:00");
+    const end = new Date(d.getFullYear(), d.getMonth()+1, 0);
+    return isoFromDate(end);
+  }
+
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+  function dateInRange(iso, startISO, endISO){
+    if(!iso) return false;
+    return iso >= startISO && iso <= endISO;
+  }
+
+  function sumFinances({startISO, endISO}){
+    let income = 0, expense = 0;
+    for(const it of (state.finances||[])){
+      const d = it.date || "";
+      if(!dateInRange(d, startISO, endISO)) continue;
+      if(it.type === "income") income += Number(it.amount||0);
+      else expense += Number(it.amount||0);
+    }
+    const net = income - expense;
+    return { income, expense, net };
+  }
+
+  function fmtMoneyBGN(n){
+    const x = Number(n||0);
+    const sign = x < 0 ? "-" : "";
+    const abs = Math.abs(x);
+    return sign + abs.toLocaleString("bg-BG", {maximumFractionDigits:2, minimumFractionDigits:2}) + " лв";
+  }
+
+  function buildDailySeries({startISO, endISO}){
+    const map = new Map();
+    const start = new Date(startISO + "T00:00:00");
+    const end = new Date(endISO + "T00:00:00");
+    for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+      map.set(isoFromDate(d), {income:0, expense:0});
+    }
+    for(const it of (state.finances||[])){
+      const d = it.date || "";
+      if(!map.has(d)) continue;
+      const rec = map.get(d);
+      if(it.type === "income") rec.income += Number(it.amount||0);
+      else rec.expense += Number(it.amount||0);
+    }
+    return Array.from(map.entries()).map(([date, v])=>({date, ...v}));
+  }
 // ===== i18n v6.3.3 (EN/BG) =====
 const I18N = {
   en: {
@@ -605,31 +662,268 @@ function viewHabitsPage(){
   }
 
 function viewFinances() {
-    const rows = state.finances
-      .slice()
-      .sort((a,b)=> (b.date||"").localeCompare(a.date||""))
-      .map((it, idx)=>`
-        <tr class="tr">
-          <td><div style="font-weight:900">${it.type==="income" ? "Приход" : "Разход"}</div><div class="small">${escapeHtml(it.note||"")}</div></td>
-          <td class="small">${escapeHtml(it.date||"")}</td>
-          <td style="font-weight:900">${it.type==="income" ? "+" : "-"}${money(it.amount)} лв</td>
-          <td><button class="btn ghost" data-action="delFinance" data-idx="${idx}">Delete</button></td>
-        </tr>
-      `).join("");
-    return `
-      <section class="card section">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-          <div>
-            <div class="h1">Finances</div>
-            <div class="sub">Income and expenses</div>
+    const today = todayISO();
+    const monthStart = startOfMonthISO(today);
+    const monthEnd = endOfMonthISO(today);
+    const m = sumFinances({startISO: monthStart, endISO: monthEnd});
+
+    // last 28 days chart
+    const start28 = (()=>{
+      const d = new Date(today + "T00:00:00");
+      d.setDate(d.getDate()-27);
+      return isoFromDate(d);
+    })();
+    const series = buildDailySeries({startISO:start28, endISO:today});
+
+    const chartSVG = (()=>{
+      const W=640, H=190, pad=18;
+      const maxV = Math.max(
+        1,
+        ...series.map(x=>x.income),
+        ...series.map(x=>x.expense)
+      );
+      const xStep = (W - pad*2) / Math.max(1, (series.length-1));
+      const y = (v)=> (H-pad) - (v/maxV)*(H-pad*2);
+
+      const points = (key)=> series.map((d,i)=>`${(pad + i*xStep).toFixed(2)},${y(d[key]).toFixed(2)}`).join(" ");
+      const pInc = points("income");
+      const pExp = points("expense");
+
+      const last = series[series.length-1] || {income:0, expense:0};
+      return `
+        <div class="finChart card section featured" style="padding:16px">
+          <div class="finChartHead">
+            <div>
+              <div class="h1" style="margin:0">Trends</div>
+              <div class="sub">Last 28 days • Income vs Expenses</div>
+            </div>
+            <div class="finLegend">
+              <span class="dot income"></span><span>Income</span>
+              <span class="dot expense"></span><span>Expenses</span>
+            </div>
           </div>
-          <button class="btn addPill" data-action="addFinance" type="button"><span class="addPillInner"><span class="addPillText">+ Entry</span><span class="addPillPlus">+</span></span></button>
+          <svg viewBox="0 0 ${W} ${H}" class="finSvg" aria-label="Finances chart">
+            <defs>
+              <linearGradient id="gInc" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="rgba(52,211,153,1)"/>
+                <stop offset="100%" stop-color="rgba(34,197,94,1)"/>
+              </linearGradient>
+              <linearGradient id="gExp" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="rgba(251,146,60,1)"/>
+                <stop offset="100%" stop-color="rgba(239,68,68,1)"/>
+              </linearGradient>
+              <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="3.2" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <rect x="0" y="0" width="${W}" height="${H}" rx="18" fill="rgba(255,255,255,0.04)" />
+
+            ${[0.25,0.5,0.75].map(fr=>{
+              const yy = (H-pad) - fr*(H-pad*2);
+              return `<line x1="${pad}" y1="${yy.toFixed(2)}" x2="${W-pad}" y2="${yy.toFixed(2)}" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>`;
+            }).join("")}
+
+            <polyline points="${pInc}" fill="none" stroke="url(#gInc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+              <animate attributeName="stroke-dasharray" dur="520ms" fill="freeze" from="0 2000" to="2000 0"/>
+            </polyline>
+            <polyline points="${pExp}" fill="none" stroke="url(#gExp)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+              <animate attributeName="stroke-dasharray" dur="520ms" fill="freeze" from="0 2000" to="2000 0"/>
+            </polyline>
+
+            <circle cx="${(pad + (series.length-1)*xStep).toFixed(2)}" cy="${y(last.income).toFixed(2)}" r="5" fill="rgba(52,211,153,1)"/>
+            <circle cx="${(pad + (series.length-1)*xStep).toFixed(2)}" cy="${y(last.expense).toFixed(2)}" r="5" fill="rgba(239,68,68,1)"/>
+          </svg>
         </div>
-        <div style="margin-top:10px" class="small">Stored locally (offline-first).</div>
-        <table class="table" style="margin-top:10px">
-          <tbody>${rows || `<tr><td class="small">No entries yet. Tap “+ Entry”.</td></tr>`}</tbody>
-        </table>
+      `;
+    })();
+
+    const kpi = `
+      <div class="finKpis">
+        <div class="finKpi">
+          <div class="l">Income (this month)</div>
+          <div class="v">${fmtMoneyBGN(m.income)}</div>
+        </div>
+        <div class="finKpi">
+          <div class="l">Balance</div>
+          <div class="v">${fmtMoneyBGN(m.net)}</div>
+        </div>
+        <div class="finKpi">
+          <div class="l">Expenses (this month)</div>
+          <div class="v">${fmtMoneyBGN(m.expense)}</div>
+        </div>
+      </div>
+    `;
+
+    const goals = (state.finGoals || []).filter(g=>!g.archived);
+
+    function goalRange(g){
+      if(g.period === "range" && g.start && g.end) return {startISO:g.start, endISO:g.end};
+      // default: this month
+      return {startISO: monthStart, endISO: monthEnd};
+    }
+
+    function goalCurrent(g){
+      if(g.type === "manual") return Number(g.manualProgress||0);
+      const r = goalRange(g);
+      const s = sumFinances({startISO:r.startISO, endISO:r.endISO});
+      // saving is positive net; don't punish if negative
+      return Math.max(0, Number(s.net||0));
+    }
+
+    function goalStatus(g, current){
+      const r = goalRange(g);
+      if(r.startISO === monthStart && r.endISO === monthEnd){
+        const nowDay = Number(today.slice(8,10));
+        const endDay = Number(monthEnd.slice(8,10));
+        const expected = Number(g.target||0) * (nowDay / Math.max(1,endDay));
+        const diff = current - expected;
+        if(diff >= Number(g.target||0)*0.05) return {label:"Ahead", cls:"ahead"};
+        if(diff <= -Number(g.target||0)*0.05) return {label:"Behind", cls:"behind"};
+        return {label:"On track", cls:"track"};
+      }
+      return {label:"In progress", cls:"track"};
+    }
+
+    const goalsHtml = `
+      <section class="card section featured">
+        <div class="finGoalsHead">
+          <div>
+            <div class="h1">Goals</div>
+            <div class="sub">Auto or manual • add multiple goals</div>
+          </div>
+          <button class="btn addPill smallAdd" data-action="addGoal" type="button">
+            <span class="addPillInner"><span class="addPillText">+ New goal</span><span class="addPillPlus">+</span></span>
+          </button>
+        </div>
+
+        <div class="finGoalsGrid">
+          ${goals.length ? goals.map(g=>{
+            const cur = goalCurrent(g);
+            const target = Number(g.target||0);
+            const pct = target>0 ? clamp(cur/target, 0, 1) : 0;
+            const left = Math.max(0, target - cur);
+            const st = goalStatus(g, cur);
+            const range = goalRange(g);
+            const rangeLabel = (range.startISO===monthStart && range.endISO===monthEnd) ? "This month" : `${range.startISO} → ${range.endISO}`;
+            const typeChip = g.type === "manual" ? "MANUAL" : "AUTO";
+            return `
+              <div class="finGoalCard">
+                <div class="finGoalTop">
+                  <div class="finGoalTitle">
+                    <div class="finGoalName">${escapeHtml(g.name || "Goal")}</div>
+                    <div class="finGoalMeta">${escapeHtml(rangeLabel)} • <span class="chip ${g.type==="manual"?"manual":"auto"}">${typeChip}</span></div>
+                  </div>
+                  <button class="iconbtn" title="Delete" data-action="delGoal" data-gid="${g.id}">🗑️</button>
+                </div>
+
+                <div class="finGoalNums">
+                  <div class="finGoalNow">${fmtMoneyBGN(cur)}</div>
+                  <div class="finGoalOf">of ${fmtMoneyBGN(target)}</div>
+                </div>
+
+                <div class="finBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct*100)}">
+                  <div class="finBarFill ${st.cls}" style="width:${Math.round(pct*100)}%"></div>
+                </div>
+
+                <div class="finGoalFoot">
+                  <div class="finGoalLeft">Left: <b>${fmtMoneyBGN(left)}</b></div>
+                  <div class="finGoalStatus ${st.cls}">${st.label}</div>
+                </div>
+
+                ${g.type === "manual" ? `
+                  <div class="finGoalActions">
+                    <button class="btn ghost" data-action="addGoalProgress" data-gid="${g.id}">+ Add</button>
+                    <button class="btn ghost" data-action="resetGoalProgress" data-gid="${g.id}">Reset</button>
+                  </div>
+                ` : `
+                  <div class="finGoalActions">
+                    <button class="btn ghost" data-action="explainAutoGoal" data-gid="${g.id}">How it works</button>
+                  </div>
+                `}
+              </div>
+            `;
+          }).join("") : `
+            <div class="finEmpty">
+              <div class="finEmptyTitle">No goals yet</div>
+              <div class="small">Create a goal like “Save 100 BGN this month”.</div>
+            </div>
+          `}
+        </div>
       </section>
+    `;
+
+    const q = (state._finQuery || "").trim().toLowerCase();
+    const entries = (state.finances||[]).map((it,i)=>({ ...it, __i:i }))
+      .sort((a,b)=> (b.date||"").localeCompare(a.date||""));
+    const filtered = q ? entries.filter(it=>{
+      const s = `${it.type} ${it.note||""} ${it.date||""} ${it.amount||""}`.toLowerCase();
+      return s.includes(q);
+    }) : entries;
+
+    const rows = filtered
+      .map((it)=>{
+        const sign = it.type === "income" ? "+" : "-";
+        const cls = it.type === "income" ? "inc" : "exp";
+        const label = it.type === "income" ? "Income" : "Expense";
+        const note = (it.note||"").trim();
+        return `
+          <div class="finRow">
+            <div class="finRowLeft">
+              <div class="finRowType ${cls}">${label}</div>
+              <div class="finRowNote">${escapeHtml(note || "—")}</div>
+              <div class="finRowDate">${escapeHtml(it.date||"")}</div>
+            </div>
+            <div class="finRowRight">
+              <div class="finRowAmount ${cls}">${sign}${fmtMoneyBGN(it.amount)}</div>
+              <button class="btn ghost finDel" data-action="delFinance" data-idx="${it.__i}">Delete</button>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+
+    return `
+      <div class="pageStack">
+        <section class="card section featured">
+          <div class="finHead">
+            <div>
+              <div class="h1">Finances</div>
+              <div class="sub">Income, expenses and savings goals</div>
+            </div>
+            <div class="finHeadActions">
+              <button class="btn addPill" data-action="addFinance" type="button">
+                <span class="addPillInner"><span class="addPillText">+ Entry</span><span class="addPillPlus">+</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="small">Stored locally (offline-first).</div>
+          ${kpi}
+        </section>
+
+        ${chartSVG}
+        ${goalsHtml}
+
+        <section class="card section">
+          <div class="finEntriesHead">
+            <div>
+              <div class="h1">Recent entries</div>
+              <div class="sub">Search, review and delete</div>
+            </div>
+            <div class="finSearch">
+              <input class="finSearchInput" type="text" value="${escapeHtml(state._finQuery||"")}" placeholder="Search…" data-action="finQuery" />
+            </div>
+          </div>
+
+          <div class="finRows">
+            ${rows || `<div class="finEmpty"><div class="finEmptyTitle">No entries yet</div><div class="small">Tap “+ Entry” to add income or expenses.</div></div>`}
+          </div>
+        </section>
+      </div>
     `;
   }
 
@@ -859,11 +1153,13 @@ function viewFinances() {
     $$(".bottomnav .tab").forEach(t=>t.classList.toggle("active", t.dataset.route===route));
 
     // actions
-    $$("[data-action]").forEach(el=>{ if(el.dataset.action==="selectPlanDay" && el.tagName==="SELECT") return; el.addEventListener("click", handleAction); });
+    $$("[data-action]").forEach(el=>{ if((el.dataset.action==="selectPlanDay" && el.tagName==="SELECT") || (el.dataset.action==="finQuery" && el.tagName==="INPUT")) return; el.addEventListener("click", handleAction); });
     // change actions
     $$("[data-action='selectPlanDay']").forEach(el=>el.addEventListener("change", handleAction));
     $$("[data-action='setTheme']").forEach(el=>el.addEventListener("change", handleAction));
     $$("[data-action='setHabitWeekFull']").forEach(el=>el.addEventListener("change", handleAction));
+    $$("[data-action='finQuery']").forEach(el=>el.addEventListener("input", (e)=>{ state._finQuery = e.currentTarget.value || ""; render(); }));
+
     // set selected theme value
     const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "light"; tSel.value = (v==="dark") ? "dark" : "light"; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
@@ -879,6 +1175,34 @@ function viewFinances() {
     if(a==="setHabitWeekFull") { state._habitWeekFull = e.currentTarget.value; saveState(); return render(); }
     if(a==="addHabit") return openAddHabit();
     if(a==="addFinance") return openAddFinance();
+
+    // ----- Finances goals -----
+    if(a==="addGoal") return openAddGoal();
+    if(a==="delGoal") {
+      const gid = e.currentTarget.dataset.gid;
+      state.finGoals = (state.finGoals||[]).filter(g=>g.id!==gid);
+      return saveState();
+    }
+    if(a==="addGoalProgress") return openAddGoalProgress(e.currentTarget.dataset.gid);
+    if(a==="resetGoalProgress") {
+      const gid = e.currentTarget.dataset.gid;
+      const g = (state.finGoals||[]).find(x=>x.id===gid);
+      if(g) g.manualProgress = 0;
+      return saveState();
+    }
+    if(a==="explainAutoGoal") {
+      openModal("Auto goal", `
+        <div class="small">Auto goals calculate progress automatically:</div>
+        <div class="pill" style="margin-top:10px">Saved = Income − Expenses (for the selected period)</div>
+        <div class="small" style="margin-top:10px">Tip: If the net is negative, progress is shown as 0 (so it never punishes you).</div>
+        <div class="row" style="justify-content:flex-end;margin-top:14px">
+          <button class="btn primary" id="ok">Got it</button>
+        </div>
+      `);
+      const ok = document.getElementById("ok");
+      if(ok) ok.addEventListener("click", closeModal);
+      return;
+    }
     if(a==="delFinance") {
       const idx = Number(e.currentTarget.dataset.idx);
       state.finances.splice(idx,1);
@@ -983,29 +1307,29 @@ function viewFinances() {
 
   // ---------- Forms ----------
   function openAddFinance() {
-    openModal("Нов запис (Finances)", `
+    openModal("New entry", `
       <div class="field">
-        <label>Тип</label>
+        <label>Type</label>
         <select id="fType">
-          <option value="expense">Разход</option>
-          <option value="income">Приход</option>
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
         </select>
       </div>
       <div class="field">
-        <label>Сума (лв)</label>
+        <label>Amount (BGN)</label>
         <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00"/>
       </div>
       <div class="field">
-        <label>Дата</label>
+        <label>Date</label>
         <input id="fDate" type="date" value="${todayISO()}"/>
       </div>
       <div class="field">
-        <label>Бележка</label>
-        <input id="fNote" type="text" placeholder="напр. Храна, Наем..."/>
+        <label>Note</label>
+        <input id="fNote" type="text" placeholder="e.g. Rent, groceries…"/>
       </div>
       <div class="row" style="justify-content:flex-end;margin-top:12px">
-        <button class="btn ghost" id="cancel">Отказ</button>
-        <button class="btn primary" id="save">Запази</button>
+        <button class="btn ghost" id="cancel">Cancel</button>
+        <button class="btn primary" id="save">Save</button>
       </div>
     `);
     $("#cancel").addEventListener("click", closeModal);
@@ -1021,6 +1345,117 @@ function viewFinances() {
       saveState();
     });
   }
+
+  function openAddGoal(){
+    const today = todayISO();
+    const monthStart = startOfMonthISO(today);
+    const monthEnd = endOfMonthISO(today);
+    openModal("New goal", `
+      <div class="field">
+        <label>Goal name</label>
+        <input id="gName" type="text" placeholder="e.g. Save 100 BGN" />
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Target (BGN)</label>
+          <input id="gTarget" type="number" step="0.01" inputmode="decimal" placeholder="100" />
+        </div>
+        <div class="field">
+          <label>Tracking</label>
+          <select id="gType">
+            <option value="auto">Auto (Income − Expenses)</option>
+            <option value="manual">Manual (you add progress)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Period</label>
+        <select id="gPeriod">
+          <option value="month">This month (${monthStart} → ${monthEnd})</option>
+          <option value="range">Custom range</option>
+        </select>
+      </div>
+      <div id="gRange" class="grid2" style="display:none">
+        <div class="field">
+          <label>Start</label>
+          <input id="gStart" type="date" value="${monthStart}" />
+        </div>
+        <div class="field">
+          <label>End</label>
+          <input id="gEnd" type="date" value="${monthEnd}" />
+        </div>
+      </div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px">
+        <button class="btn ghost" id="cancel">Cancel</button>
+        <button class="btn primary" id="save">Create</button>
+      </div>
+    `);
+
+    const periodSel = document.getElementById("gPeriod");
+    const range = document.getElementById("gRange");
+    if(periodSel && range){
+      const sync = ()=>{ range.style.display = (periodSel.value==="range") ? "grid" : "none"; };
+      periodSel.addEventListener("change", sync);
+      sync();
+    }
+
+    const cancel = document.getElementById("cancel");
+    if(cancel) cancel.addEventListener("click", closeModal);
+
+    const save = document.getElementById("save");
+    if(save) save.addEventListener("click", ()=>{
+      const name = (document.getElementById("gName").value||"").trim() || "Savings goal";
+      const target = Number(document.getElementById("gTarget").value||0);
+      if(!(target>0)) return alert("Please enter a target amount.");
+      const type = document.getElementById("gType").value === "manual" ? "manual" : "auto";
+      const period = document.getElementById("gPeriod").value === "range" ? "range" : "month";
+      const start = (document.getElementById("gStart")?.value) || monthStart;
+      const end = (document.getElementById("gEnd")?.value) || monthEnd;
+
+      const g = {
+        id: uid("g"),
+        name,
+        type,
+        target,
+        period,
+        start: period==="range" ? start : null,
+        end: period==="range" ? end : null,
+        manualProgress: type==="manual" ? 0 : undefined,
+        createdAt: Date.now(),
+        archived: false
+      };
+      state.finGoals = [...(state.finGoals||[]), g];
+      closeModal();
+      saveState();
+    });
+  }
+
+  function openAddGoalProgress(gid){
+    const g = (state.finGoals||[]).find(x=>x.id===gid);
+    if(!g) return;
+    openModal("Add progress", `
+      <div class="small">Goal: <b>${escapeHtml(g.name||"Goal")}</b></div>
+      <div class="field" style="margin-top:10px">
+        <label>Amount (BGN)</label>
+        <input id="gpAmount" type="number" step="0.01" inputmode="decimal" placeholder="20" />
+      </div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px">
+        <button class="btn ghost" id="cancel">Cancel</button>
+        <button class="btn primary" id="save">Add</button>
+      </div>
+    `);
+    const cancel = document.getElementById("cancel");
+    if(cancel) cancel.addEventListener("click", closeModal);
+    const save = document.getElementById("save");
+    if(save) save.addEventListener("click", ()=>{
+      const amt = Number(document.getElementById("gpAmount").value||0);
+      if(!(amt>0)) return;
+      g.manualProgress = Number(g.manualProgress||0) + amt;
+      closeModal();
+      saveState();
+    });
+  }
+
 
   function openAddFood() {
     openModal("Нова храна (Nutrition)", `

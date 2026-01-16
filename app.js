@@ -164,7 +164,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.3.3";
+const APP_VERSION = "6.3.4";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -380,7 +380,7 @@ function saveState() {
                           data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
               }).join("")}
             </div>
-          `).join("") : `<div class="muted" style="padding:10px 6px">Нямаш навици. Натисни “${t("addHabit")}”.</div>`}
+          `).join("") : `<div class="muted" style="padding:10px 6px">${t("noHabits")}</div>`}
         </div>
 
         <div class="habitStats">
@@ -450,7 +450,7 @@ function viewHome() {
               <div class="weekTileIcon">💰</div>
             </div>
             <div class="weekTileValue">${money(d.budget)} лв</div>
-            <div class="weekTileSub">Месец: +${money(d.income)} • -${money(d.expense)}<br/>Остава: ${money(d.budget + d.income - d.expense)} лв</div>
+            <div class="weekTileSub">Month: +${money(d.income)} • -${money(d.expense)}<br/>Remaining: ${money(d.budget + d.income - d.expense)} лв</div>
           </button>
 
           <button class="weekTile" type="button" data-route="nutrition" aria-label="Nutrition tile">
@@ -459,7 +459,7 @@ function viewHome() {
               <div class="weekTileIcon">🥗</div>
             </div>
             <div class="weekTileValue">${Math.round(d.kcal)} kcal</div>
-            <div class="weekTileSub">Днес • добави храна<br/>Цел: ${Math.round(d.kcalGoal||0)} kcal</div>
+            <div class="weekTileSub">Today • add food<br/>Цел: ${Math.round(d.kcalGoal||0)} kcal</div>
           </button>
 
           <button class="weekTile" type="button" data-route="workouts" aria-label="Workouts tile">
@@ -467,8 +467,8 @@ function viewHome() {
               <div class="weekTileTitle">Workouts</div>
               <div class="weekTileIcon">🏋️</div>
             </div>
-            <div class="weekTileValue">${Math.round(d.wmin)} мин</div>
-            <div class="weekTileSub">Последни 7 дни • ${Math.round(d.wCount||0)} трен.<br/>Планът е вътре</div>
+            <div class="weekTileValue">${Math.round(d.wmin)} min</div>
+            <div class="weekTileSub">Last 7 days • ${Math.round(d.wCount||0)} sessions<br/>Plan inside</div>
           </button>
         </div>
 </section>
@@ -486,7 +486,7 @@ function viewHome() {
           <td><div style="font-weight:900">${it.type==="income" ? "Приход" : "Разход"}</div><div class="small">${escapeHtml(it.note||"")}</div></td>
           <td class="small">${escapeHtml(it.date||"")}</td>
           <td style="font-weight:900">${it.type==="income" ? "+" : "-"}${money(it.amount)} лв</td>
-          <td><button class="btn ghost" data-action="delFinance" data-idx="${idx}">Изтрий</button></td>
+          <td><button class="btn ghost" data-action="delFinance" data-idx="${idx}">Delete</button></td>
         </tr>
       `).join("");
     return `
@@ -494,11 +494,11 @@ function viewHome() {
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
           <div>
             <div class="h1">Finances</div>
-            <div class="sub">Приходи и разходи</div>
+            <div class="sub">Income and expenses</div>
           </div>
-          <button class="btn primary" data-action="addFinance" type="button">+ Запис</button>
+          <button class="btn primary" data-action="addFinance" type="button">+ Entry</button>
         </div>
-        <div style="margin-top:10px" class="small">Съхранява се локално (offline-first).</div>
+        <div style="margin-top:10px" class="small">Stored locally (offline-first).</div>
         <table class="table" style="margin-top:10px">
           <tbody>${rows || `<tr><td class="small">No entries yet. Tap “+ Entry”.</td></tr>`}</tbody>
         </table>
@@ -515,7 +515,7 @@ function viewHome() {
           <td><div style="font-weight:900">${escapeHtml(it.food||"")}</div><div class="small">${escapeHtml(it.note||"")}</div></td>
           <td class="small">${escapeHtml(it.date||"")}</td>
           <td style="font-weight:900">${Math.round(Number(it.kcal||0))} kcal</td>
-          <td><button class="btn ghost" data-action="delFood" data-idx="${idx}">Изтрий</button></td>
+          <td><button class="btn ghost" data-action="delFood" data-idx="${idx}">Delete</button></td>
         </tr>
       `).join("");
     return `
@@ -523,9 +523,9 @@ function viewHome() {
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
           <div>
             <div class="h1">Nutrition</div>
-            <div class="sub">Храна, калории и снимки (manual)</div>
+            <div class="sub">Food, calories & photos (manual)</div>
           </div>
-          <button class="btn primary" data-action="addFood" type="button">+ Храна</button>
+          <button class="btn primary" data-action="addFood" type="button">+ Food</button>
         </div>
         <div style="margin-top:10px" class="small">* Автоматично калкулиране от снимка изисква AI/външен API. Тук е ръчно въвеждане.</div>
         <table class="table" style="margin-top:10px">
@@ -571,7 +571,7 @@ function viewHome() {
           <td><div style="font-weight:900">${escapeHtml(it.title||"Тренировка")}</div><div class="small">${escapeHtml(it.note||"")}</div></td>
           <td class="small">${escapeHtml(it.date||"")}</td>
           <td style="font-weight:900">${Math.round(Number(it.minutes||0))} мин</td>
-          <td><button class="btn ghost" data-action="delWorkout" data-idx="${idx}">Изтрий</button></td>
+          <td><button class="btn ghost" data-action="delWorkout" data-idx="${idx}">Delete</button></td>
         </tr>
       `).join("");
 
@@ -630,17 +630,17 @@ function viewHome() {
         <div class="sub">Build: <b>${APP_VERSION}</b></div>
         <div class="sub">Appearance</div>
         <div class="row" style="margin-top:10px;align-items:center">
-          <div class="pill">🌓 Тема:
+          <div class="pill">🌓 Theme:
             <select id="themeSelect" data-action="setTheme" style="padding:8px 10px;border-radius:12px">
               <option value="light">Light</option>
               <option value="dark">Dark</option>
             </select>
           </div>
         </div>
-        <div class="sub">Импорт/експорт и нулиране</div>
+        <div class="sub">Import / Export & Reset</div>
 
         <div class="row" style="margin-top:12px">
-          <button class="btn ghost" data-action="exportAll" type="button">Export всички данни</button>
+          <button class="btn ghost" data-action="exportAll" type="button">Export all data</button>
           <label class="btn ghost" style="display:inline-flex;gap:10px;align-items:center;cursor:pointer">
             Import всички данни
             <input id="importAllFile" type="file" accept="application/json" style="display:none" data-action="importAllFile">
@@ -947,7 +947,7 @@ function viewHome() {
             <div class="muted" style="font-size:12px">${h.id}</div>
           </div>
         </div>
-        <button class="btn danger" type="button" data-habit-del="${h.id}">Изтрий</button>
+        <button class="btn danger" type="button" data-habit-del="${h.id}">Delete</button>
       </div>
     `).join("") || `<div class="muted">Нямаш навици.</div>`;
 

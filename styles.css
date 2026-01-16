@@ -607,3 +607,33 @@ body{
 }
 /* ===== end v6.3.3 ===== */
 
+
+/* ===== v6.3.4 Mobile layout + habit box contrast ===== */
+.app{box-sizing:border-box;width:100%;}
+*{box-sizing:border-box;}
+
+@media (max-width:640px){
+  .app{max-width:100%;padding:12px 12px 96px;}
+  .pageStack{gap:14px;}
+  .card.section{padding:16px;}
+  .donutRow{grid-template-columns:1fr; justify-items:center;}
+  .donutCard{width:100%; display:flex; justify-content:center;}
+}
+
+/* Habit tracker: make boxes visible in dark + stronger "on" */
+:root[data-theme="dark"] .habitBox{
+  border:1px solid rgba(255,255,255,0.16);
+  background:rgba(255,255,255,0.05);
+}
+:root[data-theme="dark"] .habitBox.on{
+  background:rgba(96,165,250,0.65);
+  border-color:rgba(147,197,253,0.95);
+  box-shadow:0 10px 22px rgba(96,165,250,0.30);
+}
+:root[data-theme="light"] .habitBox.on{
+  background:rgba(37,99,235,0.30);
+  border-color:rgba(37,99,235,0.75);
+  box-shadow:0 10px 22px rgba(37,99,235,0.20);
+}
+/* ===== end v6.3.4 ===== */
+

@@ -164,7 +164,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.3.4";
+const APP_VERSION = "6.3.5";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -233,7 +233,7 @@ function saveState() {
 
   // ---------- Helpers ----------
   function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, (c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    return String(s).replace(/[&<>"']/g, (c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
   function money(n) {
     const x = Number(n||0);
@@ -318,6 +318,8 @@ function saveState() {
     const start = isoFromDate(startDate);
     const days = weekISOs(start);
 
+    const dayLetters = (state.lang === "bg") ? ["П","В","С","Ч","П","С","Н"] : ["M","T","W","T","F","S","S"];
+
     const weekOptions = weeks.length ? weeks.map(w=>{
       const val = `${year}-W${String(w.week).padStart(2,"0")}`;
       const label = `W${String(w.week).padStart(2,"0")} • ${w.start} → ${w.end}`;
@@ -361,8 +363,8 @@ function saveState() {
 
         <div class="habitWrap">
           <div class="habitHeadRow" role="row">
-            <div class="habitHeadName" role="columnheader">Навик</div>
-            ${days.map((d,i)=>`<div class="habitDay" role="columnheader">${"ПВСЧПСН"[i]}</div>`).join("")}
+            <div class="habitHeadName" role="columnheader">${t("habit")}</div>
+            ${days.map((d,i)=>`<div class="habitDay" role="columnheader">${dayLetters[i]||""}</div>`).join("")}
           </div>
 
           ${habits.length ? habits.map((h,idx)=>`
@@ -376,7 +378,7 @@ function saveState() {
               </div>
               ${days.map(d=>{
                 const on = !!(logs[d] && logs[d][h.id]);
-                return `<button class="habitBox ${on?"on":""}" type="button"
+                return `<button class="habitBox ${on?"on":""}" type="button" style="--hc:${h.color||"#60a5fa"}"
                           data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
               }).join("")}
             </div>

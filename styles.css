@@ -637,3 +637,97 @@ body{
 }
 /* ===== end v6.3.4 ===== */
 
+/* ===== v6.3.5 Mobile overflow + habit mark visibility ===== */
+html,body{overflow-x:hidden;}
+
+@media (max-width:640px){
+  .topbar{flex-wrap:wrap; gap:10px;}
+  .brand{min-width:0;}
+  .brandTitle{max-width:60vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .topActions{flex-wrap:wrap; justify-content:flex-end;}
+  .card{max-width:100%;}
+}
+
+.habitBox.on{
+  background: var(--hc, rgba(37,99,235,0.85)) !important;
+  border-color: rgba(255,255,255,0.65) !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18), 0 10px 22px color-mix(in srgb, var(--hc, #3b82f6) 35%, transparent);
+}
+.habitBox.on::after{
+  content: "✓";
+  display:block;
+  width:100%; height:100%;
+  color: rgba(255,255,255,0.95);
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 26px;
+  text-align:center;
+}
+:root[data-theme="light"] .habitBox.on::after{color: rgba(15,23,42,0.92);}
+/* ===== end v6.3.5 ===== */
+
+
+/* ===== v6.3.5 Habit on-state + mobile overflow fix ===== */
+body{overflow-x:hidden;}
+.topbar{flex-wrap:wrap;gap:10px}
+.brand{min-width:0}
+.topActions{flex-wrap:wrap;justify-content:flex-end}
+
+.habitBox{position:relative}
+.habitBox.on{
+  background: var(--hc, #2563eb) !important;
+  border-color: var(--hc, #2563eb) !important;
+  box-shadow: 0 10px 20px rgba(37,99,235,0.22) !important;
+}
+.habitBox.on::after{
+  content:"✓";
+  position:absolute; inset:0;
+  display:grid; place-items:center;
+  color:white;
+  font-size:14px;
+  font-weight:900;
+}
+
+@media (max-width:640px){
+  .card{max-width:100%}
+  .donutCard{max-width:100%}
+}
+/* ===== end v6.3.5 ===== */
+
+
+
+
+
+
+
+/* ===== v6.3.5 Habit box on-state + mobile overflow fix ===== */
+body{overflow-x:hidden}
+.topbar{flex-wrap:wrap;row-gap:10px}
+.topActions{flex-wrap:wrap;justify-content:flex-end}
+.brand{min-width:0}
+.brandTitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+
+.habitBox.on{
+  background: var(--hc, rgba(37,99,235,0.70)) !important;
+  border-color: var(--hc, rgba(96,165,250,0.95)) !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18), 0 10px 22px rgba(96,165,250,0.22);
+}
+.habitBox.on::after{
+  content: "✓";
+  display:grid;
+  place-items:center;
+  width:100%;
+  height:100%;
+  color: rgba(255,255,255,0.95);
+  font-size: 16px;
+  font-weight: 900;
+  text-shadow: 0 6px 14px rgba(0,0,0,0.25);
+}
+:root[data-theme="light"] .habitBox.on::after{color: rgba(15,23,42,0.90)}
+
+@media (max-width:640px){
+  .card{max-width:100%}
+  .view{padding:8px 0}
+}
+/* ===== end v6.3.5 ===== */
+

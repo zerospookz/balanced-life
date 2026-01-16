@@ -217,6 +217,7 @@ const I18N = {
 function t(key){
   const lang = state?.lang || "en";
   return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+  });
 }
 
 function setLang(lang){
@@ -306,7 +307,11 @@ function saveState() {
 
   let state = loadState();
 
-  // ---------- Router ----------
+  
+  localStorage.setItem("theme","dark");
+  setTheme("dark");
+  validateRuntime();
+// ---------- Router ----------
   function setRoute(route) {
     state.route = route;
     const hash = "#" + route;
@@ -1231,7 +1236,28 @@ function initFinancesUI(){
     });
   }
 }
+
+// ===== APP_GUARD_v697 (refactor barrier) =====
+function safeRun(label, fn){
+  try { return fn(); }
+  catch(err){
+    console.error("[BalancedLife]", label, err);
+    try { toast("Error: " + (err && err.message ? err.message : String(err))); } catch(_){}
+    return null;
+  }
+}
+
+function validateRuntime(){
+  const required = ["render","setRoute","openModal","closeModal"];
+  const missing = required.filter(n => typeof window[n] !== "function");
+  if(missing.length){
+    console.error("[BalancedLife] Missing functions:", missing);
+  }
+}
+// ===== end APP_GUARD_v697 =====
+
 function render() {
+  return safeRun("render", () => {
     const view = $("#view");
     const route = (state.route || "home").replace(/[^a-z]/g,"");
     const html =
@@ -1258,13 +1284,15 @@ function render() {
     $$("[data-action='finQuery']").forEach(el=>el.addEventListener("input", (e)=>{ state._finQuery = e.currentTarget.value || ""; render(); }));
 
     // set selected theme value
-    const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "light"; tSel.value = (v==="dark") ? "dark" : "light"; }
+    const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "dark"; tSel.value = (v==="dark") ? "dark" : "light"; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
-    if(route==="finances") initFinancesUI();
-  }
+    if(route==="finances") requestAnimationFrame(()=>initFinancesUI());
+  });
+}
 
 function handleAction(e) {
+  return safeRun("action", () => {
     const a = e.currentTarget.dataset.action;
     // tap feedback for UI controls (optional via Settings)
     if(a!="toggleHabit") { feedbackTap(); tapBounce(e.currentTarget); }
@@ -1322,8 +1350,8 @@ function handleAction(e) {
       state._workoutsTab = e.currentTarget.dataset.tab;
       return render();
     }
-    if(a==="setTheme"){ setTheme("dark"); localStorage.setItem("theme","dark"); return; }
-    if(a==="toggleHaptics") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.haptics = !state.prefs.haptics; saveState(); return render(); }
+    if(a==="setTheme"){ localStorage.setItem("theme","dark"); setTheme("dark"); toast("Theme locked to Dark."); return; }
+if(a==="toggleHaptics") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.haptics = !state.prefs.haptics; saveState(); return render(); }
     if(a==="toggleSound") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.sound = !state.prefs.sound; saveState(); return render(); }
 
     if(a==="selectPlanDay") {

@@ -1322,7 +1322,7 @@ function handleAction(e) {
       state._workoutsTab = e.currentTarget.dataset.tab;
       return render();
     }
-    if(a==="setTheme"){ setTheme("dark"); localStorage.setItem("theme","dark"); return; } }
+    if(a==="setTheme"){ setTheme("dark"); localStorage.setItem("theme","dark"); return; }
     if(a==="toggleHaptics") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.haptics = !state.prefs.haptics; saveState(); return render(); }
     if(a==="toggleSound") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.sound = !state.prefs.sound; saveState(); return render(); }
 

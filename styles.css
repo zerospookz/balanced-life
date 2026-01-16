@@ -1360,46 +1360,24 @@ body{overflow-x:hidden}
 #btnTheme{display:none !important;}
 
 
-/* v7.0.3 finances overlay (match design) */
-.finHero{position:relative; overflow:hidden;}
-.finChart{position:relative;}
+
+
+/* v7.0.4 finances: stats inside chart like design */
+.finChartShell{ position:relative; }
+.finChart{ position:relative; padding-top:110px; }
 .finStatsOverlay{
   position:absolute;
-  top:16px;
-  left:16px;
-  right:16px;
+  top:16px; left:16px; right:16px;
   display:grid;
   grid-template-columns: 1.1fr 0.8fr 1.1fr;
   gap:14px;
-  z-index:2;
+  z-index:3;
 }
-.finChart{padding-top:110px;}
-.finStatCard{
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius:16px;
-  padding:14px 16px;
-  backdrop-filter: blur(10px);
-}
-.finBalancePill{
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius:999px;
-  padding:10px 14px;
-  backdrop-filter: blur(10px);
-}
-@media (max-width:520px){
-  .finChart{padding-top:0px;}
+@media (max-width: 520px){
+  .finChart{ padding-top:0; }
   .finStatsOverlay{
     position:static;
     grid-template-columns: 1fr;
     margin-bottom:12px;
   }
-}
-.topSettings{margin-right:8px;}
-
-:root[data-theme="dark"] .finStatCard,
-:root[data-theme="dark"] .finBalancePill{
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.12);
 }

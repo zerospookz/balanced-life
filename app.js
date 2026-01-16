@@ -160,10 +160,12 @@ function updateHeaderUI(){
   const sub = document.querySelector(".brandSub");
   if(sub) sub.textContent = t("offlineSub");
 
-  const enBtn = document.getElementById("btnLangEN");
-  const bgBtn = document.getElementById("btnLangBG");
-  if(enBtn) enBtn.classList.toggle("isActive", (state.lang||"en") === "en");
-  if(bgBtn) bgBtn.classList.toggle("isActive", (state.lang||"en") === "bg");
+  const toggle = document.getElementById("btnLangToggle");
+  if(toggle){
+    const isBG = (state.lang||"en") === "bg";
+    toggle.classList.toggle("isBG", isBG);
+    toggle.setAttribute("aria-checked", isBG ? "true" : "false");
+  }
 }
 
 function habitDisplayName(h){
@@ -203,7 +205,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.3.9";
+const APP_VERSION = "6.4.0";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -1236,10 +1238,14 @@ function viewHome() {
   const btnTheme = $("#btnTheme");
   if(btnTheme){ btnTheme.addEventListener("click", toggleThemeQuick); }
 
-const btnLangEN = $("#btnLangEN");
-const btnLangBG = $("#btnLangBG");
-if(btnLangEN) btnLangEN.addEventListener("click", ()=>setLang("en"));
-if(btnLangBG) btnLangBG.addEventListener("click", ()=>setLang("bg"));
+	const btnLangToggle = $("#btnLangToggle");
+	if(btnLangToggle){
+	  const flip = ()=> setLang((state.lang||"en") === "bg" ? "en" : "bg");
+	  btnLangToggle.addEventListener("click", flip);
+	  btnLangToggle.addEventListener("keydown", (e)=>{
+	    if(e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); }
+	  });
+	}
 
 updateHeaderUI();
 

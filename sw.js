@@ -1,3 +1,4 @@
+// SAFE_CACHE v7.0.9
 // Balanced Life service worker
 // v6.6.1: cache-bust + pre-cache finance icons for offline-first UX
 const CACHE = "balanced-life-v661";

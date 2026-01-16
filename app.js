@@ -646,16 +646,7 @@ function viewHome() {
             <div class="weekTileValue">${Math.round(d.wmin)} min</div>
             <div class="weekTileSub">Last 7 days • ${Math.round(d.wsess||0)} sessions<br/>Plan inside</div>
           </button>
-
-          <button class="weekTile" type="button" data-route="settings" aria-label="Settings tile">
-            <div class="weekTileTop">
-              <div class="weekTileTitle">Settings</div>
-              <div class="weekTileIcon">⚙️</div>
-            </div>
-            <div class="weekTileValue">&nbsp;</div>
-            <div class="weekTileSub">Language • preferences<br/>Backup & import</div>
-          </button>
-        </div>
+</div>
 </section>
       ${viewHabitsHome()}
       </div>
@@ -2183,3 +2174,8 @@ function radialBarsSVG({id, value=0.5, centerValue="0", centerLabel="", mode="si
 // ===== end v6.3.0 =====
 
 })();
+  const btnSettings = document.getElementById("btnSettings");
+  if(btnSettings){
+    btnSettings.addEventListener("click", ()=> setRoute("settings"));
+  }
+

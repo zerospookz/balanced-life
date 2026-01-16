@@ -1485,3 +1485,53 @@ body{overflow-x:hidden}
   .goalsGrid{ grid-template-columns: 1fr !important; }
   .finEntriesGrid{ grid-template-columns: 1fr !important; }
 }
+
+
+/* v7.0.8 header: move language + settings to top-right */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.topActions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+}
+.langPill{
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+}
+.topSettings{
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+
+/* v7.0.9 mobile stacking fix */
+@media (max-width:520px){
+  .finHero{ position:relative; z-index:1; }
+  .finStatsOverlay{ z-index:2; }
+  .goalsSection, .recentSection{
+    position:relative;
+    z-index:1;
+    margin-top:14px;
+  }
+  /* prevent header overlap */
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:5;
+    backdrop-filter: blur(10px);
+  }
+}

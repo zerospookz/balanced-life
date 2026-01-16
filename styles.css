@@ -1535,3 +1535,31 @@ body{overflow-x:hidden}
     backdrop-filter: blur(10px);
   }
 }
+
+
+/* v7.1.1 mobile: place Goals & Recent under chart */
+@media (max-width:520px){
+  /* disable left overlay column */
+  .goalsSection,
+  .recentSection{
+    position:static !important;
+    width:100% !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+
+  /* ensure order: chart -> goals -> recent */
+  .financesPage{
+    display:flex;
+    flex-direction:column;
+  }
+  .finHero{ order:1; }
+  .goalsSection{ order:2; }
+  .recentSection{ order:3; }
+
+  /* spacing polish */
+  .goalsSection,
+  .recentSection{
+    margin-top:16px;
+  }
+}

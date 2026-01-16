@@ -1198,7 +1198,40 @@ function viewFinances() {
     el.classList.add("tapBounce");
     setTimeout(()=>el.classList.remove("tapBounce"), 240);
   }
-  function render() {
+  
+function initFinancesUI(){
+  const inc = document.getElementById("finIncLine");
+  const exp = document.getElementById("finExpLine");
+  const svg = document.querySelector(".finSvg");
+  const tip = document.getElementById("finChartTip");
+
+  if(inc && inc.getTotalLength){
+    const L = inc.getTotalLength();
+    inc.style.strokeDasharray = L;
+    inc.style.strokeDashoffset = L;
+    requestAnimationFrame(()=>{ inc.style.transition="stroke-dashoffset 900ms ease"; inc.style.strokeDashoffset="0"; });
+  }
+  if(exp && exp.getTotalLength){
+    const L = exp.getTotalLength();
+    exp.style.strokeDasharray = L;
+    exp.style.strokeDashoffset = L;
+    requestAnimationFrame(()=>{ exp.style.transition="stroke-dashoffset 900ms ease"; exp.style.strokeDashoffset="0"; });
+  }
+
+  if(svg && tip){
+    const hits = svg.querySelectorAll(".chart-dot.hit");
+    const fmt = v => (Number(v||0)).toFixed(2) + " BGN";
+    hits.forEach(h=>{
+      const show = ()=>{
+        tip.textContent = (h.dataset.kind==="income"?"Income: ":"Expenses: ") + fmt(h.dataset.val);
+        tip.hidden = false;
+      };
+      h.addEventListener("mouseenter", show);
+      h.addEventListener("mouseleave", ()=> tip.hidden=true);
+    });
+  }
+}
+function render() {
     const view = $("#view");
     const route = (state.route || "home").replace(/[^a-z]/g,"");
     const html =
@@ -1229,22 +1262,8 @@ function viewFinances() {
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
 
-    if(route==="finances") initFinancesUI();
+    
   }
-
-  
-  function initFinancesUI(){
-    // Animate chart lines (stroke draw)
-    const inc = $("#finIncLine");
-    const exp = $("#finExpLine");
-    const svg = $(".finSvg");
-    const tip = $("#finChartTip");
-    if(inc && inc.getTotalLength){
-      const L = inc.getTotalLength();
-      inc.style.strokeDasharray = L;
-      inc.style.strokeDashoffset = L;
-      requestAnimationFrame(()=>{ inc.classList.add("draw"); inc.style.strokeDashoffset = "0"; });
-    }
     if(exp && exp.getTotalLength){
       const L = exp.getTotalLength();
       exp.style.strokeDasharray = L;

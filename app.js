@@ -503,16 +503,485 @@ function saveState() {
               <span class="mutedInline">${t("thisWeek")}</span> • ${start} → ${days[6]}
             </div>
           </div>
-          <div class="finChartShell">
-            ${chartSVG}
-            <div class="finStats finStatsOverlay">
-              <div class="finStatCard positive">
-              <div class="finStatLabel">Income</div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+            <div class="weekComfy" title="${t("week")}">
+              <div class="weekComfyLabel">${t("week")}</div>
+              <div class="weekComfyPill">
+                <span class="weekComfyValue">${escapeHtml(savedLabel)}</span>
+                <span class="weekComfyCaret">▾</span>
+                <select class="weekComfySelect" data-action="setHabitWeekFull">
+                ${weekOptions}
+              </select>
+              </div>
+            </div>
+            <button class="btn addPill habitAddBtn" type="button" data-action="addHabit">
+              <span class="addPillInner">
+                <span class="addPillText">${t("addHabit")}</span>
+                <span class="addPillPlus">+</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="habitWrap">
+          <div class="habitHeadRow" role="row">
+            <div class="habitHeadName" role="columnheader">${t("habit")}</div>
+            ${days.map((d,i)=>`<div class="habitDay" role="columnheader">${dayLetters[i]||""}</div>`).join("")}
+          </div>
+
+          ${habits.length ? habits.map((h,idx)=>`
+            <div class="habitRow" role="row">
+              <div class="habitName" role="cell">
+                <div class="habitNameInner">
+                  <span class="habitIcon">${h.icon||"✅"}</span>
+                  <span class="habitText" style="color:${h.color||"#60a5fa"}">${escapeHtml(habitDisplayName(h)||t("habit"))}</span>
+                  <span class="chip">${weekCounts[idx]}/7</span>
+                </div>
+              </div>
+              ${days.map(d=>{
+                const on = !!(logs[d] && logs[d][h.id]);
+                const pulse = !!(lastT && lastT.hid===h.id && lastT.iso===d && (nowMs-lastT.ts<900));
+                return `<button class="habitBox ${on?"on":""} ${pulse?"pulse":""}" type="button" style="--hc:${h.color||"#60a5fa"}"
+                          data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
+              }).join("")}
+            </div>
+          `).join("") : `<div class="muted" style="padding:10px 6px">${t("noHabits")}</div>`}
+        </div>
+
+        <div class="habitStats">
+          <div class="kpi">
+            <div class="l">${t("completion")}</div>
+            <div class="v">${pct}%</div>
+          </div>
+          <div class="kpi">
+            <div class="l">${t("checked")}</div>
+            <div class="v">${totalDone}</div>
+          </div>
+          <div class="kpi">
+            <div class="l">${t("habits")}</div>
+            <div class="v">${habits.length}</div>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+function viewHome() {
+    const d = computeDashboard();
+    return `
+      <div class="pageStack">
+      <section class="card section featured">
+        <div class="h1">Dashboard</div>
+        <div class="sub">${t("dashboardToday")}</div>
+        <div class="insightRow">${escapeHtml(d.insight||t("insightOnTrack"))}</div>
+        <div class="donutRow">
+          <button class="donutCard donutCardLink" type="button" data-route="workouts" aria-label="Workouts">
+            <div class="donutStack">
+              ${(()=>{
+                const prog = donutProgress(d.wmin, d.workoutGoalMin);
+                return radialBarsSVG({id:"w", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel: t("workouts")});
+              })()}
+              <div class="donutMeta">
+                ${t("workoutsMeta1").replace("{done}", Math.round(d.wmin)).replace("{goal}", Math.round(d.workoutGoalMin))}<br/>
+                ${t("workoutsMeta2").replace("{sessions}", d.wsess)}
+              </div>
+            </div>
+          </button>
+
+          <button class="donutCard donutCardLink" type="button" data-route="finances" aria-label="Finances">
+            <div class="donutStack">
+              ${(()=>{
+                const netTxt = (d.net>=0?"+":"") + money(d.net);
+                return radialBarsSVG({id:"f", value: d.savingsRate, centerValue: netTxt, centerLabel: t("net")});
+              })()}
+              <div class="donutMeta">
+                ${t("financesMeta1").replace("{rate}", Math.round(d.savingsRate*100))}<br/>
+                ${t("financesMeta2").replace("{inc}", money(d.income)).replace("{exp}", money(d.expense))}
+              </div>
+            </div>
+          </button>
+
+          <button class="donutCard donutCardLink" type="button" data-route="nutrition" aria-label="Nutrition">
+            <div class="donutStack">
+              ${(()=>{
+                const prog = donutProgress(d.kcal, d.kcalGoal);
+                return radialBarsSVG({id:"k", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel: t("nutrition")});
+              })()}
+              <div class="donutMeta">
+                ${t("nutritionMeta1").replace("{left}", Math.round(d.kcalLeft))}<br/>
+                ${t("nutritionMeta2")}
+              </div>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <section class="card section featured">
+        <div class="h1">Weekly overview</div>
+        <div class="sub">${t("quickLook7")}</div>
+        <div class="weekTiles">
+          <button class="weekTile" type="button" data-route="finances" aria-label="Finances tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Finances</div>
+              <div class="weekTileIcon">💰</div>
+            </div>
+            <div class="weekTileValue">${money(d.budget)} лв</div>
+            <div class="weekTileSub">Month: +${money(d.income)} • -${money(d.expense)}<br/>Remaining: ${money(d.budget + d.income - d.expense)} лв</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="nutrition" aria-label="Nutrition tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Nutrition</div>
+              <div class="weekTileIcon">🥗</div>
+            </div>
+            <div class="weekTileValue">${Math.round(d.kcal)} kcal</div>
+            <div class="weekTileSub">Today • add food<br/>Goal: ${Math.round(d.kcalGoal||0)} kcal</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="workouts" aria-label="Workouts tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Workouts</div>
+              <div class="weekTileIcon">🏋️</div>
+            </div>
+            <div class="weekTileValue">${Math.round(d.wmin)} min</div>
+            <div class="weekTileSub">Last 7 days • ${Math.round(d.wsess||0)} sessions<br/>Plan inside</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="settings" aria-label="Settings tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Settings</div>
+              <div class="weekTileIcon">⚙️</div>
+            </div>
+            <div class="weekTileValue">&nbsp;</div>
+            <div class="weekTileSub">Language • preferences<br/>Backup & import</div>
+          </button>
+        </div>
+</section>
+      ${viewHabitsHome()}
+      </div>
+    `;
+  }
+
+  
+    function viewHabitsHome(){
+    return `
+      <div class="homeHabitsInline">${viewHabitTracker()}</div>
+      <section class="card section homeHabitsLink" data-route="habits" role="button" aria-label="Open habit tracker">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <div>
+            <div class="h1">${t("habitTracker")}</div>
+            <div class="sub">${t("openHabits")}</div>
+          </div>
+          <div class="chev" aria-hidden="true">›</div>
+</div>
+      </section>
+    `;
+  }
+
+function viewHabitsPage(){
+    return `
+      <div class="pageStack">
+        ${viewHabitTracker()}
+      </div>
+    `;
+  }
+
+function viewFinances() {
+    const today = todayISO();
+    const monthStart = startOfMonthISO(today);
+    const monthEnd = endOfMonthISO(today);
+
+    const thisM = sumFinances({ startISO: monthStart, endISO: monthEnd });
+
+    // previous month for % change
+    const prevRange = (() => {
+      const d = new Date(monthStart + "T00:00:00");
+      d.setDate(0); // last day of previous month
+      const prevEnd = isoFromDate(d);
+      const prevStartDate = new Date(d.getFullYear(), d.getMonth(), 1);
+      return { startISO: isoFromDate(prevStartDate), endISO: prevEnd };
+    })();
+    const prevM = sumFinances({ startISO: prevRange.startISO, endISO: prevRange.endISO });
+
+    const pctChange = (cur, prev) => {
+      const c = Number(cur || 0);
+      const p = Number(prev || 0);
+      if (!p) return c ? 100 : 0;
+      return Math.round(((c - p) / p) * 100);
+    };
+
+    const incomePct = pctChange(thisM.income, prevM.income);
+    const expensePct = pctChange(thisM.expense, prevM.expense);
+
+    // last 28 days chart
+    const start28 = (() => {
+      const d = new Date(today + "T00:00:00");
+      d.setDate(d.getDate() - 27);
+      return isoFromDate(d);
+    })();
+    const series = buildDailySeries({ startISO: start28, endISO: today });
+
+    const chartSVG = (() => {
+      const W = 900, H = 260, pad = 26;
+      const maxV = Math.max(1, ...series.map(x => x.income), ...series.map(x => x.expense));
+      const xStep = (W - pad * 2) / Math.max(1, (series.length - 1));
+      const y = (v) => (H - pad) - (v / maxV) * (H - pad * 2);
+
+      const points = (key) => series.map((d, i) => `${(pad + i * xStep).toFixed(2)},${y(d[key]).toFixed(2)}`).join(" ");
+      const pInc = points("income");
+      const pExp = points("expense");
+
+      const last = series[series.length - 1] || { income: 0, expense: 0 };
+      const lastX = (pad + (series.length - 1) * xStep).toFixed(2);
+
+      return `
+        <div class="finChart">
+          <svg viewBox="0 0 ${W} ${H}" class="finSvg" aria-label="Finances chart">
+            <defs>
+              <linearGradient id="gInc" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="rgba(52,211,153,1)"/>
+                <stop offset="100%" stop-color="rgba(34,197,94,1)"/>
+              </linearGradient>
+              <linearGradient id="gExp" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="rgba(251,146,60,1)"/>
+                <stop offset="100%" stop-color="rgba(239,68,68,1)"/>
+              </linearGradient>
+              <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="3.2" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            ${[0.2, 0.4, 0.6, 0.8].map(fr => {
+              const yy = (H - pad) - fr * (H - pad * 2);
+              return `<line x1="${pad}" y1="${yy.toFixed(2)}" x2="${W - pad}" y2="${yy.toFixed(2)}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+            }).join("")}
+
+            <polyline id="finIncLine" points="${pInc}" fill="none" stroke="url(#gInc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="chart-line-income"/>
+            <polyline id="finExpLine" points="${pExp}" fill="none" stroke="url(#gExp)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="chart-line-expense"/>
+
+            ${series.map((pt, i) => {
+              const cx = (pad + i * xStep).toFixed(2);
+              const cyI = y(pt.income).toFixed(2);
+              const cyE = y(pt.expense).toFixed(2);
+              return `
+                <circle class="chart-dot hit" cx="${cx}" cy="${cyI}" r="10" fill="transparent" data-kind="income" data-i="${i}" data-val="${pt.income}" />
+                <circle class="chart-dot hit" cx="${cx}" cy="${cyE}" r="10" fill="transparent" data-kind="expense" data-i="${i}" data-val="${pt.expense}" />
+              `;
+            }).join("")}
+
+            <circle cx="${lastX}" cy="${y(last.income).toFixed(2)}" r="6" fill="rgba(52,211,153,1)"/>
+            <circle cx="${lastX}" cy="${y(last.expense).toFixed(2)}" r="6" fill="rgba(239,68,68,1)"/>
+          </svg>
+          <div id="finChartTip" class="finChartTip" hidden></div>
+
+          <div class="finLegend">
+            <span class="finLegendItem"><span class="finDot inc"></span>Income</span>
+            <span class="finLegendItem"><span class="finDot exp"></span>Expenses</span>
+          </div>
+        </div>
+      `;
+    })();
+
+    const goals = (state.finGoals || []).filter(g => !g.archived);
+
+    function goalRange(g) {
+      if (g.period === "range" && g.start && g.end) return { startISO: g.start, endISO: g.end };
+      return { startISO: monthStart, endISO: monthEnd };
+    }
+
+    function goalCurrent(g) {
+      if (g.type === "manual") return Number(g.manualProgress || 0);
+      const r = goalRange(g);
+      const s = sumFinances({ startISO: r.startISO, endISO: r.endISO });
+      return Math.max(0, Number(s.net || 0));
+    }
+
+    function goalStatus(g, current) {
+      const r = goalRange(g);
+      if (r.startISO === monthStart && r.endISO === monthEnd) {
+        const nowDay = Number(today.slice(8, 10));
+        const endDay = Number(monthEnd.slice(8, 10));
+        const expected = Number(g.target || 0) * (nowDay / Math.max(1, endDay));
+        const diff = current - expected;
+        if (diff >= Number(g.target || 0) * 0.05) return { label: "Ahead", cls: "ahead" };
+        if (diff <= -Number(g.target || 0) * 0.05) return { label: "Behind", cls: "behind" };
+        return { label: "On track", cls: "track" };
+      }
+      return { label: "In progress", cls: "track" };
+    }
+
+    // icon mapping using extracted icons (embedded in the project root)
+    function finIconFor(note = "", type = "expense", category = "") {
+      const s = String(note || "").toLowerCase();
+      const c = String(category || "").toLowerCase();
+      const has = (src, ...keys) => keys.some(k => s.includes(k) || c.includes(k));
+
+      if (type === "income" && has("salary", "заплата")) return { src: "assets/fin/salary.png", alt: "Salary" };
+      if (type === "income" && has("freelance", "фрий", "project", "проект")) return { src: "assets/fin/freelance.png", alt: "Freelance" };
+
+      if (has("groceries", "grocery", "магазин", "храна", "kaufland", "lidl", "billa")) return { src: "assets/fin/groceries.png", alt: "Groceries" };
+      if (has("bills", "bill", "сметка", "ток", "вода", "интернет")) return { src: "assets/fin/bills.png", alt: "Bills" };
+      if (has("bank", "банка", "transfer", "превод")) return { src: "assets/fin/bank.png", alt: "Bank" };
+      if (has("vacation", "почивка", "hotel", "airbnb")) return { src: "assets/fin/vacation.png", alt: "Vacation" };
+      if (has("investment", "invest", "акции", "crypto", "крипто")) return { src: "assets/fin/investment.png", alt: "Investment" };
+      if (has("credit", "card", "карта")) return { src: "assets/fin/creditcard.png", alt: "Credit card" };
+      if (has("calculator", "calc", "калк")) return { src: "assets/fin/calculator.png", alt: "Calculator" };
+      if (has("piggy", "спест", "savings", "emergency", "спешни")) return { src: "assets/fin/piggy.png", alt: "Piggy bank" };
+
+      // fallback by type
+      return type === "income"
+        ? { src: "assets/fin/salary.png", alt: "Income" }
+        : { src: "assets/fin/groceries.png", alt: "Expense" };
+    }
+    const goalsHtml = `
+      <section class="card section finGlass">
+        <div class="finSectionHead">
+          <div>
+            <div class="h1">Goals</div>
+            <div class="sub">This month • Custom</div>
+          </div>
+          <button class="entry-btn finEntryBtn" data-action="addFinance" type="button">Entry <span class="plus">+</span></button>
+        </div>
+
+        <div class="finGoalsGrid2">
+          ${goals.length ? goals.map(g => {
+            const cur = goalCurrent(g);
+            const target = Number(g.target || 0);
+            const pct = target > 0 ? clamp(cur / target, 0, 1) : 0;
+            const left = Math.max(0, target - cur);
+            const st = goalStatus(g, cur);
+            const range = goalRange(g);
+            const rangeLabel = (range.startISO === monthStart && range.endISO === monthEnd) ? "This month" : `${range.startISO} → ${range.endISO}`;
+            const typeChip = g.type === "manual" ? "MANUAL" : "AUTO";
+            const chipCls = g.type === "manual" ? "manual" : "auto";
+            const icon = g.type === "manual" ? "fin_piggy.png" : "fin_investment.png";
+
+            return `
+              <div class="finGoalCard2">
+                <div class="finGoalHeader2">
+                  <div class="finBubble">
+                    <img src="${icon}" alt="" />
+                  </div>
+                  <div class="finGoalInfo2">
+                    <div class="finGoalName2">${escapeHtml(g.name || "Goal")}</div>
+                    <div class="finGoalMeta2">${escapeHtml(rangeLabel)} • <span class="finChip ${chipCls}">${typeChip}</span></div>
+                  </div>
+                  <button class="finIconBtn" title="Delete" data-action="delGoal" data-gid="${g.id}">⋯</button>
+                </div>
+
+                <div class="finGoalNumbers2">
+                  <div class="finGoalNow2">${fmtMoneyBGN(cur)}</div>
+                  <div class="finGoalOf2">/ ${fmtMoneyBGN(target)}</div>
+                </div>
+
+                <div class="finBar2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct * 100)}">
+                  <div class="finBarFill2 ${st.cls}" style="width:${Math.round(pct * 100)}%"></div>
+                </div>
+
+                <div class="finGoalBottom2">
+                  <div class="finGoalLeft2">Остават: <b>${fmtMoneyBGN(left)}</b></div>
+                  <div class="finGoalStatus2 ${st.cls}">${st.label}</div>
+                </div>
+
+                ${g.type === "manual" ? `
+                  <div class="finGoalActions2">
+                    <button class="btn ghost" data-action="addGoalProgress" data-gid="${g.id}">+ Add</button>
+                    <button class="btn ghost" data-action="resetGoalProgress" data-gid="${g.id}">- Remove</button>
+                  </div>
+                ` : ``}
+              </div>
+            `;
+          }).join("") : `
+            <div class="finEmpty">
+              <div class="finEmptyTitle">No goals yet</div>
+              <div class="small">Create a goal like “Save 100 BGN this month”.</div>
+            </div>
+          `}
+        </div>
+      </section>
+    `;
+
+    const q = (state._finQuery || "").trim().toLowerCase();
+    const entries = (state.finances || []).map((it, i) => ({ ...it, __i: i }))
+      .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
+    const filtered = q ? entries.filter(it => {
+      const s = `${it.type} ${it.note || ""} ${it.date || ""} ${it.amount || ""}`.toLowerCase();
+      return s.includes(q);
+    }) : entries;
+
+    const rows = filtered.map((it) => {
+      const sign = it.type === "income" ? "+" : "-";
+      const cls = it.type === "income" ? "inc" : "exp";
+      const label = it.type === "income" ? "Income" : "Expense";
+      const note = (it.note || "").trim();
+      const icon = finIconFor(note, it.type);
+
+      return `
+        <div class="finEntryCard">
+          <div class="finBubble">
+            <img src="${icon.src}" alt="${escapeHtml(icon.alt)}" />
+          </div>
+          <div class="finEntryMain">
+            <div class="finEntryTop">
+              <div class="finEntryTitle">${escapeHtml(note || label)}</div>
+              <div class="finEntryAmount ${cls}">${sign} ${fmtMoneyBGN(it.amount)}</div>
+            </div>
+            <div class="finEntrySub">
+              <span class="finEntryTag ${cls}">${label}</span>
+              <span class="finEntryDate">${escapeHtml(it.date || "")}</span>
+            ${it.category ? ` • <span class="finEntryCat">${escapeHtml(it.category)}</span>` : ``}</div>
+          </div>
+          <button class="finEntryDel" data-action="delFinance" data-idx="${it.__i}" title="Delete">✕</button>
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <div class="pageStack">
+        <section class="card section finHero">
+          <div class="finHeroHead">
+            <div>
+              <div class="h1">Finances</div>
+              <div class="sub">Income and expenses</div>
+            </div>
+            <button class="btn finEntryBtn" data-action="addFinance" type="button">
+              <span class="addPillInner"><span class="addPillText">Entry <span class='plus'>+</span></span><span class="addPillPlus">+</span></span>
+            </button>
+          </div>
+            </div>
+
+            <div class="finBalancePill">
+              <div class="finBalanceLabel">Balance</div>
+              <div class="finBalanceValue">${fmtMoneyBGN(thisM.net)}</div>
+              <div class="finPager">
+                <span></span><span></span><span class="on"></span><span></span><span></span>
+              </div>
+            </div>
+
+            <div class="finStatCard negative">
+              <div class="finStatLabel">Expenses</div>
               <div class="finStatRow">
-                <div class="finStatValue">+ ${fmtMoneyBGN(thisM.income)}</div>
-                <div class="finStatDelta">▲ ${Math.abs(incomePct)}%</div>
+                <div class="finStatValue">- ${fmtMoneyBGN(thisM.expense)}</div>
+                <div class="finStatDelta">▼ ${Math.abs(expensePct)}%</div>
+              </div>
             </div>
           </div>
+
+          <div class="finChartShell">
+          ${chartSVG}
+          <div class="finStats finStatsOverlay">
+
+          </div>
+        </div>
+
+          <div class="finStats finStatsOverlay">
+            <div class="finStatCard positive">
+              <div class="finStatLabel">Income</div>
               <div class="finStatRow">
                 <div class="finStatValue">+ ${fmtMoneyBGN(thisM.income)}</div>
                 <div class="finStatDelta">▲ ${Math.abs(incomePct)}%</div>

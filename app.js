@@ -215,9 +215,8 @@ const I18N = {
 };
 
 function t(key){
-  const lang = state?.lang || "en";
+  const lang = (state && state.lang) ? state.lang : "en";
   return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
-  });
 }
 
 function setLang(lang){
@@ -1382,9 +1381,10 @@ if(a==="toggleHaptics") { state.prefs = state.prefs || {haptics:false,sound:fals
       }
       return;
     }
-  }
+  });
+}
 
-  function exportJSON(obj, filename) {
+function exportJSON(obj, filename) {
     const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

@@ -308,7 +308,11 @@ function saveState() {
   let state = loadState();
 
   
+  
+  // THEME_LOCK_v699
   localStorage.setItem("theme","dark");
+  setTheme("dark");
+localStorage.setItem("theme","dark");
   setTheme("dark");
   validateRuntime();
 // ---------- Router ----------
@@ -1350,7 +1354,6 @@ function handleAction(e) {
       state._workoutsTab = e.currentTarget.dataset.tab;
       return render();
     }
-    if(a==="setTheme"){ localStorage.setItem("theme","dark"); setTheme("dark"); toast("Theme locked to Dark."); return; }
 if(a==="toggleHaptics") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.haptics = !state.prefs.haptics; saveState(); return render(); }
     if(a==="toggleSound") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.sound = !state.prefs.sound; saveState(); return render(); }
 

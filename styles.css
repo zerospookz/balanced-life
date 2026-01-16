@@ -1317,3 +1317,44 @@ body{overflow-x:hidden}
 [data-action="setTheme"]{
   display:none !important;
 }
+
+
+/* v7.0.2 habit mobile */
+@media (max-width: 520px){
+  .habitHeadRow,.habitRow{
+    grid-template-columns: minmax(130px, 1fr) repeat(7, 30px);
+    gap:6px;
+  }
+  .habitName{min-width:130px}
+  .habitBox{width:24px;height:24px}
+  .habitIcon{font-size:16px}
+  .habitText{font-size:13px}
+  .chip{font-size:11px;padding:2px 8px}
+}
+
+
+/* v7.0.2 dark theme variables (locked) */
+:root[data-theme="dark"]{
+  --bg:#0b1020;
+  --card: rgba(15,23,42,.62);
+  --text:#e5e7eb;
+  --sub:#93c5fd;
+  --muted: rgba(229,231,235,.72);
+  --shadow: 0 14px 40px rgba(0,0,0,.55);
+  --shadow2: 0 10px 24px rgba(0,0,0,.42);
+}
+:root[data-theme="dark"] body{
+  background: radial-gradient(1200px 800px at 20% 0%, rgba(251,146,60,.18), transparent 60%),
+              radial-gradient(900px 700px at 80% 40%, rgba(59,130,246,.22), transparent 60%),
+              var(--bg);
+}
+:root[data-theme="dark"] .card{
+  background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  border-color: rgba(255,255,255,.12);
+}
+:root[data-theme="dark"] .topbar{
+  background: transparent;
+}
+
+/* v7.0.2 theme locked: hide theme button */
+#btnTheme{display:none !important;}

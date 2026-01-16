@@ -219,6 +219,13 @@ function t(key){
   return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
 }
 
+
+function setTheme(theme){
+  // Hard lock to dark for now
+  const t = "dark";
+  document.documentElement.setAttribute("data-theme", t);
+  try{ localStorage.setItem("theme", t); }catch(_){}
+}
 function setLang(lang){
   state.lang = (lang === "bg") ? "bg" : "en";
   updateHeaderUI();
@@ -308,11 +315,9 @@ function saveState() {
 
   
   
-  // THEME_LOCK_v699
-  localStorage.setItem("theme","dark");
+  // THEME_LOCK_v702
   setTheme("dark");
-localStorage.setItem("theme","dark");
-  setTheme("dark");
+  updateHeaderUI();
   validateRuntime();
 // ---------- Router ----------
   function setRoute(route) {

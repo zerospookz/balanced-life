@@ -77,6 +77,13 @@ const I18N = {
     workoutsMeta2: "{sessions} sessions this week",
     nutritionMeta1: "{left} kcal left",
     nutritionMeta2: "Macros: —",
+    insightKcalLeft: "You have {left} kcal left today.",
+    insightWorkoutBehind: "You're {pct}% behind weekly workouts.",
+    insightWorkoutAhead: "Nice — you're {pct}% ahead on workouts.",
+    insightSpendingHigh: "Spending is +{pct}% vs usual.",
+    insightOnTrack: "You're on track today.",
+    openHabits: "Open habit tracker",
+    habitsPage: "Habits",
     financesMeta1: "Savings rate: {rate}%",
     financesMeta2: "Income {inc} • Expenses {exp}",
     net: "Net",
@@ -125,6 +132,13 @@ const I18N = {
     workoutsMeta2: "{sessions} тренировки тази седмица",
     nutritionMeta1: "Остават {left} kcal",
     nutritionMeta2: "Макроси: —",
+    insightKcalLeft: "Остават ти {left} kcal за днес.",
+    insightWorkoutBehind: "Изоставаш с {pct}% от седмичните тренировки.",
+    insightWorkoutAhead: "Супер — напред си с {pct}% при тренировките.",
+    insightSpendingHigh: "Разходите са +{pct}% спрямо обичайното.",
+    insightOnTrack: "Вървиш по план днес.",
+    openHabits: "Отвори навици",
+    habitsPage: "Навици",
     financesMeta1: "Спестяване: {rate}%",
     financesMeta2: "Приходи {inc} • Разходи {exp}",
     net: "Нето",
@@ -205,7 +219,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.4.0";
+const APP_VERSION = "6.4.1";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -350,7 +364,10 @@ function saveState() {
     const savingsRateRaw = income > 0 ? (net / income) : 0;
     const savingsRate = Math.max(0, Math.min(1, savingsRateRaw));
 
-    return {income, expense, budget, kcal, wmin, wsess, workoutGoalMin, kcalGoal, kcalLeft, net, savingsRate, progress:p};
+    // Insight: one short sentence (Today focus)
+    const insight = buildInsight({kcalLeft, kcalGoal, kcal, wmin, workoutGoalMin, expense, income});
+
+    return {income, expense, budget, kcal, wmin, wsess, workoutGoalMin, kcalGoal, kcalLeft, net, savingsRate, insight, progress:p};
   }
 
   // ---------- Views ----------
@@ -406,11 +423,15 @@ function saveState() {
             </div>
           </div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-            <div class="weekFilter" title="${t("week")}">
-              <span class="small" style="font-weight:900">${t("week")}</span>
-              <select data-action="setHabitWeekFull">
+            <div class="weekComfy" title="${t("week")}">
+              <div class="weekComfyLabel">${t("week")}</div>
+              <div class="weekComfyPill">
+                <span class="weekComfyValue">${escapeHtml(saved)}</span>
+                <span class="weekComfyCaret">▾</span>
+                <select class="weekComfySelect" data-action="setHabitWeekFull">
                 ${weekOptions}
               </select>
+              </div>
             </div>
             <button class="btn addPill habitAddBtn" type="button" data-action="addHabit">
               <span class="addPillInner">
@@ -471,6 +492,7 @@ function viewHome() {
       <section class="card section featured">
         <div class="h1">Dashboard</div>
         <div class="sub">${t("dashboardToday")}</div>
+        <div class="insightRow">${escapeHtml(d.insight||t("insightOnTrack"))}</div>
         <div class="donutRow">
           <button class="donutCard donutCardLink" type="button" data-route="workouts" aria-label="Workouts">
             <div class="donutStack">
@@ -545,12 +567,38 @@ function viewHome() {
           </button>
         </div>
 </section>
-      ${viewHabitTracker()}
+      ${viewHabitsHome()}
       </div>
     `;
   }
 
-  function viewFinances() {
+  
+    function viewHabitsHome(){
+    return `
+      <div class="homeHabitsInline">${viewHabitTracker()}</div>
+      <section class="card section homeHabitsLink" data-route="habits" role="button" aria-label="Open habit tracker">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <div>
+            <div class="h1">${t("habitTracker")}</div>
+            <div class="sub">${t("openHabits")}</div>
+          </div>
+          <div class="btn addPill" style="pointer-events:none">
+            <span class="addPillInner"><span class="addPillText">${t("openHabits")}</span><span class="addPillPlus">+</span></span>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+function viewHabitsPage(){
+    return `
+      <div class="pageStack">
+        ${viewHabitTracker()}
+      </div>
+    `;
+  }
+
+function viewFinances() {
     const rows = state.finances
       .slice()
       .sort((a,b)=> (b.date||"").localeCompare(a.date||""))
@@ -670,6 +718,7 @@ function viewHome() {
               <select id="planDaySelect" data-action="selectPlanDay" style="padding:8px 10px;border-radius:12px">
                 ${dayOptions}
               </select>
+              </div>
             </div>
             <button class="btn ghost" data-action="exportPlan" type="button">Export план</button>
             <label class="btn ghost" style="display:inline-flex;gap:10px;align-items:center;cursor:pointer">
@@ -792,6 +841,7 @@ function viewHome() {
       route === "finances" ? viewFinances() :
       route === "nutrition" ? viewNutrition() :
       route === "workouts" ? viewWorkouts() :
+      route === "habits" ? viewHabitsPage() :
       route === "settings" ? viewSettings() :
       viewHome();
     view.innerHTML = html;
@@ -1322,6 +1372,53 @@ function donutProgress(current, goal){
   const p = clamp01(c/g);
   return {pct:p, txt:`${Math.round(p*100)}%`, sub:`${Math.round(c)} / ${Math.round(g)}`};
 }
+
+  function buildInsight(d){
+    try{
+      // Priority: workouts behind > spending high > kcal left > on track
+      const dow = (new Date()).getDay();
+      const dayIndex = (dow+6)%7 + 1; // Mon=1..7
+      const expected = (d.workoutGoalMin||0) * (dayIndex/7);
+      const behindRaw = (expected - (d.wmin||0)) / Math.max(1,(d.workoutGoalMin||1));
+      const behindPct = Math.round(Math.max(0, behindRaw) * 100);
+      const aheadPct = Math.round(Math.max(0, -behindRaw) * 100);
+
+      // Spending vs usual: compare month-to-date expense to avg of previous 3 months
+      const now = new Date();
+      const ymNow = now.toISOString().slice(0,7);
+      const prev = [];
+      for(let i=1;i<=3;i++){
+        const dt = new Date(now.getFullYear(), now.getMonth()-i, 1);
+        prev.push(dt.toISOString().slice(0,7));
+      }
+      let prevExp=0, prevCount=0;
+      for(const it of state.finances||[]){
+        if(it.type!=="expense") continue;
+        const ym=(it.date||"").slice(0,7);
+        if(prev.includes(ym)){ prevExp += Number(it.amount||0); prevCount++; }
+      }
+      // crude monthly usual: average monthly expense from previous months
+      const monthsUsed = prev.length;
+      const usualMonthly = monthsUsed ? (prevExp / monthsUsed) : 0;
+      const spendingPct = (usualMonthly>0) ? Math.round(Math.max(0,(d.expense - usualMonthly) / usualMonthly) * 100) : 0;
+
+      if(behindPct >= 15){
+        return t("insightWorkoutBehind").replace("{pct}", behindPct);
+      }
+      if(spendingPct >= 15){
+        return t("insightSpendingHigh").replace("{pct}", spendingPct);
+      }
+      if((d.kcalGoal||0) > 0 && (d.kcalLeft||0) > 0){
+        return t("insightKcalLeft").replace("{left}", Math.round(d.kcalLeft));
+      }
+      if(aheadPct >= 15){
+        return t("insightWorkoutAhead").replace("{pct}", aheadPct);
+      }
+      return t("insightOnTrack");
+    }catch(e){
+      return t("insightOnTrack");
+    }
+  }
 // ===== end donuts =====
 
 

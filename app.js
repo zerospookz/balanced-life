@@ -219,7 +219,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.4.1";
+const APP_VERSION = "6.4.2";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -396,6 +396,14 @@ function saveState() {
       return `<option value="${val}" ${val===saved?"selected":""}>${label}</option>`;
     }).join("") : `<option value="${saved}">${saved}</option>`;
 
+    // Show full week range in the comfy pill on mobile/desktop (not only YYYY-W01)
+    const savedLabel = (weeks.length
+      ? (weeks.map(w=>({
+          val: `${year}-W${String(w.week).padStart(2,"0")}`,
+          label: `W${String(w.week).padStart(2,"0")} • ${w.start} → ${w.end}`
+        })).find(x=>x.val===saved)?.label)
+      : null) || saved;
+
     const habits = state.habits || [];
     const logs = state.habitLogs || {};
     const nowMs = Date.now();
@@ -426,7 +434,7 @@ function saveState() {
             <div class="weekComfy" title="${t("week")}">
               <div class="weekComfyLabel">${t("week")}</div>
               <div class="weekComfyPill">
-                <span class="weekComfyValue">${escapeHtml(saved)}</span>
+                <span class="weekComfyValue">${escapeHtml(savedLabel)}</span>
                 <span class="weekComfyCaret">▾</span>
                 <select class="weekComfySelect" data-action="setHabitWeekFull">
                 ${weekOptions}

@@ -89,7 +89,7 @@ body{
   position:fixed;left:50%;transform:translateX(-50%);
   bottom:14px;z-index:20;
   width:min(520px, calc(100% - 28px));
-  display:grid;grid-template-columns:repeat(5,1fr);
+  display:grid;grid-template-columns:repeat(6,1fr);
   gap:8px;
   padding:10px;
   border-radius:22px;
@@ -97,6 +97,13 @@ body{
   backdrop-filter: blur(14px);
   box-shadow: var(--shadow);
   border:1px solid rgba(0,0,0,.06);
+}
+
+@media (max-width:420px){
+  .bottomnav{gap:6px;padding:8px;}
+  .tab{padding:7px 4px;border-radius:14px;}
+  .tab span:last-child{font-size:10px;}
+  .tab .ico{font-size:17px;}
 }
 .tab{
   border:none;background:transparent;
@@ -942,6 +949,12 @@ body{overflow-x:hidden}
 
 .weekComfyValue{font-weight:900; font-size:13px;}
 .weekComfySelect{position:absolute; inset:0; opacity:0; cursor:pointer;}
+
+@media (max-width:520px){
+  .weekComfy{width:100%; min-width:0;}
+  .weekComfyPill{width:100%;}
+  .weekComfyValue{font-size:12px; line-height:1.15; white-space:normal;}
+}
 
 .insightRow{margin-top:10px; padding:10px 12px; border-radius:14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); font-weight:800; color:var(--text);}
 :root[data-theme="light"] .insightRow{background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.06);}

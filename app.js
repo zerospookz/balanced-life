@@ -46,7 +46,8 @@
 const I18N = {
   en: {
     offlineSub: "Offline • data stays on your phone",
-    sort: "Sort",
+    langEN: "ENG",
+    langBG: "BG",
     dashboardToday: "Today: budget • nutrition • workouts",
     weeklyOverview: "Weekly overview",
     quickLook7: "Quick look for the last 7 days",
@@ -71,10 +72,30 @@ const I18N = {
     workout: "Workout",
     noEntries: "No entries yet.",
     noSections: "No sections.",
+    workoutsMeta1: "{done} / {goal} min",
+    workoutsMeta2: "{sessions} sessions this week",
+    nutritionMeta1: "{left} kcal left",
+    nutritionMeta2: "Macros: —",
+    financesMeta1: "Savings rate: {rate}%",
+    financesMeta2: "Income {inc} • Expenses {exp}",
+    net: "Net",
+    actionsWorkout: "+ Workout",
+    actionsFinance: "+ Income/Expense",
+    actionsFood: "+ Food",
+    manageHabitsTitle: "Manage habits",
+    manageHabitsSub: "Add / delete habits for the tracker.",
+    name: "Name",
+    iconEmoji: "Icon (emoji)",
+    add: "Add",
+    currentHabits: "Current habits",
+    habitDeleted: "Habit deleted.",
+    habitAdded: "Habit added.",
+    noHabitsShort: "No habits yet."
   },
   bg: {
     offlineSub: "Офлайн • данните са на телефона",
-    sort: "Подреди",
+    langEN: "ENG",
+    langBG: "BG",
     dashboardToday: "Днес: бюджет • хранене • тренировки",
     weeklyOverview: "Weekly overview",
     quickLook7: "Бърз поглед за последните 7 дни",
@@ -99,6 +120,25 @@ const I18N = {
     workout: "Тренировка",
     noEntries: "Няма записи.",
     noSections: "Няма секции.",
+    workoutsMeta1: "{done} / {goal} мин",
+    workoutsMeta2: "{sessions} тренировки тази седмица",
+    nutritionMeta1: "Остават {left} kcal",
+    nutritionMeta2: "Макроси: —",
+    financesMeta1: "Спестяване: {rate}%",
+    financesMeta2: "Приходи {inc} • Разходи {exp}",
+    net: "Нето",
+    actionsWorkout: "+ Тренировка",
+    actionsFinance: "+ Приход/разход",
+    actionsFood: "+ Храна",
+    manageHabitsTitle: "Нови навици",
+    manageHabitsSub: "Добави / изтрий навик за тракъра.",
+    name: "Име",
+    iconEmoji: "Иконка (emoji)",
+    add: "Добави",
+    currentHabits: "Текущи навици",
+    habitDeleted: "Навикът е изтрит.",
+    habitAdded: "Навикът е добавен.",
+    noHabitsShort: "Нямаш навици."
   }
 };
 
@@ -118,8 +158,6 @@ function updateHeaderUI(){
   document.documentElement.setAttribute("lang", (state.lang||"en")==="bg" ? "bg" : "en");
   const sub = document.querySelector(".brandSub");
   if(sub) sub.textContent = t("offlineSub");
-  const r = document.getElementById("btnReorder");
-  if(r) r.textContent = t("sort");
 
   const enBtn = document.getElementById("btnLangEN");
   const bgBtn = document.getElementById("btnLangBG");
@@ -287,17 +325,29 @@ function saveState() {
     for(const it of state.nutrition){
       if(it.date===today) kcal += Number(it.kcal||0);
     }
-    // Workouts: minutes last 7 days
+    // Workouts: minutes + sessions last 7 days
     const cut = new Date(Date.now()-6*24*3600*1000);
     let wmin=0;
+    let wsess=0;
     for(const s of state.workouts){
       const d=new Date(s.date||"");
-      if(!isNaN(d) && d>=cut) wmin += Number(s.minutes||0);
+      if(!isNaN(d) && d>=cut){
+        wmin += Number(s.minutes||0);
+        wsess += 1;
+      }
     }
     // progress: simplistic normalized score
     const budget = Math.max(0, income-expense);
     const p = Math.min(1, (budget/200 + kcal/2000 + wmin/180)/3);
-    return {income, expense, budget, kcal, wmin, progress:p};
+    const workoutGoalMin = Number(state.workoutGoalMin||state.goals?.workoutMin||180);
+    const kcalGoal = Number(state.kcalGoal||state.goals?.kcal||2000);
+    const kcalLeft = Math.max(0, kcalGoal - kcal);
+
+    const net = income - expense;
+    const savingsRateRaw = income > 0 ? (net / income) : 0;
+    const savingsRate = Math.max(0, Math.min(1, savingsRateRaw));
+
+    return {income, expense, budget, kcal, wmin, wsess, workoutGoalMin, kcalGoal, kcalLeft, net, savingsRate, progress:p};
   }
 
   // ---------- Views ----------
@@ -411,35 +461,51 @@ function viewHome() {
         <div class="h1">Dashboard</div>
         <div class="sub">${t("dashboardToday")}</div>
         <div class="donutRow">
-  <div class="donutCard">
-    ${(()=>{
-      const goal = Number(state.workoutGoalMin||state.goals?.workoutMin||180);
-      const prog = donutProgress(d.wmin, goal);
-      return radialBarsSVG({id:"w", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel:"Workouts"});
-    })()}
-  </div>
+          <div class="donutCard">
+            <div class="donutStack">
+              ${(()=>{
+                const prog = donutProgress(d.wmin, d.workoutGoalMin);
+                return radialBarsSVG({id:"w", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel: t("workouts")});
+              })()}
+              <div class="donutMeta">
+                ${t("workoutsMeta1").replace("{done}", Math.round(d.wmin)).replace("{goal}", Math.round(d.workoutGoalMin))}<br/>
+                ${t("workoutsMeta2").replace("{sessions}", d.wsess)}
+              </div>
+            </div>
+          </div>
 
-  <div class="donutCard">
-    ${(()=>{
-      const inc = Math.max(0, Number(d.income||0));
-      const exp = Math.max(0, Number(d.expense||0));
-      const total = inc + exp;
-      const share = total ? inc/total : 0;
-      // show net in center like finance dashboards
-      const net = inc - exp;
-      const netTxt = (total? `${Math.round(share*100)}%` : "—");
-      return radialBarsSVG({id:"f", value: share, centerValue: netTxt, centerLabel:"Finances"});
-    })()}
-  </div>
+          <div class="donutCard">
+            <div class="donutStack">
+              ${(()=>{
+                const netTxt = (d.net>=0?"+":"") + money(d.net);
+                return radialBarsSVG({id:"f", value: d.savingsRate, centerValue: netTxt, centerLabel: t("net")});
+              })()}
+              <div class="donutMeta">
+                ${t("financesMeta1").replace("{rate}", Math.round(d.savingsRate*100))}<br/>
+                ${t("financesMeta2").replace("{inc}", money(d.income)).replace("{exp}", money(d.expense))}
+              </div>
+            </div>
+          </div>
 
-  <div class="donutCard">
-    ${(()=>{
-      const goal = Number(state.kcalGoal||state.goals?.kcal||2000);
-      const prog = donutProgress(d.kcal, goal);
-      return radialBarsSVG({id:"k", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel:"Calories"});
-    })()}
-  </div>
-</div>
+          <div class="donutCard">
+            <div class="donutStack">
+              ${(()=>{
+                const prog = donutProgress(d.kcal, d.kcalGoal);
+                return radialBarsSVG({id:"k", value: prog.pct, centerValue: `${Math.round(prog.pct*100)}%`, centerLabel: t("nutrition")});
+              })()}
+              <div class="donutMeta">
+                ${t("nutritionMeta1").replace("{left}", Math.round(d.kcalLeft))}<br/>
+                ${t("nutritionMeta2")}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashActions">
+          <button class="btn primary" type="button" data-action="addWorkout">${t("actionsWorkout")}</button>
+          <button class="btn" type="button" data-action="addFinance">${t("actionsFinance")}</button>
+          <button class="btn" type="button" data-action="addFood">${t("actionsFood")}</button>
+        </div>
       </section>
 
       <section class="card section featured">
@@ -461,7 +527,7 @@ function viewHome() {
               <div class="weekTileIcon">🥗</div>
             </div>
             <div class="weekTileValue">${Math.round(d.kcal)} kcal</div>
-            <div class="weekTileSub">Today • add food<br/>Цел: ${Math.round(d.kcalGoal||0)} kcal</div>
+            <div class="weekTileSub">Today • add food<br/>Goal: ${Math.round(d.kcalGoal||0)} kcal</div>
           </button>
 
           <button class="weekTile" type="button" data-route="workouts" aria-label="Workouts tile">
@@ -470,7 +536,7 @@ function viewHome() {
               <div class="weekTileIcon">🏋️</div>
             </div>
             <div class="weekTileValue">${Math.round(d.wmin)} min</div>
-            <div class="weekTileSub">Last 7 days • ${Math.round(d.wCount||0)} sessions<br/>Plan inside</div>
+            <div class="weekTileSub">Last 7 days • ${Math.round(d.wsess||0)} sessions<br/>Plan inside</div>
           </button>
         </div>
 </section>
@@ -951,13 +1017,15 @@ function viewHome() {
         </div>
         <button class="btn danger" type="button" data-habit-del="${h.id}">Delete</button>
       </div>
-    `).join("") || `<div class="muted">Нямаш навици.</div>`;
+    `).join("") || `<div class="muted">${t("noHabitsShort")}</div>`;
 
-    openModal(`
+    openModal(
+      t("manageHabitsTitle"),
+      `
       <div class="modalHeader">
         <div>
-          <div class="modalTitle">Нови навици</div>
-          <div class="muted">Добави / изтрий навик за Habit tracker.</div>
+          <div class="modalTitle">${t("manageHabitsTitle")}</div>
+          <div class="muted">${t("manageHabitsSub")}</div>
         </div>
         <button class="btn ghost" type="button" data-modal-close>✕</button>
       </div>
@@ -965,24 +1033,25 @@ function viewHome() {
       <form id="habitForm" class="form">
         <div class="grid2">
           <label class="field">
-            <span>Име</span>
-            <input id="habitName" required placeholder="Напр. Стречинг" />
+            <span>${t("name")}</span>
+            <input id="habitName" required placeholder="e.g. Stretching" />
           </label>
           <label class="field">
-            <span>Иконка (emoji)</span>
+            <span>${t("iconEmoji")}</span>
             <input id="habitIcon" placeholder="🧘" maxlength="4" />
           </label>
         </div>
         <div class="row" style="justify-content:flex-end;gap:10px;margin-top:10px">
-          <button class="btn" type="submit">Добави</button>
+          <button class="btn" type="submit">${t("add")}</button>
         </div>
       </form>
 
       <div style="margin-top:12px">
-        <div class="muted" style="font-size:12px;margin-bottom:6px">Текущи навици</div>
+        <div class="muted" style="font-size:12px;margin-bottom:6px">${t("currentHabits")}</div>
         ${listHtml}
       </div>
-    `);
+    `
+    );
 
     document.querySelectorAll("[data-habit-del]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
@@ -994,7 +1063,7 @@ function viewHome() {
         saveState();
         closeModal();
         render();
-        toast("Навикът е изтрит.");
+        toast(t("habitDeleted"));
       });
     });
 
@@ -1009,7 +1078,7 @@ function viewHome() {
       saveState();
       closeModal();
       render();
-      toast("Навикът е добавен.");
+      toast(t("habitAdded"));
     });
   }
 
@@ -1029,16 +1098,6 @@ function viewHome() {
 // ---------- Init ----------
   const btnTheme = $("#btnTheme");
   if(btnTheme){ btnTheme.addEventListener("click", toggleThemeQuick); }
-
-  const btnReorder = $("#btnReorder");
-if(btnReorder){
-  btnReorder.addEventListener("click", () => {
-    alert(state.lang==="bg"
-      ? "Подреждане: в тази версия плочките са премахнати (ползва се долната навигация)."
-      : "Sort: tiles were removed in this version (use the bottom navigation)."
-    );
-  });
-}
 
 const btnLangEN = $("#btnLangEN");
 const btnLangBG = $("#btnLangBG");

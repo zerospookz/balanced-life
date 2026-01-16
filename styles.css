@@ -612,8 +612,10 @@ body{
 .app{box-sizing:border-box;width:100%;}
 *{box-sizing:border-box;}
 
+body{overflow-x:hidden;}
+
 @media (max-width:640px){
-  .app{max-width:100%;padding:12px 12px 96px;}
+  .app{max-width:100%;width:100%;margin:0 auto;padding:12px 12px 96px;}
   .pageStack{gap:14px;}
   .card.section{padding:16px;}
   .donutRow{grid-template-columns:1fr; justify-items:center;}
@@ -634,6 +636,22 @@ body{
   background:rgba(37,99,235,0.30);
   border-color:rgba(37,99,235,0.75);
   box-shadow:0 10px 22px rgba(37,99,235,0.20);
+}
+
+/* Ensure checked squares are always visible (use habit color) */
+.habitBox.on{background:var(--hc, rgba(96,165,250,0.65)) !important; border-color:var(--hc, rgba(147,197,253,0.95)) !important;}
+.habitBox.on::after{content:"✓"; display:block; color:white; font-weight:900; font-size:14px; line-height:1;}
+.habitBox{display:grid; place-items:center;}
+
+/* Dashboard donut meta + quick actions */
+.donutStack{display:flex; flex-direction:column; align-items:center; gap:8px; width:100%;}
+.donutMeta{font-size:12px; font-weight:800; color:var(--muted); text-align:center; line-height:1.25;}
+.dashActions{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
+.dashActions .btn{padding:10px 12px; border-radius:14px;}
+
+@media (max-width:640px){
+  .dashActions{gap:8px;}
+  .dashActions .btn{flex:1 1 auto; min-width:120px; justify-content:center;}
 }
 /* ===== end v6.3.4 ===== */
 

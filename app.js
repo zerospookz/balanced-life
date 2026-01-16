@@ -1261,43 +1261,9 @@ function render() {
     const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "light"; tSel.value = (v==="dark") ? "dark" : "light"; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
-
-    
+    if(route==="finances") initFinancesUI();
   }
-    if(exp && exp.getTotalLength){
-      const L = exp.getTotalLength();
-      exp.style.strokeDasharray = L;
-      exp.style.strokeDashoffset = L;
-      requestAnimationFrame(()=>{ exp.classList.add("draw"); exp.style.strokeDashoffset = "0"; });
-    }
 
-    if(svg && tip){
-      const hits = $$(".chart-dot.hit");
-      const fmt = (v)=> formatMoney(Number(v||0));
-      const show = (el)=>{
-        const kind = el.dataset.kind;
-        const v = el.dataset.val;
-        tip.textContent = (kind==="income" ? "Income: " : "Expenses: ") + fmt(v);
-        tip.hidden = false;
-        const rect = svg.getBoundingClientRect();
-        const cx = Number(el.getAttribute("cx"));
-        const cy = Number(el.getAttribute("cy"));
-        const vb = svg.viewBox.baseVal;
-        // map viewBox coords to pixels
-        const x = rect.left + (cx / vb.width) * rect.width;
-        const y = rect.top + (cy / vb.height) * rect.height;
-        tip.style.left = (x + 10) + "px";
-        tip.style.top = (y - 10) + "px";
-      };
-      const hide = ()=>{ tip.hidden = true; };
-      hits.forEach(h=>{
-        h.addEventListener("mouseenter", ()=>show(h));
-        h.addEventListener("mousemove", ()=>show(h));
-        h.addEventListener("mouseleave", hide);
-        h.style.pointerEvents="all";
-      });
-    }
-  }
 function handleAction(e) {
     const a = e.currentTarget.dataset.action;
     // tap feedback for UI controls (optional via Settings)

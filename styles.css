@@ -1416,17 +1416,72 @@ body{overflow-x:hidden}
   gap:14px;
   z-index:3;
 }
-@media (max-width:520px){
-  .finChart{padding-top:0;}
-  .finStatsOverlay{
-    position:static;
-    grid-template-columns:1fr;
-    margin-bottom:12px;
-  }
-}
 
 
 /* v7.0.6 hide duplicate finances summary cards on phone */
 @media (max-width: 520px){
   .finSummaryDup{ display:none !important; }
+}
+
+
+/* v7.0.7 mobile finances: match reference layout */
+@media (max-width: 520px){
+  /* page spacing */
+  .page{ padding: 14px 14px 110px; }
+  .section{ margin-bottom: 14px; }
+  .card.section{ border-radius: 22px; }
+
+  /* Finances header */
+  .finHead{ gap: 12px; align-items: flex-start; }
+  .finHead h1{ font-size: 34px; letter-spacing: -0.02em; margin: 0; }
+  .finSub{ font-size: 14px; opacity: .75; margin-top: 4px; }
+
+  /* Entry button: pill with + circle */
+  .entry-btn{
+    height: 48px;
+    border-radius: 999px;
+    padding: 0 16px 0 16px;
+    font-weight: 800;
+    box-shadow: 0 14px 26px rgba(0,0,0,.35);
+  }
+  .entry-btn .plusCircle{
+    width: 34px; height: 34px;
+    margin-left: 12px;
+  }
+
+  /* Chart block */
+  .finHero{ padding: 14px; }
+  .finChartShell{ border-radius: 22px; overflow: hidden; }
+  .finChart{ padding-top: 118px; } /* space for overlay */
+  .finSvg{ height: 220px; } /* taller like reference */
+  .finLegend{ margin-top: 10px; }
+
+  /* Stats overlay: keep 3 across like reference */
+  .finStatsOverlay{
+    position:absolute;
+    top:14px; left:14px; right:14px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin: 0;
+  }
+  .finStatCard{ padding: 12px 12px; border-radius: 18px; }
+  .finStatTitle{ font-size: 13px; opacity: .8; margin-bottom: 6px; }
+  .finStatValue{ font-size: 18px; letter-spacing:-0.01em; }
+  .finStatDelta{ font-size: 12px; opacity: .75; }
+  .finBalancePill{ padding: 10px 12px; border-radius: 999px; }
+  .finBalancePill .finStatTitle{ text-align:center; }
+  .finBalancePill .finStatValue{ text-align:center; }
+
+  /* Goals / Recent entries cards */
+  .goalsHead h2, .recentHead h2{ font-size: 22px; }
+  .goalCard, .recentCard{ border-radius: 20px; }
+  .goalCard{ padding: 14px; }
+  .recentItem{ border-radius: 18px; padding: 12px; }
+  .recentName{ font-size: 16px; }
+  .recentMeta{ font-size: 12px; opacity: .75; }
+  .chip{ border-radius: 999px; }
+
+  /* Reduce double columns on phone to match reference */
+  .goalsGrid{ grid-template-columns: 1fr !important; }
+  .finEntriesGrid{ grid-template-columns: 1fr !important; }
 }

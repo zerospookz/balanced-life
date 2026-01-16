@@ -1594,3 +1594,16 @@ html, body { overflow-x: hidden; }
     padding: 14px 14px 110px !important;
   }
 }
+
+
+/* v7.2.0 finances rewrite: stable layout */
+.finChartShell{position:relative; overflow:hidden; border-radius:22px;}
+.finStatsOverlay{position:absolute; top:14px; left:14px; right:14px; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; z-index:2; pointer-events:none;}
+.finStatsOverlay .finStatCard, .finStatsOverlay .finBalancePill{pointer-events:none;}
+.finChart{position:relative; z-index:1; padding-top:128px;}
+
+@media (max-width:520px){
+  .finStatsOverlay{grid-template-columns:1fr 1fr 1fr; gap:10px; top:14px; left:14px; right:14px;}
+  .finChart{padding-top:122px;}
+  .finGoalsGrid2, .finEntriesGrid{grid-template-columns:1fr !important;}
+}

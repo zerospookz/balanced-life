@@ -933,7 +933,7 @@ function viewFinances() {
     }).join("");
 
     return `
-      <div class="pageStack">
+      <div class="pageStack financesPage">
         <section class="card section finHero">
           <div class="finHeroHead">
             <div>
@@ -944,60 +944,52 @@ function viewFinances() {
               <span class="addPillInner"><span class="addPillText">Entry <span class='plus'>+</span></span><span class="addPillPlus">+</span></span>
             </button>
           </div>
-            </div>
-
-            <div class="finBalancePill">
-              <div class="finBalanceLabel">Balance</div>
-              <div class="finBalanceValue">${fmtMoneyBGN(thisM.net)}</div>
-              <div class="finPager">
-                <span></span><span></span><span class="on"></span><span></span><span></span>
-              </div>
-            </div>
-
-            <div class="finStatCard negative">
-              <div class="finStatLabel">Expenses</div>
-              <div class="finStatRow">
-                <div class="finStatValue">- ${fmtMoneyBGN(thisM.expense)}</div>
-                <div class="finStatDelta">▼ ${Math.abs(expensePct)}%</div>
-              </div>
-            </div>
-          </div>
 
           <div class="finChartShell">
-          ${chartSVG}
-          <div class="finStats finStatsOverlay">
+            <div class="finStats finStatsOverlay">
+              <div class="finStatCard positive">
+                <div class="finStatLabel">Income</div>
+                <div class="finStatRow">
+                  <div class="finStatValue">+ ${fmtMoneyBGN(thisM.income)}</div>
+                  <div class="finStatDelta">▲ ${Math.abs(incomePct)}%</div>
+                </div>
+              </div>
 
-          </div>
-        </div>
+              <div class="finBalancePill">
+                <div class="finBalanceLabel">Balance</div>
+                <div class="finBalanceValue">${fmtMoneyBGN(thisM.net)}</div>
+                <div class="finPager"><span></span><span></span><span class="on"></span><span></span><span></span></div>
+              </div>
 
-          <div class="finStats finStatsOverlay">
-            <div class="finStatCard positive">
-              <div class="finStatLabel">Income</div>
-              <div class="finStatRow">
-                <div class="finStatValue">+ ${fmtMoneyBGN(thisM.income)}</div>
-                <div class="finStatDelta">▲ ${Math.abs(incomePct)}%</div>
+              <div class="finStatCard negative">
+                <div class="finStatLabel">Expenses</div>
+                <div class="finStatRow">
+                  <div class="finStatValue">- ${fmtMoneyBGN(thisM.expense)}</div>
+                  <div class="finStatDelta">▼ ${Math.abs(expensePct)}%</div>
+                </div>
+              </div>
+            </div>
+
+            ${chartSVG}
           </div>
         </section>
 
         ${goalsHtml}
 
-        <section class="card section finGlass">
+        <section class="card section finGlass recentSection">
           <div class="finSectionHead">
             <div>
               <div class="h1">Recent Entries</div>
               <div class="sub">Search and manage</div>
             </div>
-            <div class="finSearch">
-              <input class="finSearchInput" type="text" value="${escapeHtml(state._finQuery || "")}" placeholder="Search…" data-action="finQuery" />
-            </div>
+            <input class="finSearch" type="search" placeholder="Search..." value="${escapeAttr(state._finQuery || "")}" data-action="finQuery" />
           </div>
 
           <div class="finEntriesGrid">
-            ${rows || `<div class="finEmpty"><div class="finEmptyTitle">No entries yet</div><div class="small">Tap “Entry <span class='plus'>+</span>” to add income or expenses.</div></div>`}
+            ${rows || `<div class="finEmpty"><div class="finEmptyTitle">No entries yet</div><div class="small">Tap “Entry +” to add income or expenses.</div></div>`}
           </div>
         </section>
-      </div>
-    `;
+      </div>`;
   }
 
   function viewNutrition() {

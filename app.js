@@ -236,6 +236,10 @@ function updateHeaderUI(){
     const isBG = (state.lang||"en") === "bg";
     toggle.classList.toggle("isBG", isBG);
     toggle.setAttribute("aria-checked", isBG ? "true" : "false");
+
+    // v6.9.2: show only the active language inside the circle
+    const txt = toggle.querySelector(".langText");
+    if(txt) txt.textContent = isBG ? "BG" : "EN";
   }
 }
 
@@ -279,22 +283,21 @@ function habitDisplayName(h){
 const APP_VERSION = "6.4.4";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
-function applyTheme(mode){
+// NOTE v6.9.2: Light theme is temporarily locked.
+function applyTheme(_mode){
   const root = document.documentElement;
-  const m = (mode === "dark") ? "dark" : "light";
+  const m = "light";
   root.setAttribute("data-theme", m);
-  root.setAttribute("data-sky", m === "dark" ? "night" : "day");
+  root.setAttribute("data-sky", "day");
   localStorage.setItem(THEME_KEY, m);
 }
 
-applyTheme(localStorage.getItem(THEME_KEY) || "light");
+applyTheme("light");
 
 function toggleThemeQuick(){
-    const cur = localStorage.getItem(THEME_KEY) || "light";
-    const next = (cur === "dark") ? "light" : "dark";
-    applyTheme(next);
-    render();
-  }
+  // locked for now
+  applyTheme("light");
+}
 
 function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -629,6 +632,15 @@ function viewHome() {
             </div>
             <div class="weekTileValue">${Math.round(d.wmin)} min</div>
             <div class="weekTileSub">Last 7 days • ${Math.round(d.wsess||0)} sessions<br/>Plan inside</div>
+          </button>
+
+          <button class="weekTile" type="button" data-route="settings" aria-label="Settings tile">
+            <div class="weekTileTop">
+              <div class="weekTileTitle">Settings</div>
+              <div class="weekTileIcon">⚙️</div>
+            </div>
+            <div class="weekTileValue">&nbsp;</div>
+            <div class="weekTileSub">Language • preferences<br/>Backup & import</div>
           </button>
         </div>
 </section>
@@ -1509,7 +1521,7 @@ function handleAction(e) {
     });
   }
 
-  function openAddGoalfunction openAddGoal(){
+  function openAddGoal(){
     const today = todayISO();
     const monthStart = startOfMonthISO(today);
     const monthEnd = endOfMonthISO(today);

@@ -1261,8 +1261,8 @@ function safeRun(label, fn){
 }
 
 function validateRuntime(){
-  const required = ["render","setRoute","openModal","closeModal"];
-  const missing = required.filter(n => typeof window[n] !== "function");
+  const required = {render, setRoute, openModal, closeModal};
+  const missing = Object.entries(required).filter(([k,v]) => typeof v !== "function").map(([k])=>k);
   if(missing.length){
     console.error("[BalancedLife] Missing functions:", missing);
   }
@@ -1945,6 +1945,7 @@ updateHeaderUI();
   const initial = (location.hash || "#home").replace("#","");
   state.route = initial || "home";
   render();
+  window.BL_API = { render, setRoute, openModal, closeModal };
 
   // register SW
   if("serviceWorker" in navigator){

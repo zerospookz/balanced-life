@@ -1424,3 +1424,9 @@ body{overflow-x:hidden}
     margin-bottom:12px;
   }
 }
+
+
+/* v7.0.6 hide duplicate finances summary cards on phone */
+@media (max-width: 520px){
+  .finSummaryDup{ display:none !important; }
+}

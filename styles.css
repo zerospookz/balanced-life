@@ -1563,3 +1563,23 @@ body{overflow-x:hidden}
     margin-top:16px;
   }
 }
+
+
+/* v7.1.2 mobile overflow fix: prevent horizontal split */
+html, body { overflow-x: hidden; }
+
+@media (max-width:520px){
+  .pageStack{ width:100%; max-width:100%; }
+  .pageStack > .section{ width:100%; max-width:100%; }
+  .finHero, .finGlass{ width:100%; max-width:100%; }
+  .finChartShell, .finChart{ width:100%; max-width:100%; }
+  .finSvg{ width:100%; height:auto; }
+
+  /* Ensure inner grids don't force wide layout */
+  .finGoalsGrid2{ grid-template-columns: 1fr !important; }
+  .finEntriesGrid{ grid-template-columns: 1fr !important; }
+
+  /* Allow flex children to shrink instead of forcing overflow */
+  .finHeroHead, .finSectionHead{ min-width:0; }
+  .finHeroHead > *, .finSectionHead > *{ min-width:0; }
+}

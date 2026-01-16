@@ -953,14 +953,6 @@ function viewFinances() {
               <span class="addPillInner"><span class="addPillText">Entry <span class='plus'>+</span></span><span class="addPillPlus">+</span></span>
             </button>
           </div>
-
-          <div class="finStats">
-            <div class="finStatCard positive">
-              <div class="finStatLabel">Income</div>
-              <div class="finStatRow">
-                <div class="finStatValue">+ ${fmtMoneyBGN(thisM.income)}</div>
-                <div class="finStatDelta">▲ ${Math.abs(incomePct)}%</div>
-              </div>
             </div>
 
             <div class="finBalancePill">
@@ -981,6 +973,14 @@ function viewFinances() {
           </div>
 
           ${chartSVG}
+
+          <div class="finStats finStatsOverlay">
+            <div class="finStatCard positive">
+              <div class="finStatLabel">Income</div>
+              <div class="finStatRow">
+                <div class="finStatValue">+ ${fmtMoneyBGN(thisM.income)}</div>
+                <div class="finStatDelta">▲ ${Math.abs(incomePct)}%</div>
+          </div>
         </section>
 
         ${goalsHtml}

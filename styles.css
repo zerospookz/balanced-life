@@ -960,3 +960,21 @@ body{overflow-x:hidden}
 :root[data-theme="light"] .insightRow{background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.06);}
 /* ===== end v6.4.1 ===== */
 
+
+
+/* v6.4.3 chevron */
+.chev{font-size:28px;line-height:1;font-weight:900;opacity:.6;}
+:root[data-theme="light"] .chev{opacity:.45;}
+
+
+/* ===== v6.4.3 habits mobile grid ===== */
+@media (max-width:420px){
+  .habitHeadRow,.habitRow{
+    grid-template-columns: minmax(116px, 1fr) repeat(7, 28px);
+    gap:6px;
+  }
+  .habitName{min-width:116px}
+  .habitIcon{font-size:16px}
+  .habitBox{width:28px;height:28px;border-radius:7px}
+}
+/* ===== end v6.4.3 ===== */

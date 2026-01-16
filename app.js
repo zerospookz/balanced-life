@@ -219,7 +219,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.4.2";
+const APP_VERSION = "6.4.3";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -590,10 +590,8 @@ function viewHome() {
             <div class="h1">${t("habitTracker")}</div>
             <div class="sub">${t("openHabits")}</div>
           </div>
-          <div class="btn addPill" style="pointer-events:none">
-            <span class="addPillInner"><span class="addPillText">${t("openHabits")}</span><span class="addPillPlus">+</span></span>
-          </div>
-        </div>
+          <div class="chev" aria-hidden="true">›</div>
+</div>
       </section>
     `;
   }

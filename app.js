@@ -202,7 +202,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.3.5";
+const APP_VERSION = "6.3.8";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -407,7 +407,12 @@ function saveState() {
                 ${weekOptions}
               </select>
             </div>
-            <button class="btn primary habitAddBtn" type="button" data-action="addHabit">${t("addHabit")}</button>
+            <button class="btn addPill habitAddBtn" type="button" data-action="addHabit">
+              <span class="addPillInner">
+                <span class="addPillText">${t("addHabit")}</span>
+                <span class="addPillPlus">+</span>
+              </span>
+            </button>
           </div>
         </div>
 
@@ -502,9 +507,9 @@ function viewHome() {
         </div>
 
         <div class="dashActions">
-          <button class="btn primary" type="button" data-action="addWorkout">${t("actionsWorkout")}</button>
-          <button class="btn" type="button" data-action="addFinance">${t("actionsFinance")}</button>
-          <button class="btn" type="button" data-action="addFood">${t("actionsFood")}</button>
+          <button class="btn addPill" type="button" data-action="addWorkout"><span class="addPillInner"><span class="addPillText">${t("actionsWorkout")}</span><span class="addPillPlus">+</span></span></button>
+          <button class="btn addPill" type="button" data-action="addFinance"><span class="addPillInner"><span class="addPillText">${t("actionsFinance")}</span><span class="addPillPlus">+</span></span></button>
+          <button class="btn addPill" type="button" data-action="addFood"><span class="addPillInner"><span class="addPillText">${t("actionsFood")}</span><span class="addPillPlus">+</span></span></button>
         </div>
       </section>
 
@@ -564,7 +569,7 @@ function viewHome() {
             <div class="h1">Finances</div>
             <div class="sub">Income and expenses</div>
           </div>
-          <button class="btn primary" data-action="addFinance" type="button">+ Entry</button>
+          <button class="btn addPill" data-action="addFinance" type="button"><span class="addPillInner"><span class="addPillText">+ Entry</span><span class="addPillPlus">+</span></span></button>
         </div>
         <div style="margin-top:10px" class="small">Stored locally (offline-first).</div>
         <table class="table" style="margin-top:10px">
@@ -593,7 +598,7 @@ function viewHome() {
             <div class="h1">Nutrition</div>
             <div class="sub">Food, calories & photos (manual)</div>
           </div>
-          <button class="btn primary" data-action="addFood" type="button">+ Food</button>
+          <button class="btn addPill" data-action="addFood" type="button"><span class="addPillInner"><span class="addPillText">+ Food</span><span class="addPillPlus">+</span></span></button>
         </div>
         <div style="margin-top:10px" class="small">* Автоматично калкулиране от снимка изисква AI/външен API. Тук е ръчно въвеждане.</div>
         <table class="table" style="margin-top:10px">
@@ -624,7 +629,7 @@ function viewHome() {
           <div class="l" style="margin-bottom:8px">${escapeHtml(sec)}</div>
           <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">${lis}</ul>
           <div style="margin-top:10px">
-            <button class="btn ghost" data-action="addPlanItem" data-day="${escapeHtml(selected)}" data-sec="${escapeHtml(sec)}" type="button">+ Add</button>
+            <button class="btn addPill smallAdd" data-action="addPlanItem" data-day="${escapeHtml(selected)}" data-sec="${escapeHtml(sec)}" type="button"><span class="addPillInner"><span class="addPillText">+ Add</span><span class="addPillPlus">+</span></span></button>
           </div>
         </div>
       `;
@@ -655,7 +660,7 @@ function viewHome() {
           <div class="row">
             <button class="btn ghost" data-action="setWorkoutsTab" data-tab="plan" type="button" style="${tab==="plan"?"border-color:rgba(37,99,235,.45)":""}">План</button>
             <button class="btn ghost" data-action="setWorkoutsTab" data-tab="logs" type="button" style="${tab==="logs"?"border-color:rgba(37,99,235,.45)":""}">Сесии</button>
-            <button class="btn primary" data-action="addWorkout" type="button">+ Тренировка</button>
+            <button class="btn addPill" data-action="addWorkout" type="button"><span class="addPillInner"><span class="addPillText">+ Workout</span><span class="addPillPlus">+</span></span></button>
           </div>
         </div>
 
@@ -1003,7 +1008,60 @@ function viewHome() {
     });
   }
 
-  
+  // ===== v6.3.7 ${t("presetHabits")} =====
+  const PRESET_HABITS = [
+  {id: "h_workouts", name: "Workouts", icon: "🏋️"},
+  {id: "h_walk", name: "Walk", icon: "🚶"},
+  {id: "h_run", name: "Run", icon: "🏃"},
+  {id: "h_cardio", name: "Cardio", icon: "❤️"},
+  {id: "h_stretch", name: "Stretch", icon: "🧘"},
+  {id: "h_mobility", name: "Mobility", icon: "🤸"},
+  {id: "h_yoga", name: "Yoga", icon: "🕉️"},
+  {id: "h_pushups", name: "Push-ups", icon: "💪"},
+  {id: "h_pullups", name: "Pull-ups", icon: "🧗"},
+  {id: "h_squats", name: "Squats", icon: "🦵"},
+  {id: "h_sleep", name: "Sleep 8h", icon: "😴"},
+  {id: "h_wakeup", name: "Wake up early", icon: "⏰"},
+  {id: "h_no_snooze", name: "No snooze", icon: "🚫"},
+  {id: "h_nap", name: "No nap", icon: "🛌"},
+  {id: "h_sunlight", name: "Morning sunlight", icon: "🌞"},
+  {id: "h_water", name: "Drink water", icon: "💧"},
+  {id: "h_steps", name: "10k steps", icon: "👟"},
+  {id: "h_meditation", name: "Meditation", icon: "🧠"},
+  {id: "h_breath", name: "Breathing", icon: "🌬️"},
+  {id: "h_coldshower", name: "Cold shower", icon: "🚿"},
+  {id: "h_nutrition", name: "Track calories", icon: "🥗"},
+  {id: "h_protein", name: "Hit protein", icon: "🍗"},
+  {id: "h_fruit", name: "Eat fruit", icon: "🍎"},
+  {id: "h_veggies", name: "Eat veggies", icon: "🥦"},
+  {id: "h_no_sugar", name: "No sweets", icon: "🍬"},
+  {id: "h_no_fastfood", name: "No fast food", icon: "🍟"},
+  {id: "h_no_soda", name: "No soda", icon: "🥤"},
+  {id: "h_cook", name: "Cook at home", icon: "🍳"},
+  {id: "h_supplements", name: "Supplements", icon: "💊"},
+  {id: "h_read_labels", name: "Read labels", icon: "📋"},
+  {id: "h_finances", name: "Log finances", icon: "💰"},
+  {id: "h_no_spend", name: "No-spend day", icon: "🧾"},
+  {id: "h_budget", name: "Check budget", icon: "📊"},
+  {id: "h_save", name: "Save money", icon: "🏦"},
+  {id: "h_invest", name: "Invest", icon: "📈"},
+  {id: "h_debt", name: "Pay debt", icon: "💳"},
+  {id: "h_cash", name: "Cash-only", icon: "💵"},
+  {id: "h_sell", name: "Sell item", icon: "🛒"},
+  {id: "h_read", name: "Read 20 min", icon: "📚"},
+  {id: "h_journal", name: "Journal", icon: "📝"},
+  {id: "h_planning", name: "Plan tomorrow", icon: "🗓️"},
+  {id: "h_focus", name: "Deep work", icon: "🎧"},
+  {id: "h_learn", name: "Learn skill", icon: "🎓"},
+  {id: "h_language", name: "Language practice", icon: "🗣️"},
+  {id: "h_clean", name: "Tidy room", icon: "🧹"},
+  {id: "h_outside", name: "Go outside", icon: "🌿"},
+  {id: "h_social", name: "Reach out", icon: "🤝"},
+  {id: "h_gratitude", name: "Gratitude", icon: "🙏"},
+  {id: "h_screen", name: "Limit screen", icon: "📵"},
+  {id: "h_no_alcohol", name: "No alcohol", icon: "🚫🍺"}
+];
+
   function openAddHabit(){
     const habits = state.habits || [];
     const listHtml = habits.map(h=>`
@@ -1028,6 +1086,21 @@ function viewHome() {
           <div class="muted">${t("manageHabitsSub")}</div>
         </div>
         <button class="btn ghost" type="button" data-modal-close>✕</button>
+      </div>
+
+  <div style="margin-top:12px">
+        <div class="muted" style="font-size:12px;margin-bottom:6px">${t("presetHabits")}</div>
+        <div class="presetGrid">
+          ${PRESET_HABITS.map(p=>`
+            <button class="presetBtn" type="button" data-habit-preset="${p.id}" title="${escapeHtml(p.name)}">
+              <span class="presetEmoji">${p.icon}</span>
+              <span style="display:flex;flex-direction:column;align-items:flex-start">
+                <span class="presetName">${escapeHtml(p.name)}</span>
+                <span class="presetTag">${t("add")}</span>
+              </span>
+            </button>
+          `).join("")}
+        </div>
       </div>
 
       <form id="habitForm" class="form">

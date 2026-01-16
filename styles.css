@@ -655,6 +655,29 @@ body{overflow-x:hidden;}
 }
 /* ===== end v6.3.4 ===== */
 
+/* ===== v6.3.8 Add button pill + Habit mobile spacing ===== */
+.btn.addPill{padding:0;border:0;background:transparent;box-shadow:none}
+.addPillInner{display:flex;align-items:center;gap:12px;border-radius:999px;padding:10px 10px 10px 18px;background:linear-gradient(90deg, rgba(251,146,60,0.95), rgba(239,68,68,0.88));box-shadow:0px 10px 26px rgba(0,0,0,0.22)}
+:root[data-theme="light"] .addPillInner{box-shadow:0px 10px 26px rgba(2,6,23,0.12)}
+.addPillText{font-weight:900;font-size:13px;color:#fff;letter-spacing:-0.01em}
+.addPillPlus{width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,0.88);display:grid;place-items:center;color:rgba(15,23,42,0.85);font-weight:950;font-size:22px;line-height:1}
+.btn.addPill:active .addPillInner{transform:translateY(1px)}
+.btn.addPill.smallAdd .addPillInner{padding:8px 8px 8px 14px}
+.btn.addPill.smallAdd .addPillPlus{width:32px;height:32px;font-size:20px}
+
+/* Habit tracker mobile: prevent "squeezed" grid */
+@media (max-width:640px){
+  .habitWrap{overflow-x:auto;padding-bottom:6px}
+  .habitHeadRow,.habitRow{min-width:560px}
+  .habitBox{width:34px;height:34px}
+  .habitTitle{font-size:22px}
+  .habitRange{font-size:12px}
+  .habitSectionFix .cardHead{flex-direction:column;align-items:stretch;gap:12px}
+  .habitSectionFix .cardHead>div:last-child{justify-content:space-between}
+  .weekFilter{flex:1 1 auto}
+}
+/* ===== end v6.3.8 ===== */
+
 /* ===== v6.3.5 Mobile overflow + habit mark visibility ===== */
 html,body{overflow-x:hidden;}
 
@@ -749,3 +772,16 @@ body{overflow-x:hidden}
 }
 /* ===== end v6.3.5 ===== */
 
+
+
+/* ===== v6.3.7 Preset habits ===== */
+.presetGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+@media (max-width:820px){.presetGrid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:420px){.presetGrid{grid-template-columns:repeat(2,1fr)}}
+.presetBtn{display:flex;align-items:center;gap:8px;justify-content:flex-start;padding:10px 10px;border-radius:14px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);cursor:pointer}
+:root[data-theme="light"] .presetBtn{border-color:rgba(15,23,42,0.10);background:rgba(255,255,255,0.65)}
+.presetBtn:hover{transform:translateY(-1px)}
+.presetEmoji{font-size:18px}
+.presetName{font-size:12px;font-weight:900;line-height:1.1}
+.presetTag{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px}
+/* ===== end v6.3.7 ===== */

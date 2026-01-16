@@ -89,7 +89,7 @@ body{
   position:fixed;left:50%;transform:translateX(-50%);
   bottom:14px;z-index:20;
   width:min(520px, calc(100% - 28px));
-  display:grid;grid-template-columns:repeat(6,1fr);
+  display:grid;grid-template-columns:repeat(5,1fr);
   gap:8px;
   padding:10px;
   border-radius:22px;
@@ -978,3 +978,31 @@ body{overflow-x:hidden}
   .habitBox{width:28px;height:28px;border-radius:7px}
 }
 /* ===== end v6.4.3 ===== */
+
+
+/* v6.4.4 header settings button */
+.iconbtn{width:40px;height:40px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.14);backdrop-filter:blur(10px);box-shadow:var(--shadow);display:grid;place-items:center;font-size:18px;color:var(--text);cursor:pointer}
+:root[data-theme="light"] .iconbtn{border:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.72)}
+
+
+/* ===== v6.4.4 habits fit 7 days ===== */
+@media (max-width:420px){
+  .habitHeadRow,.habitRow{
+    grid-template-columns: minmax(92px, 1fr) repeat(7, 22px);
+    gap:4px;
+  }
+  .habitDay{font-size:11px;opacity:.9}
+  .habitIcon{font-size:15px}
+  .habitTitleCell{font-size:13px}
+  .habitName{max-width:92px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .habitBox{width:22px;height:22px;border-radius:6px}
+}
+@media (max-width:360px){
+  .habitHeadRow,.habitRow{
+    grid-template-columns: minmax(86px, 1fr) repeat(7, 20px);
+    gap:4px;
+  }
+  .habitBox{width:20px;height:20px;border-radius:6px}
+  .habitName{max-width:86px}
+}
+/* ===== end v6.4.4 ===== */

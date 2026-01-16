@@ -1007,100 +1007,333 @@ body{overflow-x:hidden}
 }
 /* ===== end v6.4.4 ===== */
 
-/* ===== Finances UI v6.5.0 ===== */
-.finHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
-.finHeadActions{display:flex;gap:10px;align-items:center}
+/* ===== Finances UI v6.6.0 (visual refresh) ===== */
+.finHero{position:relative;overflow:hidden}
+.finHero::before{content:"";position:absolute;inset:-2px;background:radial-gradient(1200px 420px at 20% 0%, rgba(99,102,241,.28), transparent 60%),radial-gradient(900px 380px at 90% 10%, rgba(251,146,60,.22), transparent 55%),radial-gradient(900px 500px at 55% 120%, rgba(34,197,94,.18), transparent 60%);pointer-events:none}
+.finHero > *{position:relative}
 
-.finKpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
-.finKpi{padding:12px 14px;border-radius:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);backdrop-filter: blur(10px);box-shadow: 0 16px 40px rgba(0,0,0,0.14);transition: transform .18s ease, border-color .18s ease}
-.finKpi:hover{transform: translateY(-2px);border-color: rgba(255,255,255,0.14)}
-.finKpi .l{font-size:12px;font-weight:800;letter-spacing:.2px;color:rgba(255,255,255,0.72)}
-.finKpi .v{margin-top:8px;font-size:20px;font-weight:900;color:rgba(255,255,255,0.92)}
+.finGlass{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);backdrop-filter: blur(16px);box-shadow: 0 22px 60px rgba(0,0,0,0.20)}
 
-.finChart{overflow:hidden}
-.finChartHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.finHeroHead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+
+.finEntryBtn{border:none;background:linear-gradient(135deg, rgba(251,146,60,1), rgba(239,68,68,1));color:#fff;box-shadow: 0 16px 40px rgba(239,68,68,0.22)}
+.finEntryBtn .addPillInner{background:transparent}
+.finEntryBtn:hover{transform: translateY(-1px)}
+
+.finStats{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch;margin-top:14px}
+
+.finStatCard{padding:14px 16px;border-radius:20px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.06);backdrop-filter: blur(16px);box-shadow: 0 20px 50px rgba(0,0,0,0.18)}
+.finStatCard.positive{background:linear-gradient(135deg, rgba(52,211,153,0.10), rgba(255,255,255,0.05));border-color: rgba(52,211,153,0.18)}
+.finStatCard.negative{background:linear-gradient(135deg, rgba(251,146,60,0.12), rgba(255,255,255,0.05));border-color: rgba(251,146,60,0.18)}
+.finStatLabel{font-size:13px;font-weight:850;color:rgba(255,255,255,0.72)}
+.finStatRow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:10px}
+.finStatValue{font-size:22px;font-weight:950;letter-spacing:.2px;color:rgba(255,255,255,0.92)}
+.finStatDelta{font-size:13px;font-weight:900;color:rgba(255,255,255,0.62)}
+
+.finBalancePill{display:grid;place-items:center;padding:14px 18px;min-width:220px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);background:rgba(0,0,0,0.18);backdrop-filter: blur(16px);box-shadow: 0 24px 60px rgba(0,0,0,0.22)}
+.finBalanceLabel{font-size:13px;font-weight:850;color:rgba(255,255,255,0.65)}
+.finBalanceValue{font-size:22px;font-weight:950;color:rgba(255,255,255,0.92);margin-top:4px}
+.finPager{display:flex;gap:6px;margin-top:10px}
+.finPager span{width:7px;height:7px;border-radius:999px;background:rgba(255,255,255,0.16)}
+.finPager span.on{background:rgba(255,255,255,0.55)}
+
+.finChart{margin-top:16px;border-radius:22px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);overflow:hidden;padding:12px 12px 10px}
 .finSvg{width:100%;height:auto;display:block}
-.finLegend{display:flex;gap:10px;align-items:center;font-size:12px;color:rgba(255,255,255,0.72);font-weight:800}
-.finLegend .dot{width:10px;height:10px;border-radius:999px;display:inline-block;box-shadow: 0 0 0 4px rgba(255,255,255,0.06)}
-.finLegend .dot.income{background:rgba(52,211,153,1)}
-.finLegend .dot.expense{background:rgba(239,68,68,1)}
+.finLegend{display:flex;gap:14px;justify-content:center;align-items:center;margin-top:10px;font-size:12px;color:rgba(255,255,255,0.70);font-weight:850}
+.finLegendItem{display:inline-flex;align-items:center;gap:8px}
+.finDot{width:10px;height:10px;border-radius:999px;box-shadow:0 0 0 4px rgba(255,255,255,0.05)}
+.finDot.inc{background:rgba(52,211,153,1)}
+.finDot.exp{background:rgba(251,146,60,1)}
 
-.finGoalsHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
-.finGoalsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
-.finGoalCard{padding:14px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);backdrop-filter: blur(12px);box-shadow:0 18px 44px rgba(0,0,0,0.14);transition: transform .18s ease, border-color .18s ease}
-.finGoalCard:hover{transform: translateY(-2px);border-color: rgba(255,255,255,0.14)}
-.finGoalTop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.finGoalName{font-weight:900;color:rgba(255,255,255,0.92);font-size:16px}
-.finGoalMeta{margin-top:4px;font-size:12px;color:rgba(255,255,255,0.68);font-weight:800}
-.chip.auto{border-color: rgba(96,165,250,.35);background:rgba(96,165,250,.12)}
-.chip.manual{border-color: rgba(167,139,250,.35);background:rgba(167,139,250,.12)}
-
-.iconbtn{border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.9);border-radius:14px;padding:8px 10px;cursor:pointer;transition: transform .16s ease, border-color .16s ease}
-.iconbtn:hover{transform: translateY(-1px);border-color: rgba(255,255,255,0.16)}
-.iconbtn:active{transform: scale(.98)}
-
-.finGoalNums{display:flex;align-items:baseline;gap:10px;margin-top:12px}
-.finGoalNow{font-size:22px;font-weight:950;color:rgba(255,255,255,0.92)}
-.finGoalOf{font-size:12px;font-weight:900;color:rgba(255,255,255,0.64)}
-
-.finBar{margin-top:12px;height:12px;border-radius:999px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.08);overflow:hidden}
-.finBarFill{height:100%;border-radius:999px;box-shadow: 0 10px 26px rgba(0,0,0,0.18);transition: width .55s cubic-bezier(.2,.9,.2,1)}
-.finBarFill.track{background:linear-gradient(90deg, rgba(96,165,250,1), rgba(167,139,250,1))}
-.finBarFill.ahead{background:linear-gradient(90deg, rgba(52,211,153,1), rgba(34,197,94,1))}
-.finBarFill.behind{background:linear-gradient(90deg, rgba(251,146,60,1), rgba(239,68,68,1))}
-
-.finGoalFoot{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:10px}
-.finGoalLeft{font-size:12px;color:rgba(255,255,255,0.72);font-weight:800}
-.finGoalStatus{font-size:12px;font-weight:950;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.06)}
-.finGoalStatus.ahead{border-color: rgba(52,211,153,.25);background:rgba(52,211,153,.10)}
-.finGoalStatus.behind{border-color: rgba(239,68,68,.25);background:rgba(239,68,68,.10)}
-.finGoalActions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-
-.finEntriesHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.finSectionHead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
 .finSearch{min-width:min(340px,100%)}
-.finSearchInput{width:100%;padding:12px 14px;border-radius:16px;border:1px solid rgba(15,23,42,.15);background:rgba(255,255,255,0.08);color:var(--text);outline:none;transition:border-color .18s ease, transform .18s ease}
+.finSearchInput{width:100%;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:var(--text);outline:none;transition:border-color .18s ease, transform .18s ease}
 .finSearchInput:focus{border-color:rgba(167,139,250,.45);transform: translateY(-1px)}
 
-.finRows{margin-top:12px;display:flex;flex-direction:column;gap:10px}
-.finRow{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition: transform .18s ease, border-color .18s ease}
-.finRow:hover{transform: translateY(-1px);border-color: rgba(255,255,255,0.14)}
-.finRowLeft{display:grid;gap:4px}
-.finRowType{font-size:11px;font-weight:950;letter-spacing:.3px;text-transform:uppercase;width:max-content;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.06)}
-.finRowType.inc{border-color: rgba(52,211,153,.25);background:rgba(52,211,153,.10)}
-.finRowType.exp{border-color: rgba(239,68,68,.25);background:rgba(239,68,68,.10)}
-.finRowNote{font-weight:900;color:rgba(255,255,255,0.92)}
-.finRowDate{font-size:12px;color:rgba(255,255,255,0.62);font-weight:800}
-.finRowRight{display:flex;gap:10px;align-items:center}
-.finRowAmount{font-weight:950;font-size:14px;white-space:nowrap}
-.finRowAmount.inc{color:rgba(52,211,153,1)}
-.finRowAmount.exp{color:rgba(251,146,60,1)}
-.finDel{white-space:nowrap}
+.finGoalsGrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.finGoalCard2{padding:14px;border-radius:22px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);box-shadow: 0 20px 60px rgba(0,0,0,0.18)}
+.finGoalHeader2{display:flex;align-items:center;gap:12px}
+.finGoalInfo2{flex:1;min-width:0}
+.finGoalName2{font-weight:950;font-size:16px;color:rgba(255,255,255,0.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.finGoalMeta2{margin-top:4px;font-size:12px;color:rgba(255,255,255,0.62);font-weight:850}
+
+.finBubble{width:54px;height:54px;border-radius:999px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.10);display:grid;place-items:center;overflow:hidden;flex:0 0 auto}
+.finBubble img{width:56px;height:56px;object-fit:cover;transform: scale(1.06)}
+
+.finChip{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);font-weight:950;letter-spacing:.3px;font-size:10px}
+.finChip.auto{border-color: rgba(96,165,250,.30);background:rgba(96,165,250,.12)}
+.finChip.manual{border-color: rgba(167,139,250,.30);background:rgba(167,139,250,.12)}
+
+.finIconBtn{width:40px;height:40px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);cursor:pointer}
+.finIconBtn:hover{transform: translateY(-1px);border-color: rgba(255,255,255,.18)}
+
+.finGoalNumbers2{display:flex;align-items:baseline;gap:10px;margin-top:12px}
+.finGoalNow2{font-size:22px;font-weight:950;color:rgba(255,255,255,0.92)}
+.finGoalOf2{font-size:12px;font-weight:900;color:rgba(255,255,255,0.64)}
+
+.finBar2{margin-top:12px;height:12px;border-radius:999px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.08);overflow:hidden}
+.finBarFill2{height:100%;border-radius:999px;box-shadow: 0 10px 26px rgba(0,0,0,0.18);transition: width .55s cubic-bezier(.2,.9,.2,1)}
+.finBarFill2.track{background:linear-gradient(90deg, rgba(96,165,250,1), rgba(167,139,250,1))}
+.finBarFill2.ahead{background:linear-gradient(90deg, rgba(52,211,153,1), rgba(34,197,94,1))}
+.finBarFill2.behind{background:linear-gradient(90deg, rgba(251,146,60,1), rgba(239,68,68,1))}
+
+.finGoalBottom2{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px}
+.finGoalLeft2{font-size:12px;color:rgba(255,255,255,0.72);font-weight:850}
+.finGoalStatus2{font-size:12px;font-weight:950;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.06)}
+.finGoalStatus2.ahead{border-color: rgba(52,211,153,.25);background:rgba(52,211,153,.10)}
+.finGoalStatus2.behind{border-color: rgba(239,68,68,.25);background:rgba(239,68,68,.10)}
+
+.finGoalActions2{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+
+.finEntriesGrid{margin-top:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.finEntryCard{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:22px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);transition: transform .18s ease, border-color .18s ease}
+.finEntryCard:hover{transform: translateY(-1px);border-color: rgba(255,255,255,0.16)}
+.finEntryMain{flex:1;min-width:0}
+.finEntryTop{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.finEntryTitle{font-weight:950;color:rgba(255,255,255,0.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.finEntryAmount{font-weight:950;white-space:nowrap}
+.finEntryAmount.inc{color:rgba(52,211,153,1)}
+.finEntryAmount.exp{color:rgba(251,146,60,1)}
+.finEntrySub{display:flex;gap:10px;align-items:center;margin-top:6px}
+.finEntryTag{font-size:10px;font-weight:950;letter-spacing:.3px;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.06)}
+.finEntryTag.inc{border-color: rgba(52,211,153,.25);background:rgba(52,211,153,.10)}
+.finEntryTag.exp{border-color: rgba(251,146,60,.25);background:rgba(251,146,60,.10)}
+.finEntryDate{font-size:12px;color:rgba(255,255,255,0.60);font-weight:850}
+.finEntryDel{width:34px;height:34px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);cursor:pointer}
+.finEntryDel:hover{border-color: rgba(255,255,255,0.18);transform: translateY(-1px)}
 
 .finEmpty{padding:18px;border-radius:18px;background:rgba(0,0,0,0.14);border:1px dashed rgba(255,255,255,0.18)}
 .finEmptyTitle{font-weight:950;color:rgba(255,255,255,0.90);margin-bottom:6px}
 
-@media (max-width: 720px){
-  .finKpis{grid-template-columns:1fr;}
-  .finGoalsGrid{grid-template-columns:1fr;}
-  .finLegend{display:none;}
+@media (max-width: 860px){
+  .finStats{grid-template-columns:1fr;}
+  .finBalancePill{min-width:unset;border-radius:22px;place-items:start;align-items:start}
+  .finEntriesGrid{grid-template-columns:1fr;}
+  .finGoalsGrid2{grid-template-columns:1fr;}
 }
 /* ===== end finances ===== */
 
-/* Light theme tuning */
-:root[data-theme="light"] .finKpi,
-:root[data-theme="light"] .finGoalCard,
-:root[data-theme="light"] .finRow,
+/* Light theme tuning (finances) */
+:root[data-theme="light"] .finGlass,
+:root[data-theme="light"] .finStatCard,
+:root[data-theme="light"] .finBalancePill,
 :root[data-theme="light"] .finChart,
-:root[data-theme="light"] .finSearchInput{background:rgba(255,255,255,0.60);border-color: rgba(15,23,42,0.10)}
-:root[data-theme="light"] .finKpi .l{color: rgba(15,23,42,0.60)}
-:root[data-theme="light"] .finKpi .v,
-:root[data-theme="light"] .finGoalName,
-:root[data-theme="light"] .finGoalNow,
-:root[data-theme="light"] .finRowNote{color: rgba(15,23,42,0.92)}
-:root[data-theme="light"] .finGoalMeta,
-:root[data-theme="light"] .finGoalOf,
-:root[data-theme="light"] .finRowDate{color: rgba(15,23,42,0.55)}
-:root[data-theme="light"] .finLegend{color: rgba(15,23,42,0.60)}
-:root[data-theme="light"] .finLegend .dot{box-shadow: 0 0 0 4px rgba(15,23,42,0.06)}
-:root[data-theme="light"] .finEmpty{background:rgba(255,255,255,0.65);border-color: rgba(15,23,42,0.14)}
+:root[data-theme="light"] .finGoalCard2,
+:root[data-theme="light"] .finEntryCard,
+:root[data-theme="light"] .finSearchInput{background:rgba(255,255,255,0.70);border-color: rgba(15,23,42,0.12)}
+:root[data-theme="light"] .finHero::before{opacity:.55}
+:root[data-theme="light"] .finStatLabel,
+:root[data-theme="light"] .finStatDelta,
+:root[data-theme="light"] .finBalanceLabel,
+:root[data-theme="light"] .finEntryDate,
+:root[data-theme="light"] .finGoalMeta2,
+:root[data-theme="light"] .finGoalOf2{color: rgba(15,23,42,0.60)}
+:root[data-theme="light"] .finStatValue,
+:root[data-theme="light"] .finBalanceValue,
+:root[data-theme="light"] .finGoalName2,
+:root[data-theme="light"] .finGoalNow2,
+:root[data-theme="light"] .finEntryTitle{color: rgba(15,23,42,0.92)}
+:root[data-theme="light"] .finDot{box-shadow:0 0 0 4px rgba(15,23,42,0.06)}
+:root[data-theme="light"] .finEmpty{background:rgba(255,255,255,0.75);border-color: rgba(15,23,42,0.14)}
 :root[data-theme="light"] .finEmptyTitle{color: rgba(15,23,42,0.90)}
+
+
+/* ===== v6.6.2 visual polish ===== */
+
+/* Entry button */
+.entry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg,#ff8a5c,#ff5f6d);
+  color:#fff;
+  font-weight:600;
+  border:none;
+}
+.entry-btn span.plus {
+  display:inline-flex;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.25);
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+}
+
+/* Chart glow */
+.chart-line-income {
+  stroke:#7CFFB2;
+  filter: drop-shadow(0 0 6px rgba(124,255,178,.6));
+}
+.chart-line-expense {
+  stroke:#FF8A8A;
+  filter: drop-shadow(0 0 6px rgba(255,138,138,.6));
+}
+.chart-dot {
+  fill:#fff;
+  stroke-width:3;
+}
+
+/* Goals cards spacing */
+.goal-card {
+  padding:22px;
+  border-radius:18px;
+}
+.goal-progress {
+  height:8px;
+  border-radius:6px;
+}
+
+/* Recent entries grid */
+.recent-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.recent-item {
+  padding:16px;
+  border-radius:16px;
+}
+
+
+/* ===== v6.9.0: Animated chart + Entry modal + Category bubbles ===== */
+
+.finEntriesGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
+}
+
+@media (max-width: 820px){
+  .finEntriesGrid{ grid-template-columns: 1fr; }
+}
+
+.finEntryRow{
+  position:relative;
+  overflow:hidden;
+}
+
+.finEntryIcon{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background: rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex: 0 0 auto;
+}
+
+.finEntryIcon img{
+  width:46px;
+  height:46px;
+  object-fit:contain;
+  border-radius:50%;
+}
+
+.finEntryCat{
+  opacity:.85;
+  text-transform:capitalize;
+}
+
+.finChartTip{
+  position: fixed;
+  z-index: 9999;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15,19,40,.78);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  font-weight: 700;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.chart-line-income.draw,
+.chart-line-expense.draw{
+  transition: stroke-dashoffset 900ms ease;
+}
+
+/* Better hit areas for hover */
+.chart-dot.hit{ cursor: pointer; }
+
+/* Modal type pills + categories */
+.finModalTop{ margin-bottom: 8px; }
+
+.finTypePills{
+  display:flex;
+  gap:10px;
+  background: rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius: 999px;
+  padding:6px;
+}
+.finTypePill{
+  flex:1;
+  border:none;
+  border-radius:999px;
+  padding:10px 12px;
+  color: rgba(255,255,255,.85);
+  background: transparent;
+  font-weight: 700;
+}
+.finTypePill.active{
+  background: rgba(255,255,255,0.10);
+  color:#fff;
+}
+
+.finCats{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap:12px;
+  margin-top:8px;
+}
+
+@media (max-width: 520px){
+  .finCats{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+
+.finCatBtn{
+  border:none;
+  background: rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius: 18px;
+  padding:10px 10px 12px;
+  text-align:center;
+  color: rgba(255,255,255,.9);
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+.finCatBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.06); }
+.finCatBtn.active{
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.08);
+}
+
+.finCatIcon{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(255,255,255,0.02);
+  margin-bottom: 8px;
+}
+.finCatIcon img{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  object-fit:contain;
+}
+.finCatLabel{
+  display:block;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: .9;
+}
+
+/* Header Entry button already styled as .entry-btn in v6.6.2 */

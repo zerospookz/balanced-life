@@ -665,43 +665,52 @@ function viewFinances() {
     const today = todayISO();
     const monthStart = startOfMonthISO(today);
     const monthEnd = endOfMonthISO(today);
-    const m = sumFinances({startISO: monthStart, endISO: monthEnd});
+
+    const thisM = sumFinances({ startISO: monthStart, endISO: monthEnd });
+
+    // previous month for % change
+    const prevRange = (() => {
+      const d = new Date(monthStart + "T00:00:00");
+      d.setDate(0); // last day of previous month
+      const prevEnd = isoFromDate(d);
+      const prevStartDate = new Date(d.getFullYear(), d.getMonth(), 1);
+      return { startISO: isoFromDate(prevStartDate), endISO: prevEnd };
+    })();
+    const prevM = sumFinances({ startISO: prevRange.startISO, endISO: prevRange.endISO });
+
+    const pctChange = (cur, prev) => {
+      const c = Number(cur || 0);
+      const p = Number(prev || 0);
+      if (!p) return c ? 100 : 0;
+      return Math.round(((c - p) / p) * 100);
+    };
+
+    const incomePct = pctChange(thisM.income, prevM.income);
+    const expensePct = pctChange(thisM.expense, prevM.expense);
 
     // last 28 days chart
-    const start28 = (()=>{
+    const start28 = (() => {
       const d = new Date(today + "T00:00:00");
-      d.setDate(d.getDate()-27);
+      d.setDate(d.getDate() - 27);
       return isoFromDate(d);
     })();
-    const series = buildDailySeries({startISO:start28, endISO:today});
+    const series = buildDailySeries({ startISO: start28, endISO: today });
 
-    const chartSVG = (()=>{
-      const W=640, H=190, pad=18;
-      const maxV = Math.max(
-        1,
-        ...series.map(x=>x.income),
-        ...series.map(x=>x.expense)
-      );
-      const xStep = (W - pad*2) / Math.max(1, (series.length-1));
-      const y = (v)=> (H-pad) - (v/maxV)*(H-pad*2);
+    const chartSVG = (() => {
+      const W = 900, H = 260, pad = 26;
+      const maxV = Math.max(1, ...series.map(x => x.income), ...series.map(x => x.expense));
+      const xStep = (W - pad * 2) / Math.max(1, (series.length - 1));
+      const y = (v) => (H - pad) - (v / maxV) * (H - pad * 2);
 
-      const points = (key)=> series.map((d,i)=>`${(pad + i*xStep).toFixed(2)},${y(d[key]).toFixed(2)}`).join(" ");
+      const points = (key) => series.map((d, i) => `${(pad + i * xStep).toFixed(2)},${y(d[key]).toFixed(2)}`).join(" ");
       const pInc = points("income");
       const pExp = points("expense");
 
-      const last = series[series.length-1] || {income:0, expense:0};
+      const last = series[series.length - 1] || { income: 0, expense: 0 };
+      const lastX = (pad + (series.length - 1) * xStep).toFixed(2);
+
       return `
-        <div class="finChart card section featured" style="padding:16px">
-          <div class="finChartHead">
-            <div>
-              <div class="h1" style="margin:0">Trends</div>
-              <div class="sub">Last 28 days • Income vs Expenses</div>
-            </div>
-            <div class="finLegend">
-              <span class="dot income"></span><span>Income</span>
-              <span class="dot expense"></span><span>Expenses</span>
-            </div>
-          </div>
+        <div class="finChart">
           <svg viewBox="0 0 ${W} ${H}" class="finSvg" aria-label="Finances chart">
             <defs>
               <linearGradient id="gInc" x1="0" y1="0" x2="1" y2="1">
@@ -721,130 +730,144 @@ function viewFinances() {
               </filter>
             </defs>
 
-            <rect x="0" y="0" width="${W}" height="${H}" rx="18" fill="rgba(255,255,255,0.04)" />
-
-            ${[0.25,0.5,0.75].map(fr=>{
-              const yy = (H-pad) - fr*(H-pad*2);
-              return `<line x1="${pad}" y1="${yy.toFixed(2)}" x2="${W-pad}" y2="${yy.toFixed(2)}" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>`;
+            ${[0.2, 0.4, 0.6, 0.8].map(fr => {
+              const yy = (H - pad) - fr * (H - pad * 2);
+              return `<line x1="${pad}" y1="${yy.toFixed(2)}" x2="${W - pad}" y2="${yy.toFixed(2)}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
             }).join("")}
 
-            <polyline points="${pInc}" fill="none" stroke="url(#gInc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
-              <animate attributeName="stroke-dasharray" dur="520ms" fill="freeze" from="0 2000" to="2000 0"/>
-            </polyline>
-            <polyline points="${pExp}" fill="none" stroke="url(#gExp)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
-              <animate attributeName="stroke-dasharray" dur="520ms" fill="freeze" from="0 2000" to="2000 0"/>
-            </polyline>
+            <polyline id="finIncLine" points="${pInc}" fill="none" stroke="url(#gInc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="chart-line-income"/>
+            <polyline id="finExpLine" points="${pExp}" fill="none" stroke="url(#gExp)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="chart-line-expense"/>
 
-            <circle cx="${(pad + (series.length-1)*xStep).toFixed(2)}" cy="${y(last.income).toFixed(2)}" r="5" fill="rgba(52,211,153,1)"/>
-            <circle cx="${(pad + (series.length-1)*xStep).toFixed(2)}" cy="${y(last.expense).toFixed(2)}" r="5" fill="rgba(239,68,68,1)"/>
+            ${series.map((pt, i) => {
+              const cx = (pad + i * xStep).toFixed(2);
+              const cyI = y(pt.income).toFixed(2);
+              const cyE = y(pt.expense).toFixed(2);
+              return `
+                <circle class="chart-dot hit" cx="${cx}" cy="${cyI}" r="10" fill="transparent" data-kind="income" data-i="${i}" data-val="${pt.income}" />
+                <circle class="chart-dot hit" cx="${cx}" cy="${cyE}" r="10" fill="transparent" data-kind="expense" data-i="${i}" data-val="${pt.expense}" />
+              `;
+            }).join("")}
+
+            <circle cx="${lastX}" cy="${y(last.income).toFixed(2)}" r="6" fill="rgba(52,211,153,1)"/>
+            <circle cx="${lastX}" cy="${y(last.expense).toFixed(2)}" r="6" fill="rgba(239,68,68,1)"/>
           </svg>
+          <div id="finChartTip" class="finChartTip" hidden></div>
+
+          <div class="finLegend">
+            <span class="finLegendItem"><span class="finDot inc"></span>Income</span>
+            <span class="finLegendItem"><span class="finDot exp"></span>Expenses</span>
+          </div>
         </div>
       `;
     })();
 
-    const kpi = `
-      <div class="finKpis">
-        <div class="finKpi">
-          <div class="l">Income (this month)</div>
-          <div class="v">${fmtMoneyBGN(m.income)}</div>
-        </div>
-        <div class="finKpi">
-          <div class="l">Balance</div>
-          <div class="v">${fmtMoneyBGN(m.net)}</div>
-        </div>
-        <div class="finKpi">
-          <div class="l">Expenses (this month)</div>
-          <div class="v">${fmtMoneyBGN(m.expense)}</div>
-        </div>
-      </div>
-    `;
+    const goals = (state.finGoals || []).filter(g => !g.archived);
 
-    const goals = (state.finGoals || []).filter(g=>!g.archived);
-
-    function goalRange(g){
-      if(g.period === "range" && g.start && g.end) return {startISO:g.start, endISO:g.end};
-      // default: this month
-      return {startISO: monthStart, endISO: monthEnd};
+    function goalRange(g) {
+      if (g.period === "range" && g.start && g.end) return { startISO: g.start, endISO: g.end };
+      return { startISO: monthStart, endISO: monthEnd };
     }
 
-    function goalCurrent(g){
-      if(g.type === "manual") return Number(g.manualProgress||0);
+    function goalCurrent(g) {
+      if (g.type === "manual") return Number(g.manualProgress || 0);
       const r = goalRange(g);
-      const s = sumFinances({startISO:r.startISO, endISO:r.endISO});
-      // saving is positive net; don't punish if negative
-      return Math.max(0, Number(s.net||0));
+      const s = sumFinances({ startISO: r.startISO, endISO: r.endISO });
+      return Math.max(0, Number(s.net || 0));
     }
 
-    function goalStatus(g, current){
+    function goalStatus(g, current) {
       const r = goalRange(g);
-      if(r.startISO === monthStart && r.endISO === monthEnd){
-        const nowDay = Number(today.slice(8,10));
-        const endDay = Number(monthEnd.slice(8,10));
-        const expected = Number(g.target||0) * (nowDay / Math.max(1,endDay));
+      if (r.startISO === monthStart && r.endISO === monthEnd) {
+        const nowDay = Number(today.slice(8, 10));
+        const endDay = Number(monthEnd.slice(8, 10));
+        const expected = Number(g.target || 0) * (nowDay / Math.max(1, endDay));
         const diff = current - expected;
-        if(diff >= Number(g.target||0)*0.05) return {label:"Ahead", cls:"ahead"};
-        if(diff <= -Number(g.target||0)*0.05) return {label:"Behind", cls:"behind"};
-        return {label:"On track", cls:"track"};
+        if (diff >= Number(g.target || 0) * 0.05) return { label: "Ahead", cls: "ahead" };
+        if (diff <= -Number(g.target || 0) * 0.05) return { label: "Behind", cls: "behind" };
+        return { label: "On track", cls: "track" };
       }
-      return {label:"In progress", cls:"track"};
+      return { label: "In progress", cls: "track" };
     }
 
+    // icon mapping using extracted icons (embedded in the project root)
+    function finIconFor(note = "", type = "expense", category = "") {
+      const s = String(note || "").toLowerCase();
+      const c = String(category || "").toLowerCase();
+      const has = (src, ...keys) => keys.some(k => s.includes(k) || c.includes(k));
+
+      if (type === "income" && has("salary", "заплата")) return { src: "assets/fin/salary.png", alt: "Salary" };
+      if (type === "income" && has("freelance", "фрий", "project", "проект")) return { src: "assets/fin/freelance.png", alt: "Freelance" };
+
+      if (has("groceries", "grocery", "магазин", "храна", "kaufland", "lidl", "billa")) return { src: "assets/fin/groceries.png", alt: "Groceries" };
+      if (has("bills", "bill", "сметка", "ток", "вода", "интернет")) return { src: "assets/fin/bills.png", alt: "Bills" };
+      if (has("bank", "банка", "transfer", "превод")) return { src: "assets/fin/bank.png", alt: "Bank" };
+      if (has("vacation", "почивка", "hotel", "airbnb")) return { src: "assets/fin/vacation.png", alt: "Vacation" };
+      if (has("investment", "invest", "акции", "crypto", "крипто")) return { src: "assets/fin/investment.png", alt: "Investment" };
+      if (has("credit", "card", "карта")) return { src: "assets/fin/creditcard.png", alt: "Credit card" };
+      if (has("calculator", "calc", "калк")) return { src: "assets/fin/calculator.png", alt: "Calculator" };
+      if (has("piggy", "спест", "savings", "emergency", "спешни")) return { src: "assets/fin/piggy.png", alt: "Piggy bank" };
+
+      // fallback by type
+      return type === "income"
+        ? { src: "assets/fin/salary.png", alt: "Income" }
+        : { src: "assets/fin/groceries.png", alt: "Expense" };
+    }
     const goalsHtml = `
-      <section class="card section featured">
-        <div class="finGoalsHead">
+      <section class="card section finGlass">
+        <div class="finSectionHead">
           <div>
             <div class="h1">Goals</div>
-            <div class="sub">Auto or manual • add multiple goals</div>
+            <div class="sub">This month • Custom</div>
           </div>
-          <button class="btn addPill smallAdd" data-action="addGoal" type="button">
-            <span class="addPillInner"><span class="addPillText">+ New goal</span><span class="addPillPlus">+</span></span>
-          </button>
+          <button class="entry-btn finEntryBtn" data-action="addFinance" type="button">Entry <span class="plus">+</span></button>
         </div>
 
-        <div class="finGoalsGrid">
-          ${goals.length ? goals.map(g=>{
+        <div class="finGoalsGrid2">
+          ${goals.length ? goals.map(g => {
             const cur = goalCurrent(g);
-            const target = Number(g.target||0);
-            const pct = target>0 ? clamp(cur/target, 0, 1) : 0;
+            const target = Number(g.target || 0);
+            const pct = target > 0 ? clamp(cur / target, 0, 1) : 0;
             const left = Math.max(0, target - cur);
             const st = goalStatus(g, cur);
             const range = goalRange(g);
-            const rangeLabel = (range.startISO===monthStart && range.endISO===monthEnd) ? "This month" : `${range.startISO} → ${range.endISO}`;
+            const rangeLabel = (range.startISO === monthStart && range.endISO === monthEnd) ? "This month" : `${range.startISO} → ${range.endISO}`;
             const typeChip = g.type === "manual" ? "MANUAL" : "AUTO";
+            const chipCls = g.type === "manual" ? "manual" : "auto";
+            const icon = g.type === "manual" ? "fin_piggy.png" : "fin_investment.png";
+
             return `
-              <div class="finGoalCard">
-                <div class="finGoalTop">
-                  <div class="finGoalTitle">
-                    <div class="finGoalName">${escapeHtml(g.name || "Goal")}</div>
-                    <div class="finGoalMeta">${escapeHtml(rangeLabel)} • <span class="chip ${g.type==="manual"?"manual":"auto"}">${typeChip}</span></div>
+              <div class="finGoalCard2">
+                <div class="finGoalHeader2">
+                  <div class="finBubble">
+                    <img src="${icon}" alt="" />
                   </div>
-                  <button class="iconbtn" title="Delete" data-action="delGoal" data-gid="${g.id}">🗑️</button>
+                  <div class="finGoalInfo2">
+                    <div class="finGoalName2">${escapeHtml(g.name || "Goal")}</div>
+                    <div class="finGoalMeta2">${escapeHtml(rangeLabel)} • <span class="finChip ${chipCls}">${typeChip}</span></div>
+                  </div>
+                  <button class="finIconBtn" title="Delete" data-action="delGoal" data-gid="${g.id}">⋯</button>
                 </div>
 
-                <div class="finGoalNums">
-                  <div class="finGoalNow">${fmtMoneyBGN(cur)}</div>
-                  <div class="finGoalOf">of ${fmtMoneyBGN(target)}</div>
+                <div class="finGoalNumbers2">
+                  <div class="finGoalNow2">${fmtMoneyBGN(cur)}</div>
+                  <div class="finGoalOf2">/ ${fmtMoneyBGN(target)}</div>
                 </div>
 
-                <div class="finBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct*100)}">
-                  <div class="finBarFill ${st.cls}" style="width:${Math.round(pct*100)}%"></div>
+                <div class="finBar2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct * 100)}">
+                  <div class="finBarFill2 ${st.cls}" style="width:${Math.round(pct * 100)}%"></div>
                 </div>
 
-                <div class="finGoalFoot">
-                  <div class="finGoalLeft">Left: <b>${fmtMoneyBGN(left)}</b></div>
-                  <div class="finGoalStatus ${st.cls}">${st.label}</div>
+                <div class="finGoalBottom2">
+                  <div class="finGoalLeft2">Остават: <b>${fmtMoneyBGN(left)}</b></div>
+                  <div class="finGoalStatus2 ${st.cls}">${st.label}</div>
                 </div>
 
                 ${g.type === "manual" ? `
-                  <div class="finGoalActions">
+                  <div class="finGoalActions2">
                     <button class="btn ghost" data-action="addGoalProgress" data-gid="${g.id}">+ Add</button>
-                    <button class="btn ghost" data-action="resetGoalProgress" data-gid="${g.id}">Reset</button>
+                    <button class="btn ghost" data-action="resetGoalProgress" data-gid="${g.id}">- Remove</button>
                   </div>
-                ` : `
-                  <div class="finGoalActions">
-                    <button class="btn ghost" data-action="explainAutoGoal" data-gid="${g.id}">How it works</button>
-                  </div>
-                `}
+                ` : ``}
               </div>
             `;
           }).join("") : `
@@ -858,69 +881,98 @@ function viewFinances() {
     `;
 
     const q = (state._finQuery || "").trim().toLowerCase();
-    const entries = (state.finances||[]).map((it,i)=>({ ...it, __i:i }))
-      .sort((a,b)=> (b.date||"").localeCompare(a.date||""));
-    const filtered = q ? entries.filter(it=>{
-      const s = `${it.type} ${it.note||""} ${it.date||""} ${it.amount||""}`.toLowerCase();
+    const entries = (state.finances || []).map((it, i) => ({ ...it, __i: i }))
+      .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
+    const filtered = q ? entries.filter(it => {
+      const s = `${it.type} ${it.note || ""} ${it.date || ""} ${it.amount || ""}`.toLowerCase();
       return s.includes(q);
     }) : entries;
 
-    const rows = filtered
-      .map((it)=>{
-        const sign = it.type === "income" ? "+" : "-";
-        const cls = it.type === "income" ? "inc" : "exp";
-        const label = it.type === "income" ? "Income" : "Expense";
-        const note = (it.note||"").trim();
-        return `
-          <div class="finRow">
-            <div class="finRowLeft">
-              <div class="finRowType ${cls}">${label}</div>
-              <div class="finRowNote">${escapeHtml(note || "—")}</div>
-              <div class="finRowDate">${escapeHtml(it.date||"")}</div>
-            </div>
-            <div class="finRowRight">
-              <div class="finRowAmount ${cls}">${sign}${fmtMoneyBGN(it.amount)}</div>
-              <button class="btn ghost finDel" data-action="delFinance" data-idx="${it.__i}">Delete</button>
-            </div>
+    const rows = filtered.map((it) => {
+      const sign = it.type === "income" ? "+" : "-";
+      const cls = it.type === "income" ? "inc" : "exp";
+      const label = it.type === "income" ? "Income" : "Expense";
+      const note = (it.note || "").trim();
+      const icon = finIconFor(note, it.type);
+
+      return `
+        <div class="finEntryCard">
+          <div class="finBubble">
+            <img src="${icon.src}" alt="${escapeHtml(icon.alt)}" />
           </div>
-        `;
-      })
-      .join("");
+          <div class="finEntryMain">
+            <div class="finEntryTop">
+              <div class="finEntryTitle">${escapeHtml(note || label)}</div>
+              <div class="finEntryAmount ${cls}">${sign} ${fmtMoneyBGN(it.amount)}</div>
+            </div>
+            <div class="finEntrySub">
+              <span class="finEntryTag ${cls}">${label}</span>
+              <span class="finEntryDate">${escapeHtml(it.date || "")}</span>
+            ${it.category ? ` • <span class="finEntryCat">${escapeHtml(it.category)}</span>` : ``}</div>
+          </div>
+          <button class="finEntryDel" data-action="delFinance" data-idx="${it.__i}" title="Delete">✕</button>
+        </div>
+      `;
+    }).join("");
 
     return `
       <div class="pageStack">
-        <section class="card section featured">
-          <div class="finHead">
+        <section class="card section finHero">
+          <div class="finHeroHead">
             <div>
               <div class="h1">Finances</div>
-              <div class="sub">Income, expenses and savings goals</div>
+              <div class="sub">Income and expenses</div>
             </div>
-            <div class="finHeadActions">
-              <button class="btn addPill" data-action="addFinance" type="button">
-                <span class="addPillInner"><span class="addPillText">+ Entry</span><span class="addPillPlus">+</span></span>
-              </button>
+            <button class="btn finEntryBtn" data-action="addFinance" type="button">
+              <span class="addPillInner"><span class="addPillText">Entry <span class='plus'>+</span></span><span class="addPillPlus">+</span></span>
+            </button>
+          </div>
+
+          <div class="finStats">
+            <div class="finStatCard positive">
+              <div class="finStatLabel">Income</div>
+              <div class="finStatRow">
+                <div class="finStatValue">+ ${fmtMoneyBGN(thisM.income)}</div>
+                <div class="finStatDelta">▲ ${Math.abs(incomePct)}%</div>
+              </div>
+            </div>
+
+            <div class="finBalancePill">
+              <div class="finBalanceLabel">Balance</div>
+              <div class="finBalanceValue">${fmtMoneyBGN(thisM.net)}</div>
+              <div class="finPager">
+                <span></span><span></span><span class="on"></span><span></span><span></span>
+              </div>
+            </div>
+
+            <div class="finStatCard negative">
+              <div class="finStatLabel">Expenses</div>
+              <div class="finStatRow">
+                <div class="finStatValue">- ${fmtMoneyBGN(thisM.expense)}</div>
+                <div class="finStatDelta">▼ ${Math.abs(expensePct)}%</div>
+              </div>
             </div>
           </div>
-          <div class="small">Stored locally (offline-first).</div>
-          ${kpi}
+
+          ${chartSVG}
         </section>
 
-        ${chartSVG}
         ${goalsHtml}
 
-        <section class="card section">
-          <div class="finEntriesHead">
+        <section class="card section finGlass">
+          <div class="finSectionHead">
             <div>
-              <div class="h1">Recent entries</div>
-              <div class="sub">Search, review and delete</div>
+              <div class="h1">Recent Entries</div>
+              <div class="sub">Search and manage</div>
             </div>
             <div class="finSearch">
-              <input class="finSearchInput" type="text" value="${escapeHtml(state._finQuery||"")}" placeholder="Search…" data-action="finQuery" />
+              <input class="finSearchInput" type="text" value="${escapeHtml(state._finQuery || "")}" placeholder="Search…" data-action="finQuery" />
             </div>
           </div>
 
-          <div class="finRows">
-            ${rows || `<div class="finEmpty"><div class="finEmptyTitle">No entries yet</div><div class="small">Tap “+ Entry” to add income or expenses.</div></div>`}
+          <div class="finEntriesGrid">
+            ${rows || `<div class="finEmpty"><div class="finEmptyTitle">No entries yet</div><div class="small">Tap “Entry <span class='plus'>+</span>” to add income or expenses.</div></div>`}
           </div>
         </section>
       </div>
@@ -1164,9 +1216,58 @@ function viewFinances() {
     const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "light"; tSel.value = (v==="dark") ? "dark" : "light"; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
+
+    if(route==="finances") initFinancesUI();
   }
 
-  function handleAction(e) {
+  
+  function initFinancesUI(){
+    // Animate chart lines (stroke draw)
+    const inc = $("#finIncLine");
+    const exp = $("#finExpLine");
+    const svg = $(".finSvg");
+    const tip = $("#finChartTip");
+    if(inc && inc.getTotalLength){
+      const L = inc.getTotalLength();
+      inc.style.strokeDasharray = L;
+      inc.style.strokeDashoffset = L;
+      requestAnimationFrame(()=>{ inc.classList.add("draw"); inc.style.strokeDashoffset = "0"; });
+    }
+    if(exp && exp.getTotalLength){
+      const L = exp.getTotalLength();
+      exp.style.strokeDasharray = L;
+      exp.style.strokeDashoffset = L;
+      requestAnimationFrame(()=>{ exp.classList.add("draw"); exp.style.strokeDashoffset = "0"; });
+    }
+
+    if(svg && tip){
+      const hits = $$(".chart-dot.hit");
+      const fmt = (v)=> formatMoney(Number(v||0));
+      const show = (el)=>{
+        const kind = el.dataset.kind;
+        const v = el.dataset.val;
+        tip.textContent = (kind==="income" ? "Income: " : "Expenses: ") + fmt(v);
+        tip.hidden = false;
+        const rect = svg.getBoundingClientRect();
+        const cx = Number(el.getAttribute("cx"));
+        const cy = Number(el.getAttribute("cy"));
+        const vb = svg.viewBox.baseVal;
+        // map viewBox coords to pixels
+        const x = rect.left + (cx / vb.width) * rect.width;
+        const y = rect.top + (cy / vb.height) * rect.height;
+        tip.style.left = (x + 10) + "px";
+        tip.style.top = (y - 10) + "px";
+      };
+      const hide = ()=>{ tip.hidden = true; };
+      hits.forEach(h=>{
+        h.addEventListener("mouseenter", ()=>show(h));
+        h.addEventListener("mousemove", ()=>show(h));
+        h.addEventListener("mouseleave", hide);
+        h.style.pointerEvents="all";
+      });
+    }
+  }
+function handleAction(e) {
     const a = e.currentTarget.dataset.action;
     // tap feedback for UI controls (optional via Settings)
     if(a!="toggleHabit") { feedbackTap(); tapBounce(e.currentTarget); }
@@ -1307,46 +1408,108 @@ function viewFinances() {
 
   // ---------- Forms ----------
   function openAddFinance() {
+    const cats = [
+      {id:"salary", name:"Salary", icon:"assets/fin/salary.png"},
+      {id:"vacation", name:"Vacation", icon:"assets/fin/vacation.png"},
+      {id:"groceries", name:"Groceries", icon:"assets/fin/groceries.png"},
+      {id:"briefcase", name:"Work", icon:"assets/fin/briefcase.png"},
+      {id:"jar", name:"Savings", icon:"assets/fin/jar.png"},
+      {id:"freelance", name:"Freelance", icon:"assets/fin/freelance.png"},
+      {id:"bills", name:"Bills", icon:"assets/fin/bills.png"},
+      {id:"bank", name:"Bank", icon:"assets/fin/bank.png"},
+      {id:"calculator", name:"Calculator", icon:"assets/fin/calculator.png"},
+      {id:"creditcard", name:"Credit card", icon:"assets/fin/creditcard.png"},
+      {id:"investment", name:"Investment", icon:"assets/fin/investment.png"},
+      {id:"piggy", name:"Piggy bank", icon:"assets/fin/piggy.png"},
+    ];
+
     openModal("New entry", `
-      <div class="field">
-        <label>Type</label>
-        <select id="fType">
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
+      <div class="finModalTop">
+        <div class="finTypePills">
+          <button type="button" class="finTypePill active" data-ftype="expense">Expense</button>
+          <button type="button" class="finTypePill" data-ftype="income">Income</button>
+          <input type="hidden" id="fType" value="expense"/>
+        </div>
       </div>
-      <div class="field">
-        <label>Amount (BGN)</label>
-        <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00"/>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Amount (BGN)</label>
+          <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00"/>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input id="fDate" type="date" value="${todayISO()}"/>
+        </div>
       </div>
+
       <div class="field">
-        <label>Date</label>
-        <input id="fDate" type="date" value="${todayISO()}"/>
+        <label>Category</label>
+        <div class="finCats" id="finCats">
+          ${cats.map(c=>`
+            <button type="button" class="finCatBtn" data-cat="${c.id}" title="${escapeHtml(c.name)}">
+              <span class="finCatIcon"><img src="${c.icon}" alt="${escapeHtml(c.name)}"/></span>
+              <span class="finCatLabel">${escapeHtml(c.name)}</span>
+            </button>
+          `).join("")}
+        </div>
+        <input type="hidden" id="fCategory" value="groceries"/>
       </div>
+
       <div class="field">
         <label>Note</label>
         <input id="fNote" type="text" placeholder="e.g. Rent, groceries…"/>
       </div>
-      <div class="row" style="justify-content:flex-end;margin-top:12px">
+
+      <div class="row" style="justify-content:flex-end;margin-top:14px;gap:10px">
         <button class="btn ghost" id="cancel">Cancel</button>
         <button class="btn primary" id="save">Save</button>
       </div>
-    `);
-    $("#cancel").addEventListener("click", closeModal);
-    $("#save").addEventListener("click", () => {
-      const it={
-        type: $("#fType").value,
-        amount: Number($("#fAmount").value||0),
-        date: $("#fDate").value || todayISO(),
-        note: $("#fNote").value || ""
+    `, () => {
+      const close = () => closeModal();
+      $("#cancel").addEventListener("click", close);
+
+      // type pills
+      $$(".finTypePill").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          $$(".finTypePill").forEach(x=>x.classList.remove("active"));
+          b.classList.add("active");
+          $("#fType").value = b.dataset.ftype || "expense";
+          // small UX: if income, default category salary
+          if($("#fType").value==="income") setCategory("salary");
+        });
+      });
+
+      const setCategory = (id)=>{
+        $("#fCategory").value = id;
+        $$(".finCatBtn").forEach(x=>x.classList.toggle("active", x.dataset.cat===id));
       };
-      state.finances.unshift(it);
-      closeModal();
-      saveState();
+
+      // default selection
+      setCategory("groceries");
+
+      $$(".finCatBtn").forEach(b=>{
+        b.addEventListener("click", ()=> setCategory(b.dataset.cat||"groceries"));
+      });
+
+      $("#save").addEventListener("click", () => {
+        const type = ($("#fType").value || "expense");
+        const amount = Number($("#fAmount").value || 0);
+        const date = $("#fDate").value || todayISO();
+        const note = ($("#fNote").value || "").trim();
+        const category = $("#fCategory").value || "";
+
+        if(!amount || amount <= 0) return toast("Enter a valid amount.");
+        state.finances = state.finances || [];
+        state.finances.push({ type, amount, date, note, category });
+        saveState();
+        close();
+        render();
+      });
     });
   }
 
-  function openAddGoal(){
+  function openAddGoalfunction openAddGoal(){
     const today = todayISO();
     const monthStart = startOfMonthISO(today);
     const monthEnd = endOfMonthISO(today);

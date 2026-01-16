@@ -785,3 +785,60 @@ body{overflow-x:hidden}
 .presetName{font-size:12px;font-weight:900;line-height:1.1}
 .presetTag{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px}
 /* ===== end v6.3.7 ===== */
+
+/* ===== v6.3.9 Interactions: chart shortcuts + tap bounce + habit fill animation ===== */
+
+/* Donut cards are now buttons (shortcuts) */
+.donutCardLink{border:none;cursor:pointer;text-align:left;}
+.donutCardLink:focus-visible{outline:2px solid rgba(96,165,250,0.65);outline-offset:3px;}
+
+.tapBounce{animation:tapBounce 220ms ease-out;}
+@keyframes tapBounce{
+  0%{transform:scale(1)}
+  45%{transform:scale(0.97)}
+  100%{transform:scale(1)}
+}
+
+/* Habit tracker: fill animation instead of static look */
+.habitBox{position:relative;overflow:hidden;}
+.habitBox::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:var(--hc, #60a5fa);
+  opacity:0.85;
+  transform:scale(0);
+  border-radius:10px;
+  transition:transform 180ms ease-out, opacity 180ms ease-out;
+}
+.habitBox.on::before{transform:scale(1);}
+.habitBox::after{
+  content:"✓";
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  color:rgba(255,255,255,0.95);
+  text-shadow:0 6px 14px rgba(0,0,0,0.35);
+  opacity:0;
+  transform:scale(0.6);
+  transition:opacity 160ms ease-out, transform 160ms ease-out;
+}
+.habitBox.on::after{opacity:1;transform:scale(1);}
+
+.habitBox.pulse.on::before{animation:hbFillPop 220ms ease-out;}
+.habitBox.pulse.on::after{animation:hbCheckPop 220ms ease-out;}
+@keyframes hbFillPop{
+  0%{transform:scale(0)}
+  70%{transform:scale(1.06)}
+  100%{transform:scale(1)}
+}
+@keyframes hbCheckPop{
+  0%{opacity:0;transform:scale(0.6)}
+  70%{opacity:1;transform:scale(1.1)}
+  100%{opacity:1;transform:scale(1)}
+}
+
+/* ===== end v6.3.9 ===== */

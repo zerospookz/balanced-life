@@ -40,6 +40,7 @@
       {id:"h_cardio", name:"Кардио", icon:"🏃", color:"#EF4444"},
     ],
     habitLogs: {},
+    prefs: { haptics: false, sound: false },
     workoutPlan: {"Понеделник": {"Фокус": "Push + Planche (тежко) + Handstand", "Skill: Handstand (15–20 мин)": ["Chest-to-wall 5×30–45 сек (линия)", "Kick-ups 6–10 опита ×10–25 сек", "Scap shrugs в стойка 3×10"], "Skill: Planche (8–12 мин)": ["Tuck/Frog holds 6–10×6–12 сек", "Planche leans 3×20 сек"], "Skill: Flag (8–12 мин)": ["(по желание) 2–4 леки опита"], "Сила — Блок A (тежко)": ["Bench press ИЛИ Weighted dips 4×4–6", "Overhead press 3×5–8"], "Сила — Блок B": ["Pseudo planche push-ups 4×6–10", "Hollow hold 4×20–40 сек"], "Аксесоари / Прехаб": ["Lateral raise 3×12–20", "Китки: wrist rocks 2×10"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "RPE 7–8; спри при разпад на форма"}, "Вторник": {"Фокус": "Pull (тежко) + Flag + Набирания", "Skill: Handstand (15–20 мин)": ["(кратко: 3–5 леки опита по 10–15 сек)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": ["Tuck/ластик 6–10×5–10 сек", "Негативи 4×3–6 сек (контрол)"], "Сила — Блок A (тежко)": ["Weighted pull-ups 5×3–5", "Chin-ups 3×6–10"], "Сила — Блок B": ["Row (щанга/опора) 4×6–10", "Lat pulldown 3×10–15"], "Аксесоари / Прехаб": ["Face pulls 3×15–20", "External rotations 3×15–20", "Side plank/Copenhagen 4×20–40 сек/страна"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Фокус: стабилни рамене, лакът без болка"}, "Сряда": {"Фокус": "Крака (фитнес) + Core + лека стойка", "Skill: Handstand (15–20 мин)": ["Scap shrugs 3×10", "3–5 леки опита стойка (без борба)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": ["Squat (back/front) 4×3–6", "RDL 4×5–8"], "Сила — Блок B": ["Bulgarian split squat 3×8–12/крак", "Leg curl ИЛИ Nordic прогресия 3×8–12"], "Аксесоари / Прехаб": ["Calves 4×10–20", "Ab wheel ИЛИ Hanging knee raises 4×8–15"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Не до отказ (за да пазиш краката)"}, "Четвъртък": {"Фокус": "Кондиция: Бокс + Въже + Мобилност", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Прехаб 10 мин: scap push-ups 2×10", "Wrist rocks 2×10", "External rotations 3×15–20"], "Кондиция / Спорт": ["Въже 12×(40/40)", "Бокс 8–12 рунда × 2–3 мин"], "Център време (мин)": "45–75", "Бележки": "Дръж умерено (техника + дишане)"}, "Петък": {"Фокус": "Upper (обем/умение) + Planche + Pull-up вариации", "Skill: Handstand (15–20 мин)": ["6–10 опита ×10–25 сек (контрол)", "Wall line 2×30 сек"], "Skill: Planche (8–12 мин)": ["Holds 6–8×8–12 сек", "Lean 3×20 сек"], "Skill: Flag (8–12 мин)": ["4–6 леки опита ×5–8 сек (само чисто)"], "Сила — Блок A (тежко)": ["Explosive pull-ups / chest-to-bar 6×2–4", "Archer / Typewriter 4×3–6/страна"], "Сила — Блок B": ["Incline DB press 4×8–12", "Seated cable row 3×10–15"], "Аксесоари / Прехаб": ["Curls 3×10–15", "Triceps pushdown 3×10–15", "Farmer/Suitcase carry 6×20–40 м"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Пази свежест за уикенда (без отказ)"}, "Събота": {"Фокус": "Футбол + кратък Skill/прехаб (леко)", "Skill: Handstand (15–20 мин)": ["8–12 мин лесни опита (или стена)"], "Skill: Planche (8–12 мин)": ["Lean 3×15–25 сек", "PPPUs 3×8 (леки)"], "Skill: Flag (8–12 мин)": ["Само ако си свеж: 1–3 опита ×5–8 сек"], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Face pulls 2×20", "External rotations 2×20", "Разтягане 5–10 мин"], "Кондиция / Спорт": ["Футбол (трен./мач)"], "Център време (мин)": "20–45 + футбол", "Бележки": "Ако мачът е тежък → само мобилност"}, "Неделя": {"Фокус": "Футбол + възстановяване", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Мобилност 10–15 мин (грасци/бедра/таз/гръб/рамене)"], "Кондиция / Спорт": ["Футбол", "Zone 2 20–40 мин (по желание)"], "Център време (мин)": "20–40 + футбол", "Бележки": "Цел: възстановяване"}},
   };
 // ===== i18n v6.3.3 (EN/BG) =====
@@ -202,7 +203,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.3.8";
+const APP_VERSION = "6.3.9";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 function applyTheme(mode){
@@ -378,6 +379,8 @@ function saveState() {
 
     const habits = state.habits || [];
     const logs = state.habitLogs || {};
+    const nowMs = Date.now();
+    const lastT = state._lastToggle;
 
     const weekCounts = habits.map(h=>{
       let c=0;
@@ -433,7 +436,8 @@ function saveState() {
               </div>
               ${days.map(d=>{
                 const on = !!(logs[d] && logs[d][h.id]);
-                return `<button class="habitBox ${on?"on":""}" type="button" style="--hc:${h.color||"#60a5fa"}"
+                const pulse = !!(lastT && lastT.hid===h.id && lastT.iso===d && (nowMs-lastT.ts<900));
+                return `<button class="habitBox ${on?"on":""} ${pulse?"pulse":""}" type="button" style="--hc:${h.color||"#60a5fa"}"
                           data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
               }).join("")}
             </div>
@@ -466,7 +470,7 @@ function viewHome() {
         <div class="h1">Dashboard</div>
         <div class="sub">${t("dashboardToday")}</div>
         <div class="donutRow">
-          <div class="donutCard">
+          <button class="donutCard donutCardLink" type="button" data-route="workouts" aria-label="Workouts">
             <div class="donutStack">
               ${(()=>{
                 const prog = donutProgress(d.wmin, d.workoutGoalMin);
@@ -477,9 +481,9 @@ function viewHome() {
                 ${t("workoutsMeta2").replace("{sessions}", d.wsess)}
               </div>
             </div>
-          </div>
+          </button>
 
-          <div class="donutCard">
+          <button class="donutCard donutCardLink" type="button" data-route="finances" aria-label="Finances">
             <div class="donutStack">
               ${(()=>{
                 const netTxt = (d.net>=0?"+":"") + money(d.net);
@@ -490,9 +494,9 @@ function viewHome() {
                 ${t("financesMeta2").replace("{inc}", money(d.income)).replace("{exp}", money(d.expense))}
               </div>
             </div>
-          </div>
+          </button>
 
-          <div class="donutCard">
+          <button class="donutCard donutCardLink" type="button" data-route="nutrition" aria-label="Nutrition">
             <div class="donutStack">
               ${(()=>{
                 const prog = donutProgress(d.kcal, d.kcalGoal);
@@ -503,13 +507,7 @@ function viewHome() {
                 ${t("nutritionMeta2")}
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="dashActions">
-          <button class="btn addPill" type="button" data-action="addWorkout"><span class="addPillInner"><span class="addPillText">${t("actionsWorkout")}</span><span class="addPillPlus">+</span></span></button>
-          <button class="btn addPill" type="button" data-action="addFinance"><span class="addPillInner"><span class="addPillText">${t("actionsFinance")}</span><span class="addPillPlus">+</span></span></button>
-          <button class="btn addPill" type="button" data-action="addFood"><span class="addPillInner"><span class="addPillText">${t("actionsFood")}</span><span class="addPillPlus">+</span></span></button>
+          </button>
         </div>
       </section>
 
@@ -710,6 +708,30 @@ function viewHome() {
             </select>
           </div>
         </div>
+        <div class="sub">Feedback</div>
+        <div class="row" style="margin-top:10px;gap:12px;flex-wrap:wrap">
+          <label class="pill" style="display:flex;gap:10px;align-items:center">
+            <input type="checkbox" data-action="toggleHaptics" ${state.prefs && state.prefs.haptics ? "checked" : ""}>
+            Haptics
+          </label>
+          <label class="pill" style="display:flex;gap:10px;align-items:center">
+            <input type="checkbox" data-action="toggleSound" ${state.prefs && state.prefs.sound ? "checked" : ""}>
+            Sound
+          </label>
+        </div>
+
+        <div class="sub">Feedback</div>
+        <div class="row" style="margin-top:10px;gap:12px;flex-wrap:wrap">
+          <label class="pill" style="display:flex;gap:10px;align-items:center">
+            <input type="checkbox" data-action="toggleHaptics" ${state.prefs && state.prefs.haptics ? "checked" : ""}>
+            Haptics
+          </label>
+          <label class="pill" style="display:flex;gap:10px;align-items:center">
+            <input type="checkbox" data-action="toggleSound" ${state.prefs && state.prefs.sound ? "checked" : ""}>
+            Sound
+          </label>
+        </div>
+
         <div class="sub">Import / Export & Reset</div>
 
         <div class="row" style="margin-top:12px">
@@ -728,6 +750,39 @@ function viewHome() {
     `;
   }
 
+  function playClickSound(){
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+    const ctx = new Ctx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = "triangle";
+    o.frequency.value = 640;
+    g.gain.setValueAtTime(0.001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + 0.09);
+    o.onended = ()=>{ try{ ctx.close(); }catch(e){} };
+  }
+
+  function feedbackTap(){
+    try{
+      const p = state.prefs || (state.prefs = {haptics:false,sound:false});
+      if(p.haptics && navigator.vibrate) navigator.vibrate(12);
+      if(p.sound) playClickSound();
+    }catch(e){}
+  }
+
+  function tapBounce(el){
+    if(!el) return;
+    el.classList.remove("tapBounce");
+    void el.offsetWidth; // restart animation
+    el.classList.add("tapBounce");
+    setTimeout(()=>el.classList.remove("tapBounce"), 240);
+  }
   function render() {
     const view = $("#view");
     const route = (state.route || "home").replace(/[^a-z]/g,"");
@@ -759,6 +814,9 @@ function viewHome() {
 
   function handleAction(e) {
     const a = e.currentTarget.dataset.action;
+    // tap feedback for UI controls (optional via Settings)
+    if(a!="toggleHabit") { feedbackTap(); tapBounce(e.currentTarget); }
+
     if(a==="toggleHabit") return toggleHabit(e.currentTarget.dataset.habit, e.currentTarget.dataset.date);
     if(a==="setHabitWeekFull") { state._habitWeekFull = e.currentTarget.value; saveState(); return render(); }
     if(a==="addHabit") return openAddHabit();
@@ -785,6 +843,9 @@ function viewHome() {
       return render();
     }
     if(a==="setTheme") { applyTheme(e.currentTarget.value); return; }
+    if(a==="toggleHaptics") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.haptics = !state.prefs.haptics; saveState(); return render(); }
+    if(a==="toggleSound") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.sound = !state.prefs.sound; saveState(); return render(); }
+
     if(a==="selectPlanDay") {
       const v = e.currentTarget.value;
       state._selectedPlanDay = v;
@@ -1157,6 +1218,8 @@ function viewHome() {
 
   function toggleHabit(hid, iso){
     if(!hid || !iso) return;
+    feedbackTap();
+    state._lastToggle = {hid, iso, ts: Date.now()};
     state.habitLogs = state.habitLogs || {};
     state.habitLogs[iso] = state.habitLogs[iso] || {};
     state.habitLogs[iso][hid] = !state.habitLogs[iso][hid];
@@ -1165,6 +1228,7 @@ function viewHome() {
     if(Object.keys(state.habitLogs[iso]).length===0) delete state.habitLogs[iso];
     saveState();
     render();
+    setTimeout(()=>{ state._lastToggle = null; }, 700);
   }
 
 

@@ -1583,3 +1583,14 @@ html, body { overflow-x: hidden; }
   .finHeroHead, .finSectionHead{ min-width:0; }
   .finHeroHead > *, .finSectionHead > *{ min-width:0; }
 }
+
+
+/* v7.1.3 app mobile width: prevent desktop max-width on phone */
+@media (max-width: 520px){
+  .app{
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 14px 14px 110px !important;
+  }
+}

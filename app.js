@@ -225,27 +225,27 @@ function t(key){
 // data-sky: day|night (background + glass tuning)
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
-function applyTheme(mode){
-  const m = (mode === "light") ? "light" : "dark";
+function applyTheme(_mode){
+  // Theme is locked to DARK
+  const m = "dark";
   const root = document.documentElement;
   root.setAttribute("data-theme", m);
-  root.setAttribute("data-sky", m === "dark" ? "night" : "day");
+  root.setAttribute("data-sky", "night");
   try{ localStorage.setItem(THEME_KEY, m); }catch(_){ }
 }
 
 function getSavedTheme(){
+  // Theme is locked to DARK
   try{ return localStorage.getItem(THEME_KEY) || "dark"; }catch(_){ return "dark"; }
 }
 
 function toggleThemeQuick(){
-  const cur = document.documentElement.getAttribute("data-theme") || getSavedTheme();
-  applyTheme(cur === "dark" ? "light" : "dark");
-  // keep the UI consistent
-  render();
+  // Theme is locked to DARK
+  applyTheme("dark");
 }
 
 // apply theme immediately on load
-applyTheme(getSavedTheme());
+applyTheme("dark");
 function setLang(lang){
   state.lang = (lang === "bg") ? "bg" : "en";
   updateHeaderUI();
@@ -358,6 +358,10 @@ function saveState() {
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, (c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
+  function escapeAttr(s) {
+    return escapeHtml(s);
+  }
+
   function money(n) {
     const x = Number(n||0);
     return x.toLocaleString("bg-BG", {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -1112,12 +1116,7 @@ function viewFinances() {
         <div class="sub">Build: <b>${APP_VERSION}</b></div>
         <div class="sub">Appearance</div>
         <div class="row" style="margin-top:10px;align-items:center">
-          <div class="pill">🌓 Theme:
-            <select id="themeSelect" data-action="setTheme" style="padding:8px 10px;border-radius:12px">
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </div>
+          <div class="pill">🌓 Theme: <b>Dark</b> <span class="small" style="opacity:.7">(locked)</span></div>
         </div>
         <div class="sub">Feedback</div>
         <div class="row" style="margin-top:10px;gap:12px;flex-wrap:wrap">
@@ -1275,7 +1274,7 @@ function render() {
     $$("[data-action='finQuery']").forEach(el=>el.addEventListener("input", (e)=>{ state._finQuery = e.currentTarget.value || ""; render(); }));
 
     // set selected theme value
-    const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "dark"; tSel.value = (v==="dark") ? "dark" : "light"; }
+    const tSel = $("#themeSelect"); if(tSel){ tSel.value = "dark"; tSel.disabled = true; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
     if(route==="finances") requestAnimationFrame(()=>initFinancesUI());
@@ -1906,7 +1905,7 @@ function exportJSON(obj, filename) {
 
 // ---------- Init ----------
   const btnTheme = $("#btnTheme");
-  if(btnTheme){ btnTheme.addEventListener("click", toggleThemeQuick); }
+  if(btnTheme){ btnTheme.style.display = "none"; }
 
 	const btnLangToggle = $("#btnLangToggle");
 	if(btnLangToggle){

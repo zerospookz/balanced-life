@@ -1644,3 +1644,4 @@ html, body { overflow-x: hidden; }
   .finChart{padding-top:122px;}
   .finGoalsGrid2, .finEntriesGrid{grid-template-columns:1fr !important;}
 }
+\n#btnTheme{display:none !important;}

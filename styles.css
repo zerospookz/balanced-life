@@ -49,9 +49,10 @@ body{
 .logo{
   width:42px;height:42px;border-radius:14px;
   display:grid;place-items:center;
-  background:rgba(255,255,255,.75);
-  border:1px solid rgba(0,0,0,.06);
-  box-shadow: var(--shadow2);
+  /* Premium dark badge (no strong glow) */
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:none;
   font-weight:800;
   overflow:hidden;
 }
@@ -59,8 +60,10 @@ body{
   width:100%;
   height:100%;
   display:block;
-  object-fit:cover;
-  border-radius:14px;
+  /* Center the 2x2 grid optically */
+  object-fit:contain;
+  padding:4px;
+  border-radius:0;
 }
 
 .brandTitle{font-weight:800}

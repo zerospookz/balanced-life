@@ -27,6 +27,26 @@
 
 *{box-sizing:border-box}
 html,body{height:100%}
+
+/* Global premium background image */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:url('background.png') center/cover no-repeat;
+  z-index:-2;
+}
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background: radial-gradient(1200px 700px at 15% 10%, rgba(37,99,235,.22), transparent 60%),
+              radial-gradient(900px 700px at 85% 20%, rgba(16,185,129,.16), transparent 60%),
+              radial-gradient(1000px 800px at 50% 95%, rgba(245,158,11,.14), transparent 60%),
+              linear-gradient(180deg, rgba(5,10,20,.70), rgba(5,10,20,.78));
+  z-index:-1;
+  pointer-events:none;
+}
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -116,62 +136,91 @@ body{
 
 .bottomnav{
   position:fixed;
-  left:0; right:0;
+  left:50%;
+  transform:translateX(-50%);
   bottom:calc(18px + env(safe-area-inset-bottom));
   z-index:20;
+
+  width:min(920px, calc(100% - 28px));
   display:flex;
-  justify-content:space-around;
+  justify-content:space-between;
   align-items:flex-end;
-  gap:18px;
-  padding:0 16px;
-  background:transparent;
-  border:none;
-  box-shadow:none;
-  backdrop-filter:none;
+  gap:14px;
+
+  padding:18px 18px 14px;
+  border-radius:36px;
+
+  border:1px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)) padding-box,
+    linear-gradient(90deg, rgba(56,189,248,.35), rgba(168,85,247,.25), rgba(251,191,36,.22)) border-box;
+
+  box-shadow: 0 18px 55px rgba(0,0,0,.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .tab{
+  flex:1;
   border:none;
   background:transparent;
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:flex-end;
   gap:12px;
-  padding:6px 6px;
+  padding:0;
   cursor:pointer;
-  color:rgba(255,255,255,.88);
+  color:rgba(255,255,255,.92);
   transition: transform .14s ease, filter .14s ease, opacity .14s ease;
 }
 .tab:active{transform:translateY(1px) scale(.985)}
 
-/* Bottom nav icons: "old" premium style = white tile + clipped image (nothing can bleed outside) */
+/* Icon tile (inside the pill) */
 .tab .ico{
-  line-height:0;
-  width:74px;
-  height:74px;
+  width:118px;
+  height:96px;
+  border-radius:22px;
+  overflow:hidden;
   display:grid;
   place-items:center;
-  background:rgba(245,246,248,.96);
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 8px 20px rgba(0,0,0,.22);
+
+  border:1px solid rgba(255,255,255,.10);
+  background: linear-gradient(180deg, rgba(17,25,45,.72), rgba(10,16,32,.56));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 28px rgba(0,0,0,.45);
 }
+
 .tab .icoImg{
   width:100%;
   height:100%;
   display:block;
-  object-fit:cover; /* clips any glow/overflow from the PNG */
+  object-fit:cover;
 }
-.tab span:last-child{font-size:18px;font-weight:700;letter-spacing:.2px}
+
+.tab span:last-child{
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:.2px;
+}
 
 .tab:not(.active) .icoImg{opacity:.92;filter:saturate(.92) brightness(.92)}
-.tab.active .icoImg{filter:saturate(1.05) brightness(1.02)}
-.tab.active{transform:translateY(-1px)}
+.tab.active .icoImg{filter:saturate(1.02) brightness(1.02)}
+
+@media (max-width:780px){
+  .tab .ico{width:96px;height:84px;border-radius:20px;}
+  .tab span:last-child{font-size:20px;}
+}
 
 @media (max-width:420px){
-  .bottomnav{gap:14px;padding:0 12px;bottom:calc(14px + env(safe-area-inset-bottom));}
+  .bottomnav{
+    width:calc(100% - 18px);
+    padding:14px 14px 12px;
+    bottom:calc(12px + env(safe-area-inset-bottom));
+    border-radius:30px;
+    gap:10px;
+  }
   .tab{gap:10px;}
-  .tab .ico{width:64px;height:64px;border-radius:18px;}
+  .tab .ico{width:74px;height:74px;border-radius:20px;}
   .tab span:last-child{font-size:16px;}
 }
 

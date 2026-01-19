@@ -1,10 +1,8 @@
 
-/* LifeSync v7.2 (finances entry modal polish + app rename/logo) - static SPA */
+/* Balanced life v5.8 (workouts plan + import/export) - static SPA */
 (() => {
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-  const APP_VERSION = "7.2";
-
 
   const STORAGE_KEY = "balancedLife.v59";
   const todayISO = () => new Date().toISOString().slice(0,10);
@@ -80,17 +78,11 @@
   }
 
   function fmtMoneyBGN(n){
-    // App currency: EUR
     const x = Number(n||0);
-    try {
-      return new Intl.NumberFormat("bg-BG", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(x);
-    } catch(_) {
-      const sign = x < 0 ? "-" : "";
-      const abs = Math.abs(x);
-      return sign + abs.toFixed(2) + " €";
-    }
+    const sign = x < 0 ? "-" : "";
+    const abs = Math.abs(x);
+    return sign + abs.toLocaleString("bg-BG", {maximumFractionDigits:2, minimumFractionDigits:2}) + " лв";
   }
-
 
   function buildDailySeries({startISO, endISO}){
     const map = new Map();
@@ -163,6 +155,8 @@ const I18N = {
     currentHabits: "Current habits",
     habitDeleted: "Habit deleted.",
     habitAdded: "Habit added.",
+    maxHabits: "You can have up to 10 habits.",
+    habitExists: "Already added.",
     noHabitsShort: "No habits yet."
   },
   bg: {
@@ -218,6 +212,8 @@ const I18N = {
     currentHabits: "Текущи навици",
     habitDeleted: "Навикът е изтрит.",
     habitAdded: "Навикът е добавен.",
+    maxHabits: "Можеш да имаш до 10 навика.",
+    habitExists: "Вече е добавен.",
     noHabitsShort: "Нямаш навици."
   }
 };
@@ -228,32 +224,12 @@ function t(key){
 }
 
 
-// ===== Theme (light/dark) + sky mode =====
-// data-theme: light|dark (component styling)
-// data-sky: day|night (background + glass tuning)
-const THEME_KEY = "bl_theme_mode"; // light | dark
-
-function applyTheme(_mode){
-  // Theme is locked to DARK
-  const m = "dark";
-  const root = document.documentElement;
-  root.setAttribute("data-theme", m);
-  root.setAttribute("data-sky", "night");
-  try{ localStorage.setItem(THEME_KEY, m); }catch(_){ }
+function setTheme(theme){
+  // Hard lock to dark for now
+  const t = "dark";
+  document.documentElement.setAttribute("data-theme", t);
+  try{ localStorage.setItem("theme", t); }catch(_){}
 }
-
-function getSavedTheme(){
-  // Theme is locked to DARK
-  try{ return localStorage.getItem(THEME_KEY) || "dark"; }catch(_){ return "dark"; }
-}
-
-function toggleThemeQuick(){
-  // Theme is locked to DARK
-  applyTheme("dark");
-}
-
-// apply theme immediately on load
-applyTheme("dark");
 function setLang(lang){
   state.lang = (lang === "bg") ? "bg" : "en";
   updateHeaderUI();
@@ -264,7 +240,7 @@ function setLang(lang){
 function updateHeaderUI(){
   document.documentElement.setAttribute("lang", (state.lang||"en")==="bg" ? "bg" : "en");
   const sub = document.querySelector(".brandSub");
-  if(sub) sub.textContent = `${t("offlineSub")} • v${APP_VERSION}`;
+  if(sub) sub.textContent = t("offlineSub");
 
   const toggle = document.getElementById("btnLangToggle");
   if(toggle){
@@ -313,6 +289,27 @@ function habitDisplayName(h){
     }
   }
 
+  
+  // ===== THEME_MODE v6.2.5 (manual light/dark) =====
+const APP_VERSION = "7.3";
+const THEME_KEY = "bl_theme_mode"; // light | dark
+
+// NOTE v6.9.2: Light theme is temporarily locked.
+function applyTheme(_mode){
+  const root = document.documentElement;
+  const m = "light";
+  root.setAttribute("data-theme", m);
+  root.setAttribute("data-sky", "day");
+  localStorage.setItem(THEME_KEY, m);
+}
+
+applyTheme("light");
+
+function toggleThemeQuick(){
+  // locked for now
+  applyTheme("light");
+}
+
 function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     render(); // keep UI consistent after any write
@@ -320,6 +317,10 @@ function saveState() {
 
   let state = loadState();
 
+  
+  
+  // THEME_LOCK_v702
+  setTheme("dark");
   updateHeaderUI();
   validateRuntime();
 // ---------- Router ----------
@@ -366,10 +367,6 @@ function saveState() {
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, (c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
-  function escapeAttr(s) {
-    return escapeHtml(s);
-  }
-
   function money(n) {
     const x = Number(n||0);
     return x.toLocaleString("bg-BG", {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -814,14 +811,6 @@ function viewFinances() {
 
     // icon mapping using extracted icons (embedded in the project root)
     function finIconFor(note = "", type = "expense", category = "") {
-      // Prefer explicit category icon
-      try {
-        if(category){
-          const meta = (getFinanceCategories() || []).find(x => x.id === category);
-          if(meta) return { src: meta.icon, alt: meta.name };
-        }
-      } catch(_) {}
-
       const s = String(note || "").toLowerCase();
       const c = String(category || "").toLowerCase();
       const has = (src, ...keys) => keys.some(k => s.includes(k) || c.includes(k));
@@ -843,7 +832,6 @@ function viewFinances() {
         ? { src: "assets/fin/salary.png", alt: "Income" }
         : { src: "assets/fin/groceries.png", alt: "Expense" };
     }
-
     const goalsHtml = `
       <section class="card section finGlass">
         <div class="finSectionHead">
@@ -905,7 +893,7 @@ function viewFinances() {
           }).join("") : `
             <div class="finEmpty">
               <div class="finEmptyTitle">No goals yet</div>
-              <div class="small">Create a goal like “Save 100 € this month”.</div>
+              <div class="small">Create a goal like “Save 100 BGN this month”.</div>
             </div>
           `}
         </div>
@@ -926,9 +914,7 @@ function viewFinances() {
       const cls = it.type === "income" ? "inc" : "exp";
       const label = it.type === "income" ? "Income" : "Expense";
       const note = (it.note || "").trim();
-      const icon = finIconFor(note, it.type, it.category);
-      const catMeta = (it.category ? (getFinanceCategories() || []).find(x => x.id === it.category) : null);
-      const catName = catMeta ? catMeta.name : (it.category || "");
+      const icon = finIconFor(note, it.type);
 
       return `
         <div class="finEntryCard">
@@ -943,12 +929,9 @@ function viewFinances() {
             <div class="finEntrySub">
               <span class="finEntryTag ${cls}">${label}</span>
               <span class="finEntryDate">${escapeHtml(it.date || "")}</span>
-            ${catName ? ` • <span class="finEntryCat">${escapeHtml(catName)}</span>` : ``}</div>
+            ${it.category ? ` • <span class="finEntryCat">${escapeHtml(it.category)}</span>` : ``}</div>
           </div>
-          <div class="finEntryBtns">
-            <button class="finEntryEdit" data-action="editFinance" data-idx="${it.__i}" title="Edit">✎</button>
-            <button class="finEntryDel" data-action="delFinance" data-idx="${it.__i}" title="Delete">✕</button>
-          </div>
+          <button class="finEntryDel" data-action="delFinance" data-idx="${it.__i}" title="Delete">✕</button>
         </div>
       `;
     }).join("");
@@ -1138,7 +1121,12 @@ function viewFinances() {
         <div class="sub">Build: <b>${APP_VERSION}</b></div>
         <div class="sub">Appearance</div>
         <div class="row" style="margin-top:10px;align-items:center">
-          <div class="pill">🌓 Theme: <b>Dark</b> <span class="small" style="opacity:.7">(locked)</span></div>
+          <div class="pill">🌓 Theme:
+            <select id="themeSelect" data-action="setTheme" style="padding:8px 10px;border-radius:12px">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
         </div>
         <div class="sub">Feedback</div>
         <div class="row" style="margin-top:10px;gap:12px;flex-wrap:wrap">
@@ -1237,7 +1225,7 @@ function initFinancesUI(){
 
   if(svg && tip){
     const hits = svg.querySelectorAll(".chart-dot.hit");
-    const fmt = v => fmtMoneyBGN(Number(v||0));
+    const fmt = v => (Number(v||0)).toFixed(2) + " BGN";
     hits.forEach(h=>{
       const show = ()=>{
         tip.textContent = (h.dataset.kind==="income"?"Income: ":"Expenses: ") + fmt(h.dataset.val);
@@ -1253,7 +1241,7 @@ function initFinancesUI(){
 function safeRun(label, fn){
   try { return fn(); }
   catch(err){
-    console.error("[LifeSync]", label, err);
+    console.error("[BalancedLife]", label, err);
     try { toast("Error: " + (err && err.message ? err.message : String(err))); } catch(_){}
     return null;
   }
@@ -1263,7 +1251,7 @@ function validateRuntime(){
   const required = {render, setRoute, openModal, closeModal};
   const missing = Object.entries(required).filter(([k,v]) => typeof v !== "function").map(([k])=>k);
   if(missing.length){
-    console.error("[LifeSync] Missing functions:", missing);
+    console.error("[BalancedLife] Missing functions:", missing);
   }
 }
 // ===== end APP_GUARD_v697 =====
@@ -1296,7 +1284,7 @@ function render() {
     $$("[data-action='finQuery']").forEach(el=>el.addEventListener("input", (e)=>{ state._finQuery = e.currentTarget.value || ""; render(); }));
 
     // set selected theme value
-    const tSel = $("#themeSelect"); if(tSel){ tSel.value = "dark"; tSel.disabled = true; }
+    const tSel = $("#themeSelect"); if(tSel){ const v = localStorage.getItem("bl_theme_mode") || "dark"; tSel.value = (v==="dark") ? "dark" : "light"; }
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
     if(route==="finances") requestAnimationFrame(()=>initFinancesUI());
@@ -1313,7 +1301,6 @@ function handleAction(e) {
     if(a==="setHabitWeekFull") { state._habitWeekFull = e.currentTarget.value; saveState(); return render(); }
     if(a==="addHabit") return openAddHabit();
     if(a==="addFinance") return openAddFinance();
-    if(a==="editFinance") return openEditFinance(e.currentTarget.dataset.idx);
 
     // ----- Finances goals -----
     if(a==="addGoal") return openAddGoal();
@@ -1445,188 +1432,104 @@ function exportJSON(obj, filename) {
   }
 
   // ---------- Forms ----------
-
   function openAddFinance() {
-    return openFinanceEntryModal({ mode: 'add' });
-  }
-
-  function openEditFinance(idx) {
-    idx = Number(idx);
-    const it = (state.finances || [])[idx];
-    if (!it) return;
-    return openFinanceEntryModal({ mode: 'edit', idx, it });
-  }
-
-  function getFinanceCategories() {
-    return [
-      { id: 'salary', name: 'Salary', icon: 'assets/fin/salary.png', types: ['income'] },
-      { id: 'freelance', name: 'Freelance', icon: 'assets/fin/freelance.png', types: ['income'] },
-      { id: 'briefcase', name: 'Work', icon: 'assets/fin/briefcase.png', types: ['income', 'expense'] },
-
-      { id: 'groceries', name: 'Groceries', icon: 'assets/fin/groceries.png', types: ['expense'] },
-      { id: 'bills', name: 'Bills', icon: 'assets/fin/bills.png', types: ['expense'] },
-      { id: 'bank', name: 'Bank', icon: 'assets/fin/bank.png', types: ['expense', 'income'] },
-      { id: 'vacation', name: 'Vacation', icon: 'assets/fin/vacation.png', types: ['expense'] },
-      { id: 'jar', name: 'Savings', icon: 'assets/fin/jar.png', types: ['expense', 'income'] },
-      { id: 'investment', name: 'Investment', icon: 'assets/fin/investment.png', types: ['expense', 'income'] },
-      { id: 'creditcard', name: 'Credit card', icon: 'assets/fin/creditcard.png', types: ['expense'] },
-      { id: 'calculator', name: 'Calculator', icon: 'assets/fin/calculator.png', types: ['expense', 'income'] },
-      { id: 'piggy', name: 'Piggy bank', icon: 'assets/fin/piggy.png', types: ['expense', 'income'] },
+    const cats = [
+      {id:"salary", name:"Salary", icon:"assets/fin/salary.png"},
+      {id:"vacation", name:"Vacation", icon:"assets/fin/vacation.png"},
+      {id:"groceries", name:"Groceries", icon:"assets/fin/groceries.png"},
+      {id:"briefcase", name:"Work", icon:"assets/fin/briefcase.png"},
+      {id:"jar", name:"Savings", icon:"assets/fin/jar.png"},
+      {id:"freelance", name:"Freelance", icon:"assets/fin/freelance.png"},
+      {id:"bills", name:"Bills", icon:"assets/fin/bills.png"},
+      {id:"bank", name:"Bank", icon:"assets/fin/bank.png"},
+      {id:"calculator", name:"Calculator", icon:"assets/fin/calculator.png"},
+      {id:"creditcard", name:"Credit card", icon:"assets/fin/creditcard.png"},
+      {id:"investment", name:"Investment", icon:"assets/fin/investment.png"},
+      {id:"piggy", name:"Piggy bank", icon:"assets/fin/piggy.png"},
     ];
-  }
 
-  function openFinanceEntryModal({ mode = 'add', idx = null, it = null } = {}) {
-    const cats = getFinanceCategories();
-    const existing = it || { type: 'expense', amount: 0, date: todayISO(), note: '', category: 'groceries' };
-    const curType = existing.type || 'expense';
-    const curCat = existing.category || (curType === 'income' ? 'salary' : 'groceries');
-
-    const total = sumFinances({ startISO: '0000-01-01', endISO: '9999-12-31' });
-    const currentBalance = Number(total.net || 0);
-
-    openModal(mode === 'edit' ? 'Edit entry' : 'New entry', `
+    openModal("New entry", `
       <div class="finModalTop">
         <div class="finTypePills">
-          <button type="button" class="finTypePill ${curType === 'expense' ? 'active' : ''}" data-ftype="expense">Expense</button>
-          <button type="button" class="finTypePill ${curType === 'income' ? 'active' : ''}" data-ftype="income">Income</button>
-          <input type="hidden" id="fType" value="${escapeAttr(curType)}"/>
-        </div>
-
-        <div class="finModalBalance">
-          <div class="finModalBalanceLabel">Current balance</div>
-          <div class="finModalBalanceValue" id="fCurBal">${fmtMoneyBGN(currentBalance)}</div>
-          <div class="finModalBalanceHint" id="fAfterBal" hidden></div>
+          <button type="button" class="finTypePill active" data-ftype="expense">Expense</button>
+          <button type="button" class="finTypePill" data-ftype="income">Income</button>
+          <input type="hidden" id="fType" value="expense"/>
         </div>
       </div>
 
       <div class="grid2">
         <div class="field">
-          <label>Amount (EUR)</label>
-          <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00" value="${escapeAttr(existing.amount || '')}"/>
+          <label>Amount (BGN)</label>
+          <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00"/>
         </div>
         <div class="field">
           <label>Date</label>
-          <input id="fDate" type="date" value="${escapeAttr(existing.date || todayISO())}"/>
+          <input id="fDate" type="date" value="${todayISO()}"/>
         </div>
       </div>
 
       <div class="field">
         <label>Category</label>
         <div class="finCats" id="finCats">
-          ${cats.map(c => `
-            <button type="button" class="finCatBtn" data-cat="${escapeAttr(c.id)}" data-types="${escapeAttr(c.types.join(','))}" title="${escapeAttr(c.name)}">
-              <span class="finCatIcon"><img src="${escapeAttr(c.icon)}" alt="${escapeAttr(c.name)}"/></span>
+          ${cats.map(c=>`
+            <button type="button" class="finCatBtn" data-cat="${c.id}" title="${escapeHtml(c.name)}">
+              <span class="finCatIcon"><img src="${c.icon}" alt="${escapeHtml(c.name)}"/></span>
               <span class="finCatLabel">${escapeHtml(c.name)}</span>
             </button>
-          `).join('')}
+          `).join("")}
         </div>
-        <input type="hidden" id="fCategory" value="${escapeAttr(curCat)}"/>
+        <input type="hidden" id="fCategory" value="groceries"/>
       </div>
 
       <div class="field">
         <label>Note</label>
-        <input id="fNote" type="text" placeholder="e.g. Rent, groceries…" value="${escapeAttr(existing.note || '')}"/>
+        <input id="fNote" type="text" placeholder="e.g. Rent, groceries…"/>
       </div>
 
-      <div class="row finModalActions">
-        ${mode === 'edit' ? '<button class="btn danger" id="del">Delete</button>' : '<span></span>'}
-        <div style="display:flex;gap:10px">
-          <button class="btn ghost" id="cancel">Cancel</button>
-          <button class="btn primary" id="save">Save</button>
-        </div>
+      <div class="row" style="justify-content:flex-end;margin-top:14px;gap:10px">
+        <button class="btn ghost" id="cancel">Cancel</button>
+        <button class="btn primary" id="save">Save</button>
       </div>
     `, () => {
       const close = () => closeModal();
-      const typeEl = document.getElementById('fType');
-      const amountEl = document.getElementById('fAmount');
-      const afterEl = document.getElementById('fAfterBal');
+      $("#cancel").addEventListener("click", close);
 
-      document.getElementById('cancel').addEventListener('click', close);
-
-      const setCategory = (id) => {
-        document.getElementById('fCategory').value = id;
-        document.querySelectorAll('.finCatBtn').forEach(x => x.classList.toggle('active', x.dataset.cat === id));
-      };
-
-      const syncCatsForType = () => {
-        const t = typeEl.value || 'expense';
-        const buttons = Array.from(document.querySelectorAll('.finCatBtn'));
-        let firstVisible = null;
-        buttons.forEach(b => {
-          const types = (b.dataset.types || '').split(',').filter(Boolean);
-          const ok = types.includes(t);
-          b.style.display = ok ? '' : 'none';
-          if (ok && !firstVisible) firstVisible = b.dataset.cat;
-        });
-
-        const current = document.getElementById('fCategory').value || '';
-        const isVisible = buttons.some(b => b.dataset.cat === current && b.style.display !== 'none');
-        if (!isVisible) setCategory(firstVisible || (t === 'income' ? 'salary' : 'groceries'));
-      };
-
-      // default selections
-      setCategory(curCat);
-      syncCatsForType();
-
-      document.querySelectorAll('.finTypePill').forEach(b => {
-        b.addEventListener('click', () => {
-          document.querySelectorAll('.finTypePill').forEach(x => x.classList.remove('active'));
-          b.classList.add('active');
-          typeEl.value = b.dataset.ftype || 'expense';
-          syncCatsForType();
-          updateAfterBalance();
+      // type pills
+      $$(".finTypePill").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          $$(".finTypePill").forEach(x=>x.classList.remove("active"));
+          b.classList.add("active");
+          $("#fType").value = b.dataset.ftype || "expense";
+          // small UX: if income, default category salary
+          if($("#fType").value==="income") setCategory("salary");
         });
       });
 
-      document.querySelectorAll('.finCatBtn').forEach(b => {
-        b.addEventListener('click', () => setCategory(b.dataset.cat || ''));
-      });
-
-      const updateAfterBalance = () => {
-        const t = typeEl.value || 'expense';
-        const amt = Number(amountEl.value || 0);
-        if (!amt || amt <= 0) {
-          afterEl.hidden = true;
-          afterEl.textContent = '';
-          return;
-        }
-        const delta = (t === 'income') ? amt : -amt;
-        const after = currentBalance + delta;
-        afterEl.hidden = false;
-        afterEl.textContent = `After save: ${fmtMoneyBGN(after)} (${delta >= 0 ? '+' : ''}${fmtMoneyBGN(delta)})`;
+      const setCategory = (id)=>{
+        $("#fCategory").value = id;
+        $$(".finCatBtn").forEach(x=>x.classList.toggle("active", x.dataset.cat===id));
       };
 
-      amountEl.addEventListener('input', updateAfterBalance);
-      updateAfterBalance();
+      // default selection
+      setCategory("groceries");
 
-      const delBtn = document.getElementById('del');
-      if (delBtn) {
-        delBtn.addEventListener('click', () => {
-          if (!confirm('Delete this entry?')) return;
-          state.finances = state.finances || [];
-          state.finances.splice(idx, 1);
-          saveState();
-          close();
-        });
-      }
+      $$(".finCatBtn").forEach(b=>{
+        b.addEventListener("click", ()=> setCategory(b.dataset.cat||"groceries"));
+      });
 
-      document.getElementById('save').addEventListener('click', () => {
-        const type = typeEl.value || 'expense';
-        const amount = Number(amountEl.value || 0);
-        const date = document.getElementById('fDate').value || todayISO();
-        const note = (document.getElementById('fNote').value || '').trim();
-        const category = document.getElementById('fCategory').value || '';
+      $("#save").addEventListener("click", () => {
+        const type = ($("#fType").value || "expense");
+        const amount = Number($("#fAmount").value || 0);
+        const date = $("#fDate").value || todayISO();
+        const note = ($("#fNote").value || "").trim();
+        const category = $("#fCategory").value || "";
 
-        if (!amount || amount <= 0) return toast('Enter a valid amount.');
-
+        if(!amount || amount <= 0) return toast("Enter a valid amount.");
         state.finances = state.finances || [];
-        const payload = { type, amount, date, note, category };
-
-        if (mode === 'edit' && idx !== null) state.finances[idx] = payload;
-        else state.finances.push(payload);
-
+        state.finances.push({ type, amount, date, note, category });
         saveState();
         close();
+        render();
       });
     });
   }
@@ -1638,11 +1541,11 @@ function exportJSON(obj, filename) {
     openModal("New goal", `
       <div class="field">
         <label>Goal name</label>
-        <input id="gName" type="text" placeholder="e.g. Save 100 €" />
+        <input id="gName" type="text" placeholder="e.g. Save 100 BGN" />
       </div>
       <div class="grid2">
         <div class="field">
-          <label>Target (EUR)</label>
+          <label>Target (BGN)</label>
           <input id="gTarget" type="number" step="0.01" inputmode="decimal" placeholder="100" />
         </div>
         <div class="field">
@@ -1721,7 +1624,7 @@ function exportJSON(obj, filename) {
     openModal("Add progress", `
       <div class="small">Goal: <b>${escapeHtml(g.name||"Goal")}</b></div>
       <div class="field" style="margin-top:10px">
-        <label>Amount (EUR)</label>
+        <label>Amount (BGN)</label>
         <input id="gpAmount" type="number" step="0.01" inputmode="decimal" placeholder="20" />
       </div>
       <div class="row" style="justify-content:flex-end;margin-top:12px">
@@ -1902,19 +1805,43 @@ function exportJSON(obj, filename) {
 ];
 
   function openAddHabit(){
-    const habits = state.habits || [];
-    const listHtml = habits.map(h=>`
-      <div class="row" style="justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(15,23,42,.06)">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:18px">${h.icon||"✅"}</span>
-          <div>
-            <div style="font-weight:700">${escapeHtml(habitDisplayName(h)||t("habit"))}</div>
-            <div class="muted" style="font-size:12px">${h.id}</div>
+    function canAddMore(){
+      return (state.habits || []).length < 10;
+    }
+
+    function currentListHtml(){
+      const habits = state.habits || [];
+      return habits.map(h=>`
+        <div class="row" style="justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--cardDivider, rgba(15,23,42,.06))">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:18px">${h.icon||"✅"}</span>
+            <div>
+              <div style="font-weight:700">${escapeHtml(habitDisplayName(h)||t("habit"))}</div>
+              <div class="muted" style="font-size:12px">${h.id}</div>
+            </div>
           </div>
+          <button class="btn danger" type="button" data-habit-del="${h.id}">Delete</button>
         </div>
-        <button class="btn danger" type="button" data-habit-del="${h.id}">Delete</button>
-      </div>
-    `).join("") || `<div class="muted">${t("noHabitsShort")}</div>`;
+      `).join("") || `<div class="muted">${t("noHabitsShort")}</div>`;
+    }
+
+    function refreshCurrentList(){
+      const host = document.getElementById("currentHabitsList");
+      if(!host) return;
+      host.innerHTML = currentListHtml();
+      wireDeleteButtons();
+    }
+
+    function addHabitObj(h){
+      const existing = (state.habits || []).some(x=>x.id === h.id);
+      if(existing){ toast(t("habitExists")); return; }
+      if(!canAddMore()){ toast(t("maxHabits")); return; }
+      state.habits = [...(state.habits||[]), h];
+      saveState();
+      refreshCurrentList();
+      render();
+      toast(t("habitAdded"));
+    }
 
     openModal(
       t("manageHabitsTitle"),
@@ -1927,7 +1854,7 @@ function exportJSON(obj, filename) {
         <button class="btn ghost" type="button" data-modal-close>✕</button>
       </div>
 
-  <div style="margin-top:12px">
+      <div style="margin-top:12px">
         <div class="muted" style="font-size:12px;margin-bottom:6px">${t("presetHabits")}</div>
         <div class="presetGrid">
           ${PRESET_HABITS.map(p=>`
@@ -1960,37 +1887,50 @@ function exportJSON(obj, filename) {
 
       <div style="margin-top:12px">
         <div class="muted" style="font-size:12px;margin-bottom:6px">${t("currentHabits")}</div>
-        ${listHtml}
+        <div class="muted" style="font-size:12px;margin:-2px 0 6px">${(state.habits||[]).length}/10</div>
+        <div id="currentHabitsList">${currentListHtml()}</div>
       </div>
     `
     );
 
-    document.querySelectorAll("[data-habit-del]").forEach(btn=>{
+    function wireDeleteButtons(){
+      document.querySelectorAll("[data-habit-del]").forEach(btn=>{
+        btn.onclick = () => {
+          const hid = btn.getAttribute("data-habit-del");
+          state.habits = (state.habits||[]).filter(h=>h.id!==hid);
+          // clean logs
+          const logs = state.habitLogs || {};
+          Object.keys(logs).forEach(d=>{ if(logs[d]) delete logs[d][hid]; });
+          saveState();
+          refreshCurrentList();
+          render();
+          toast(t("habitDeleted"));
+        };
+      });
+    }
+    wireDeleteButtons();
+
+    // Clicking a preset adds it immediately to current habits
+    document.querySelectorAll("[data-habit-preset]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
-        const hid = btn.getAttribute("data-habit-del");
-        state.habits = (state.habits||[]).filter(h=>h.id!==hid);
-        // clean logs
-        const logs = state.habitLogs || {};
-        Object.keys(logs).forEach(d=>{ if(logs[d]) delete logs[d][hid]; });
-        saveState();
-        closeModal();
-        render();
-        toast(t("habitDeleted"));
+        const pid = btn.getAttribute("data-habit-preset");
+        const p = PRESET_HABITS.find(x=>x.id===pid);
+        if(!p) return;
+        addHabitObj({id: p.id, name: p.name, icon: p.icon});
       });
     });
 
     const form = document.getElementById("habitForm");
     form.addEventListener("submit", (e)=>{
       e.preventDefault();
+      if(!canAddMore()){ toast(t("maxHabits")); return; }
       const name = document.getElementById("habitName").value.trim();
       const icon = document.getElementById("habitIcon").value.trim() || "✅";
       if(!name) return;
       const id = "h_" + Date.now().toString(36);
-      state.habits = [...(state.habits||[]), {id, name, icon}];
-      saveState();
-      closeModal();
-      render();
-      toast(t("habitAdded"));
+      addHabitObj({id, name, icon});
+      document.getElementById("habitName").value = "";
+      document.getElementById("habitIcon").value = "";
     });
   }
 

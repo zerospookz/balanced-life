@@ -54,7 +54,6 @@ body{
   box-shadow: var(--shadow2);
   font-weight:800;
 }
-.logoImg{width:34px;height:34px;border-radius:10px;display:block}
 .brandTitle{font-weight:800}
 .brandSub{font-size:12px;color:var(--muted)}
 .btn{
@@ -142,7 +141,10 @@ body{
 label{font-size:12px;color:var(--sub);font-weight:800}
 input,select,textarea{
   padding:12px;border-radius:14px;border:1px solid rgba(0,0,0,.12);
-  background:rgba(255,255,255,.9);color:var(--text);
+  /* Default (light) controls: dark text on light bg. Night mode is overridden below. */
+  background:rgba(255,255,255,.92);
+  color:#0b1220;
+  -webkit-text-fill-color:#0b1220;
   outline:none;
 }
 textarea{min-height:90px;resize:vertical}
@@ -316,28 +318,6 @@ textarea{min-height:90px;resize:vertical}
   --sky1: rgba(15,58,79,.08);  /* Accent glow 5–8% */
   --sky2: rgba(12,36,54,1);    /* Gradient Top */
   --sky3: rgba(5,8,20,1);      /* Gradient Bottom */
-}
-
-/* Night mode form controls (fix invisible typed text on light inputs) */
-:root[data-sky="night"] input,
-:root[data-sky="night"] select,
-:root[data-sky="night"] textarea{
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.14);
-  color: var(--text);
-  caret-color: var(--text);
-  -webkit-text-fill-color: var(--text);
-  color-scheme: dark;
-}
-
-:root[data-sky="night"] input::placeholder,
-:root[data-sky="night"] textarea::placeholder{
-  color: rgba(238,242,255,0.55);
-}
-
-:root[data-sky="night"] .logo{
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.14);
 }
 
 /* Make background use sky tokens (safe override) */
@@ -1033,17 +1013,6 @@ body{overflow-x:hidden}
 
 .finSectionHead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
 .finSearch{min-width:min(340px,100%)}
-.finSearch{
-  width:100%;
-  padding:12px 14px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,0.14);
-  background:rgba(255,255,255,0.06);
-  color:var(--text);
-  outline:none;
-  transition:border-color .18s ease, transform .18s ease;
-}
-.finSearch:focus{border-color:rgba(167,139,250,.45);transform: translateY(-1px)}
 .finSearchInput{width:100%;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:var(--text);outline:none;transition:border-color .18s ease, transform .18s ease}
 .finSearchInput:focus{border-color:rgba(167,139,250,.45);transform: translateY(-1px)}
 
@@ -1109,32 +1078,6 @@ body{overflow-x:hidden}
   .finGoalsGrid2{grid-template-columns:1fr;}
 }
 /* ===== end finances ===== */
-
-/* Finances: match the dark "glass" look from the reference UI */
-:root[data-sky="night"] .finGlass,
-:root[data-sky="night"] .finStatCard,
-:root[data-sky="night"] .finBalancePill,
-:root[data-sky="night"] .finChart,
-:root[data-sky="night"] .finGoalCard2,
-:root[data-sky="night"] .finEntryCard{
-  background: rgba(11,28,45,.72);
-  border-color: rgba(255,255,255,0.10);
-}
-
-:root[data-sky="night"] .finHero::before{
-  opacity: .95;
-}
-
-:root[data-sky="night"] .finEntryDel,
-:root[data-sky="night"] .finIconBtn{
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.14);
-}
-
-:root[data-sky="night"] .finSearch{
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.12);
-}
 
 /* Light theme tuning (finances) */
 :root[data-theme="light"] .finGlass,
@@ -1667,20 +1610,3 @@ html, body { overflow-x: hidden; }
   .finChart{padding-top:122px;}
   .finGoalsGrid2, .finEntriesGrid{grid-template-columns:1fr !important;}
 }
-\n#btnTheme{display:none !important;}
-
-/* v7.1 - Finances entry modal + edit controls */
-.finEntryBtns{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
-.finEntryEdit{width:34px;height:34px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);cursor:pointer}
-.finEntryEdit:hover{border-color: rgba(255,255,255,0.18);transform: translateY(-1px)}
-
-.finModalTop{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.finModalBalance{min-width: 180px;flex:0 0 auto;padding:10px 12px;border-radius:18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10)}
-.finModalBalanceLabel{font-size:11px;letter-spacing:.3px;text-transform:uppercase;font-weight:950;color:rgba(255,255,255,0.65)}
-.finModalBalanceValue{font-size:16px;font-weight:1000;margin-top:4px;color:rgba(255,255,255,0.92)}
-.finModalBalanceHint{font-size:12px;font-weight:850;margin-top:6px;color:rgba(255,255,255,0.70)}
-
-.finModalActions{justify-content:space-between;align-items:center;margin-top:14px;gap:12px}
-
-.btn.danger{background:rgba(239,68,68,0.16);border-color:rgba(239,68,68,0.35);color:rgba(255,255,255,0.92)}
-.btn.danger:hover{background:rgba(239,68,68,0.22);border-color:rgba(239,68,68,0.45)}

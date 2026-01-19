@@ -69,9 +69,7 @@ body{
   /* Fill the square like a real app icon */
   object-fit:cover;
   padding:0;
-  /* Optical balance: slightly denser + tiny vertical correction */
-  transform: scale(1.035) translateY(-0.5px);
-  border-radius:13px;
+  border-radius:0;
 }
 
 /* Premium micro-interaction just for the logo */

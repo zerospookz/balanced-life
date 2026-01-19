@@ -291,7 +291,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "7.7";
+const APP_VERSION = "7.8";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -845,7 +845,9 @@ function viewFinances() {
             <div class="h1">Goals</div>
             <div class="sub">This month • Custom</div>
           </div>
-          <button class="entry-btn finEntryBtn" data-action="addFinance" type="button">Entry <span class="plus">+</span></button>
+          <button class="btn addPill smallAdd finEntryBtn" data-action="addFinance" type="button" aria-label="Add entry">
+            <span class="addPillInner"><span class="addPillText">Entry</span><span class="addPillPlus">+</span></span>
+          </button>
         </div>
 
         <div class="finGoalsGrid2">
@@ -950,8 +952,8 @@ function viewFinances() {
               <div class="h1">Finances</div>
               <div class="sub">Income and expenses</div>
             </div>
-            <button class="btn finEntryBtn" data-action="addFinance" type="button">
-              <span class="addPillInner"><span class="addPillText">Entry <span class='plus'>+</span></span><span class="addPillPlus">+</span></span>
+            <button class="btn addPill smallAdd finEntryBtn" data-action="addFinance" type="button" aria-label="Add entry">
+              <span class="addPillInner"><span class="addPillText">Entry</span><span class="addPillPlus">+</span></span>
             </button>
           </div>
 

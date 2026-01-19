@@ -1030,6 +1030,18 @@ body{overflow-x:hidden}
   .finPager span{width:6px;height:6px}
 }
 
+/* Even tighter stats on small phones */
+@media (max-width: 390px){
+  .finStats{gap:8px}
+  .finStatCard{padding:8px 10px;border-radius:14px}
+  .finStatLabel{font-size:11px}
+  .finStatValue{font-size:16px}
+  .finStatDelta{font-size:11px}
+  .finBalancePill{min-width:132px;padding:8px 10px}
+  .finBalanceLabel{font-size:11px}
+  .finBalanceValue{font-size:16px}
+}
+
 .finStatCard{padding:14px 16px;border-radius:20px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.06);backdrop-filter: blur(16px);box-shadow: 0 20px 50px rgba(0,0,0,0.18)}
 .finStatCard.positive{background:linear-gradient(135deg, rgba(52,211,153,0.10), rgba(255,255,255,0.05));border-color: rgba(52,211,153,0.18)}
 .finStatCard.negative{background:linear-gradient(135deg, rgba(251,146,60,0.12), rgba(255,255,255,0.05));border-color: rgba(251,146,60,0.18)}
@@ -1651,4 +1663,13 @@ html, body { overflow-x: hidden; }
   .finStatsOverlay{grid-template-columns:1fr 1fr 1fr; gap:10px; top:14px; left:14px; right:14px;}
   .finChart{padding-top:122px;}
   .finGoalsGrid2, .finEntriesGrid{grid-template-columns:1fr !important;}
+}
+
+@media (max-width:390px){
+  .finStatsOverlay{gap:8px; top:12px; left:12px; right:12px;}
+  .finChart{padding-top:114px;}
+  .finStatsOverlay .finStatCard{padding:8px 10px;border-radius:14px}
+  .finStatsOverlay .finBalancePill{padding:8px 10px;border-radius:16px;min-width:unset}
+  .finStatsOverlay .finStatValue, .finStatsOverlay .finBalanceValue{font-size:16px}
+  .finStatsOverlay .finStatLabel, .finStatsOverlay .finBalanceLabel{font-size:11px}
 }

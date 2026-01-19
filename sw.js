@@ -1,5 +1,5 @@
-// LifeSync v7.9 SAFE SERVICE WORKER (no addAll)
-const CACHE_NAME = "lifesync-v7.9.0";
+// LifeSync v8.0 SAFE SERVICE WORKER (no addAll)
+const CACHE_NAME = "lifesync-v8.0.0";
 self.addEventListener("install", event => {
   self.skipWaiting();
 });

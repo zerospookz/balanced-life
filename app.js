@@ -77,11 +77,16 @@
     return { income, expense, net };
   }
 
+  // Currency: EUR (locked)
+  // (Keeping the historical function name to avoid touching many call-sites.)
   function fmtMoneyBGN(n){
     const x = Number(n||0);
     const sign = x < 0 ? "-" : "";
     const abs = Math.abs(x);
-    return sign + abs.toLocaleString("bg-BG", {maximumFractionDigits:2, minimumFractionDigits:2}) + " лв";
+    return sign + abs.toLocaleString("bg-BG", {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2
+    }) + " €";
   }
 
   function buildDailySeries({startISO, endISO}){
@@ -291,7 +296,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "7.9";
+const APP_VERSION = "8.0";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -635,8 +640,8 @@ function viewHome() {
               <div class="weekTileTitle">Finances</div>
               <div class="weekTileIcon">💰</div>
             </div>
-            <div class="weekTileValue">${money(d.budget)} лв</div>
-            <div class="weekTileSub">Month: +${money(d.income)} • -${money(d.expense)}<br/>Remaining: ${money(d.budget + d.income - d.expense)} лв</div>
+            <div class="weekTileValue">${money(d.budget)} €</div>
+            <div class="weekTileSub">Month: +${money(d.income)} â¢ -${money(d.expense)}<br/>Remaining: ${money(d.budget + d.income - d.expense)} €</div>
           </button>
 
           <button class="weekTile" type="button" data-route="nutrition" aria-label="Nutrition tile">
@@ -901,7 +906,7 @@ function viewFinances() {
           }).join("") : `
             <div class="finEmpty">
               <div class="finEmptyTitle">No goals yet</div>
-              <div class="small">Create a goal like “Save 100 BGN this month”.</div>
+              <div class="small">Create a goal like “Save 100 EUR this month”.</div>
             </div>
           `}
         </div>
@@ -1233,7 +1238,7 @@ function initFinancesUI(){
 
   if(svg && tip){
     const hits = svg.querySelectorAll(".chart-dot.hit");
-    const fmt = v => (Number(v||0)).toFixed(2) + " BGN";
+    const fmt = v => (Number(v||0)).toFixed(2) + " EUR";
     hits.forEach(h=>{
       const show = ()=>{
         tip.textContent = (h.dataset.kind==="income"?"Income: ":"Expenses: ") + fmt(h.dataset.val);
@@ -1467,7 +1472,7 @@ function exportJSON(obj, filename) {
 
       <div class="grid2">
         <div class="field">
-          <label>Amount (BGN)</label>
+          <label>Amount (EUR)</label>
           <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00"/>
         </div>
         <div class="field">
@@ -1549,11 +1554,11 @@ function exportJSON(obj, filename) {
     openModal("New goal", `
       <div class="field">
         <label>Goal name</label>
-        <input id="gName" type="text" placeholder="e.g. Save 100 BGN" />
+        <input id="gName" type="text" placeholder="e.g. Save 100 EUR" />
       </div>
       <div class="grid2">
         <div class="field">
-          <label>Target (BGN)</label>
+          <label>Target (EUR)</label>
           <input id="gTarget" type="number" step="0.01" inputmode="decimal" placeholder="100" />
         </div>
         <div class="field">
@@ -1632,7 +1637,7 @@ function exportJSON(obj, filename) {
     openModal("Add progress", `
       <div class="small">Goal: <b>${escapeHtml(g.name||"Goal")}</b></div>
       <div class="field" style="margin-top:10px">
-        <label>Amount (BGN)</label>
+        <label>Amount (EUR)</label>
         <input id="gpAmount" type="number" step="0.01" inputmode="decimal" placeholder="20" />
       </div>
       <div class="row" style="justify-content:flex-end;margin-top:12px">

@@ -49,7 +49,8 @@ body{
 .logo{
   width:42px;
   height:42px;
-  border-radius:12px;
+  /* Slightly rounder (iOS-ish) */
+  border-radius:13px;
   display:grid;
   place-items:center;
   /* Clean icon badge: no extra glow, no heavy frame */
@@ -60,16 +61,23 @@ body{
   overflow:hidden;
   transition: transform .16s ease;
 }
-.logo:active{transform:translateY(1px) scale(.98)}
+.logo:active{transform:translateY(1px) scale(.97)}
 .logoImg{
   width:100%;
   height:100%;
   display:block;
-  /* Icon itself provides the shape */
-  object-fit:contain;
+  /* Fill the square like a real app icon */
+  object-fit:cover;
   padding:0;
-  transform:none;
-  border-radius:12px;
+  /* Optical balance: slightly denser + tiny vertical correction */
+  transform: scale(1.035) translateY(-0.5px);
+  border-radius:13px;
+}
+
+/* Premium micro-interaction just for the logo */
+.logo{will-change:transform}
+@media (hover:hover){
+  .logo:hover{transform:translateY(-1px) scale(1.03)}
 }
 
 .brandTitle{font-weight:800}

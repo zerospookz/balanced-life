@@ -296,7 +296,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "8.3";
+const APP_VERSION = "8.4";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.

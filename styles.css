@@ -49,33 +49,30 @@ body{
 .logo{
   width:42px;
   height:42px;
-  /* Slightly rounder (iOS-ish) */
-  border-radius:13px;
-  display:grid;
-  place-items:center;
-  /* Clean icon badge: no extra glow, no heavy frame */
+  /* IMPORTANT: the icon image itself defines the contours (rounded corners/glow).
+     The container must NOT clip or add a frame, otherwise it looks like an icon-in-a-box. */
+  display:block;
   background:transparent;
   border:none;
   box-shadow:none;
-  font-weight:800;
-  overflow:hidden;
-  transition: transform .16s ease;
+  border-radius:0;
+  overflow:visible;
 }
-.logo:active{transform:translateY(1px) scale(.97)}
+.logo:active .logoImg{transform:translateY(1px) scale(.97)}
 .logoImg{
   width:100%;
   height:100%;
   display:block;
-  /* Fill the square like a real app icon */
-  object-fit:cover;
+  object-fit:contain;
   padding:0;
   border-radius:0;
+  transition: transform .16s ease;
 }
 
 /* Premium micro-interaction just for the logo */
-.logo{will-change:transform}
+.logoImg{will-change:transform}
 @media (hover:hover){
-  .logo:hover{transform:translateY(-1px) scale(1.03)}
+  .logo:hover .logoImg{transform:translateY(-1px) scale(1.03)}
 }
 
 .brandTitle{font-weight:800}

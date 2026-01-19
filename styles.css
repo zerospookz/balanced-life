@@ -172,9 +172,9 @@ body{
 
 /* Icon tile (inside the pill) */
 .tab .ico{
-  width:94px;
-  height:76px;
-  border-radius:20px;
+  width:86px;
+  height:70px;
+  border-radius:18px;
   overflow:hidden;
   display:grid;
   place-items:center;
@@ -188,11 +188,13 @@ body{
   width:100%;
   height:100%;
   display:block;
-  object-fit:cover;
+  /* The icon files already include their own tile/background.
+     Using contain avoids awkward cropping/zooming. */
+  object-fit:contain;
 }
 
 .tab span:last-child{
-  font-size:18px;
+  font-size:16px;
   font-weight:800;
   letter-spacing:.2px;
 }
@@ -201,21 +203,21 @@ body{
 .tab.active .icoImg{filter:saturate(1.02) brightness(1.02)}
 
 @media (max-width:780px){
-  .tab .ico{width:84px;height:70px;border-radius:18px;}
+  .tab .ico{width:74px;height:62px;border-radius:16px;}
   .tab span:last-child{font-size:14px;}
 }
 
 @media (max-width:420px){
   .bottomnav{
     width:calc(100% - 18px);
-    padding:10px 10px 8px;
+    padding:8px 8px 7px;
     bottom:calc(12px + env(safe-area-inset-bottom));
-    border-radius:30px;
-    gap:10px;
+    border-radius:24px;
+    gap:8px;
   }
   .tab{gap:8px;}
-  .tab .ico{width:66px;height:60px;border-radius:16px;}
-  .tab span:last-child{font-size:14px;}
+  .tab .ico{width:56px;height:50px;border-radius:15px;}
+  .tab span:last-child{font-size:12px;}
 }
 
 .modal{

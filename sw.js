@@ -1,5 +1,5 @@
-// v7.1.0 SAFE SERVICE WORKER (no addAll)
-const CACHE_NAME = "balanced-life-v7.1.0";
+// v7.2.0 SAFE SERVICE WORKER (no addAll)
+const CACHE_NAME = "lifesync-v7.2.0";
 self.addEventListener("install", event => {
   self.skipWaiting();
 });

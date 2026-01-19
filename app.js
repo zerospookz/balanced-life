@@ -1,9 +1,9 @@
 
-/* Balanced life v7.1 (finances entry modal + categories + persistence) - static SPA */
+/* LifeSync v7.2 (finances entry modal polish + app rename/logo) - static SPA */
 (() => {
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-  const APP_VERSION = "7.1";
+  const APP_VERSION = "7.2";
 
 
   const STORAGE_KEY = "balancedLife.v59";
@@ -1253,7 +1253,7 @@ function initFinancesUI(){
 function safeRun(label, fn){
   try { return fn(); }
   catch(err){
-    console.error("[BalancedLife]", label, err);
+    console.error("[LifeSync]", label, err);
     try { toast("Error: " + (err && err.message ? err.message : String(err))); } catch(_){}
     return null;
   }
@@ -1263,7 +1263,7 @@ function validateRuntime(){
   const required = {render, setRoute, openModal, closeModal};
   const missing = Object.entries(required).filter(([k,v]) => typeof v !== "function").map(([k])=>k);
   if(missing.length){
-    console.error("[BalancedLife] Missing functions:", missing);
+    console.error("[LifeSync] Missing functions:", missing);
   }
 }
 // ===== end APP_GUARD_v697 =====

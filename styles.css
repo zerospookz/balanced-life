@@ -115,41 +115,50 @@ body{
 @media (max-width:740px){.grid2{grid-template-columns:1fr}}
 
 .bottomnav{
-  position:fixed;left:50%;transform:translateX(-50%);
-  bottom:14px;z-index:20;
-  width:min(520px, calc(100% - 28px));
-  display:grid;grid-template-columns:repeat(5,1fr);
-  gap:8px;
-  padding:10px;
-  border-radius:22px;
-  background:rgba(255,255,255,.78);
-  backdrop-filter: blur(14px);
-  box-shadow: var(--shadow);
-  border:1px solid rgba(0,0,0,.06);
+  position:fixed;
+  left:0; right:0;
+  bottom:calc(18px + env(safe-area-inset-bottom));
+  z-index:20;
+  display:flex;
+  justify-content:space-around;
+  align-items:flex-end;
+  gap:18px;
+  padding:0 16px;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  backdrop-filter:none;
 }
+
+.tab{
+  border:none;
+  background:transparent;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  padding:6px 6px;
+  cursor:pointer;
+  color:rgba(255,255,255,.88);
+  transition: transform .14s ease, filter .14s ease, opacity .14s ease;
+}
+.tab:active{transform:translateY(1px) scale(.985)}
+
+/* Bottom nav icons: use the image as-is (the file defines the contour) */
+.tab .ico{line-height:0}
+.tab .icoImg{width:74px;height:74px;display:block}
+.tab span:last-child{font-size:18px;font-weight:700;letter-spacing:.2px}
+
+.tab:not(.active) .icoImg{opacity:.92;filter:saturate(.92) brightness(.92)}
+.tab.active .icoImg{filter:saturate(1.05) brightness(1.02)}
+.tab.active{transform:translateY(-1px)}
 
 @media (max-width:420px){
-  .bottomnav{gap:6px;padding:8px;}
-  .tab{padding:7px 4px;border-radius:14px;}
-  .tab span:last-child{font-size:10px;}
-  .tab .ico{font-size:17px;}
+  .bottomnav{gap:14px;padding:0 12px;bottom:calc(14px + env(safe-area-inset-bottom));}
+  .tab{gap:10px;}
+  .tab .icoImg{width:64px;height:64px;}
+  .tab span:last-child{font-size:16px;}
 }
-.tab{
-  border:none;background:transparent;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  padding:8px 6px;border-radius:16px;
-  color:var(--muted);cursor:pointer;
-  transition: transform .12s ease, background .16s ease, color .16s ease;
-}
-.tab:active{transform:translateY(1px) scale(.99)}
-.tab .ico{font-size:18px;line-height:1}
-
-/* Image icons in bottom nav: icon file defines the contours (no container mask) */
-.tab .icoImg{width:22px;height:22px;display:block}
-@media (max-width:420px){.tab .icoImg{width:20px;height:20px}}
-.tab span:last-child{font-size:11px;font-weight:700}
-.tab.active{background:rgba(37,99,235,.12);color:var(--text)}
-.tab.active .ico{filter:saturate(1.1)}
 
 .modal{
   position:fixed;inset:0;
@@ -377,8 +386,8 @@ body{
   background: linear-gradient(180deg, rgba(5,8,20,.92), rgba(5,8,20,.65));
 }
 :root[data-sky="night"] .bottomnav{
-  background: rgba(11,28,45,.92);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: transparent;
+  border: none;
 }
 
 /* Featured card surface */

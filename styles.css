@@ -47,26 +47,29 @@ body{
 }
 .brand{display:flex;gap:10px;align-items:center}
 .logo{
-  width:42px;height:42px;border-radius:14px;
-  display:grid;place-items:center;
-  /* Premium dark badge (no strong glow) */
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.14);
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  /* Clean icon badge: no extra glow, no heavy frame */
+  background:transparent;
+  border:none;
   box-shadow:none;
   font-weight:800;
   overflow:hidden;
-  transition: transform .16s ease, border-color .16s ease, background .16s ease;
+  transition: transform .16s ease;
 }
 .logo:active{transform:translateY(1px) scale(.98)}
 .logoImg{
   width:100%;
   height:100%;
   display:block;
-  /* Center the 2x2 grid optically */
+  /* Icon itself provides the shape */
   object-fit:contain;
-  padding:2px;
-  transform: scale(1.06);
-  border-radius:0;
+  padding:0;
+  transform:none;
+  border-radius:12px;
 }
 
 .brandTitle{font-weight:800}
@@ -87,7 +90,7 @@ body{
 
 @media (hover:hover){
   .btn:hover{transform:translateY(-1px)}
-  .logo:hover{transform:translateY(-1px) scale(1.01);border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.07)}
+  .logo:hover{transform:translateY(-1px) scale(1.02)}
   .tab:hover{transform:translateY(-1px);background:rgba(255,255,255,.06)}
 }
 .view{padding:8px 2px}

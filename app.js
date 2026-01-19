@@ -1,8 +1,10 @@
 
-/* Balanced life v5.8 (workouts plan + import/export) - static SPA */
+/* Balanced life v7.1 (finances entry modal + categories + persistence) - static SPA */
 (() => {
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const APP_VERSION = "7.1";
+
 
   const STORAGE_KEY = "balancedLife.v59";
   const todayISO = () => new Date().toISOString().slice(0,10);
@@ -78,11 +80,17 @@
   }
 
   function fmtMoneyBGN(n){
+    // App currency: EUR
     const x = Number(n||0);
-    const sign = x < 0 ? "-" : "";
-    const abs = Math.abs(x);
-    return sign + abs.toLocaleString("bg-BG", {maximumFractionDigits:2, minimumFractionDigits:2}) + " лв";
+    try {
+      return new Intl.NumberFormat("bg-BG", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(x);
+    } catch(_) {
+      const sign = x < 0 ? "-" : "";
+      const abs = Math.abs(x);
+      return sign + abs.toFixed(2) + " €";
+    }
   }
+
 
   function buildDailySeries({startISO, endISO}){
     const map = new Map();
@@ -256,7 +264,7 @@ function setLang(lang){
 function updateHeaderUI(){
   document.documentElement.setAttribute("lang", (state.lang||"en")==="bg" ? "bg" : "en");
   const sub = document.querySelector(".brandSub");
-  if(sub) sub.textContent = t("offlineSub");
+  if(sub) sub.textContent = `${t("offlineSub")} • v${APP_VERSION}`;
 
   const toggle = document.getElementById("btnLangToggle");
   if(toggle){
@@ -806,6 +814,14 @@ function viewFinances() {
 
     // icon mapping using extracted icons (embedded in the project root)
     function finIconFor(note = "", type = "expense", category = "") {
+      // Prefer explicit category icon
+      try {
+        if(category){
+          const meta = (getFinanceCategories() || []).find(x => x.id === category);
+          if(meta) return { src: meta.icon, alt: meta.name };
+        }
+      } catch(_) {}
+
       const s = String(note || "").toLowerCase();
       const c = String(category || "").toLowerCase();
       const has = (src, ...keys) => keys.some(k => s.includes(k) || c.includes(k));
@@ -827,6 +843,7 @@ function viewFinances() {
         ? { src: "assets/fin/salary.png", alt: "Income" }
         : { src: "assets/fin/groceries.png", alt: "Expense" };
     }
+
     const goalsHtml = `
       <section class="card section finGlass">
         <div class="finSectionHead">
@@ -888,7 +905,7 @@ function viewFinances() {
           }).join("") : `
             <div class="finEmpty">
               <div class="finEmptyTitle">No goals yet</div>
-              <div class="small">Create a goal like “Save 100 BGN this month”.</div>
+              <div class="small">Create a goal like “Save 100 € this month”.</div>
             </div>
           `}
         </div>
@@ -909,7 +926,9 @@ function viewFinances() {
       const cls = it.type === "income" ? "inc" : "exp";
       const label = it.type === "income" ? "Income" : "Expense";
       const note = (it.note || "").trim();
-      const icon = finIconFor(note, it.type);
+      const icon = finIconFor(note, it.type, it.category);
+      const catMeta = (it.category ? (getFinanceCategories() || []).find(x => x.id === it.category) : null);
+      const catName = catMeta ? catMeta.name : (it.category || "");
 
       return `
         <div class="finEntryCard">
@@ -924,9 +943,12 @@ function viewFinances() {
             <div class="finEntrySub">
               <span class="finEntryTag ${cls}">${label}</span>
               <span class="finEntryDate">${escapeHtml(it.date || "")}</span>
-            ${it.category ? ` • <span class="finEntryCat">${escapeHtml(it.category)}</span>` : ``}</div>
+            ${catName ? ` • <span class="finEntryCat">${escapeHtml(catName)}</span>` : ``}</div>
           </div>
-          <button class="finEntryDel" data-action="delFinance" data-idx="${it.__i}" title="Delete">✕</button>
+          <div class="finEntryBtns">
+            <button class="finEntryEdit" data-action="editFinance" data-idx="${it.__i}" title="Edit">✎</button>
+            <button class="finEntryDel" data-action="delFinance" data-idx="${it.__i}" title="Delete">✕</button>
+          </div>
         </div>
       `;
     }).join("");
@@ -1215,7 +1237,7 @@ function initFinancesUI(){
 
   if(svg && tip){
     const hits = svg.querySelectorAll(".chart-dot.hit");
-    const fmt = v => (Number(v||0)).toFixed(2) + " BGN";
+    const fmt = v => fmtMoneyBGN(Number(v||0));
     hits.forEach(h=>{
       const show = ()=>{
         tip.textContent = (h.dataset.kind==="income"?"Income: ":"Expenses: ") + fmt(h.dataset.val);
@@ -1291,6 +1313,7 @@ function handleAction(e) {
     if(a==="setHabitWeekFull") { state._habitWeekFull = e.currentTarget.value; saveState(); return render(); }
     if(a==="addHabit") return openAddHabit();
     if(a==="addFinance") return openAddFinance();
+    if(a==="editFinance") return openEditFinance(e.currentTarget.dataset.idx);
 
     // ----- Finances goals -----
     if(a==="addGoal") return openAddGoal();
@@ -1422,104 +1445,188 @@ function exportJSON(obj, filename) {
   }
 
   // ---------- Forms ----------
-  function openAddFinance() {
-    const cats = [
-      {id:"salary", name:"Salary", icon:"assets/fin/salary.png"},
-      {id:"vacation", name:"Vacation", icon:"assets/fin/vacation.png"},
-      {id:"groceries", name:"Groceries", icon:"assets/fin/groceries.png"},
-      {id:"briefcase", name:"Work", icon:"assets/fin/briefcase.png"},
-      {id:"jar", name:"Savings", icon:"assets/fin/jar.png"},
-      {id:"freelance", name:"Freelance", icon:"assets/fin/freelance.png"},
-      {id:"bills", name:"Bills", icon:"assets/fin/bills.png"},
-      {id:"bank", name:"Bank", icon:"assets/fin/bank.png"},
-      {id:"calculator", name:"Calculator", icon:"assets/fin/calculator.png"},
-      {id:"creditcard", name:"Credit card", icon:"assets/fin/creditcard.png"},
-      {id:"investment", name:"Investment", icon:"assets/fin/investment.png"},
-      {id:"piggy", name:"Piggy bank", icon:"assets/fin/piggy.png"},
-    ];
 
-    openModal("New entry", `
+  function openAddFinance() {
+    return openFinanceEntryModal({ mode: 'add' });
+  }
+
+  function openEditFinance(idx) {
+    idx = Number(idx);
+    const it = (state.finances || [])[idx];
+    if (!it) return;
+    return openFinanceEntryModal({ mode: 'edit', idx, it });
+  }
+
+  function getFinanceCategories() {
+    return [
+      { id: 'salary', name: 'Salary', icon: 'assets/fin/salary.png', types: ['income'] },
+      { id: 'freelance', name: 'Freelance', icon: 'assets/fin/freelance.png', types: ['income'] },
+      { id: 'briefcase', name: 'Work', icon: 'assets/fin/briefcase.png', types: ['income', 'expense'] },
+
+      { id: 'groceries', name: 'Groceries', icon: 'assets/fin/groceries.png', types: ['expense'] },
+      { id: 'bills', name: 'Bills', icon: 'assets/fin/bills.png', types: ['expense'] },
+      { id: 'bank', name: 'Bank', icon: 'assets/fin/bank.png', types: ['expense', 'income'] },
+      { id: 'vacation', name: 'Vacation', icon: 'assets/fin/vacation.png', types: ['expense'] },
+      { id: 'jar', name: 'Savings', icon: 'assets/fin/jar.png', types: ['expense', 'income'] },
+      { id: 'investment', name: 'Investment', icon: 'assets/fin/investment.png', types: ['expense', 'income'] },
+      { id: 'creditcard', name: 'Credit card', icon: 'assets/fin/creditcard.png', types: ['expense'] },
+      { id: 'calculator', name: 'Calculator', icon: 'assets/fin/calculator.png', types: ['expense', 'income'] },
+      { id: 'piggy', name: 'Piggy bank', icon: 'assets/fin/piggy.png', types: ['expense', 'income'] },
+    ];
+  }
+
+  function openFinanceEntryModal({ mode = 'add', idx = null, it = null } = {}) {
+    const cats = getFinanceCategories();
+    const existing = it || { type: 'expense', amount: 0, date: todayISO(), note: '', category: 'groceries' };
+    const curType = existing.type || 'expense';
+    const curCat = existing.category || (curType === 'income' ? 'salary' : 'groceries');
+
+    const total = sumFinances({ startISO: '0000-01-01', endISO: '9999-12-31' });
+    const currentBalance = Number(total.net || 0);
+
+    openModal(mode === 'edit' ? 'Edit entry' : 'New entry', `
       <div class="finModalTop">
         <div class="finTypePills">
-          <button type="button" class="finTypePill active" data-ftype="expense">Expense</button>
-          <button type="button" class="finTypePill" data-ftype="income">Income</button>
-          <input type="hidden" id="fType" value="expense"/>
+          <button type="button" class="finTypePill ${curType === 'expense' ? 'active' : ''}" data-ftype="expense">Expense</button>
+          <button type="button" class="finTypePill ${curType === 'income' ? 'active' : ''}" data-ftype="income">Income</button>
+          <input type="hidden" id="fType" value="${escapeAttr(curType)}"/>
+        </div>
+
+        <div class="finModalBalance">
+          <div class="finModalBalanceLabel">Current balance</div>
+          <div class="finModalBalanceValue" id="fCurBal">${fmtMoneyBGN(currentBalance)}</div>
+          <div class="finModalBalanceHint" id="fAfterBal" hidden></div>
         </div>
       </div>
 
       <div class="grid2">
         <div class="field">
-          <label>Amount (BGN)</label>
-          <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00"/>
+          <label>Amount (EUR)</label>
+          <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00" value="${escapeAttr(existing.amount || '')}"/>
         </div>
         <div class="field">
           <label>Date</label>
-          <input id="fDate" type="date" value="${todayISO()}"/>
+          <input id="fDate" type="date" value="${escapeAttr(existing.date || todayISO())}"/>
         </div>
       </div>
 
       <div class="field">
         <label>Category</label>
         <div class="finCats" id="finCats">
-          ${cats.map(c=>`
-            <button type="button" class="finCatBtn" data-cat="${c.id}" title="${escapeHtml(c.name)}">
-              <span class="finCatIcon"><img src="${c.icon}" alt="${escapeHtml(c.name)}"/></span>
+          ${cats.map(c => `
+            <button type="button" class="finCatBtn" data-cat="${escapeAttr(c.id)}" data-types="${escapeAttr(c.types.join(','))}" title="${escapeAttr(c.name)}">
+              <span class="finCatIcon"><img src="${escapeAttr(c.icon)}" alt="${escapeAttr(c.name)}"/></span>
               <span class="finCatLabel">${escapeHtml(c.name)}</span>
             </button>
-          `).join("")}
+          `).join('')}
         </div>
-        <input type="hidden" id="fCategory" value="groceries"/>
+        <input type="hidden" id="fCategory" value="${escapeAttr(curCat)}"/>
       </div>
 
       <div class="field">
         <label>Note</label>
-        <input id="fNote" type="text" placeholder="e.g. Rent, groceries…"/>
+        <input id="fNote" type="text" placeholder="e.g. Rent, groceries…" value="${escapeAttr(existing.note || '')}"/>
       </div>
 
-      <div class="row" style="justify-content:flex-end;margin-top:14px;gap:10px">
-        <button class="btn ghost" id="cancel">Cancel</button>
-        <button class="btn primary" id="save">Save</button>
+      <div class="row finModalActions">
+        ${mode === 'edit' ? '<button class="btn danger" id="del">Delete</button>' : '<span></span>'}
+        <div style="display:flex;gap:10px">
+          <button class="btn ghost" id="cancel">Cancel</button>
+          <button class="btn primary" id="save">Save</button>
+        </div>
       </div>
     `, () => {
       const close = () => closeModal();
-      $("#cancel").addEventListener("click", close);
+      const typeEl = document.getElementById('fType');
+      const amountEl = document.getElementById('fAmount');
+      const afterEl = document.getElementById('fAfterBal');
 
-      // type pills
-      $$(".finTypePill").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          $$(".finTypePill").forEach(x=>x.classList.remove("active"));
-          b.classList.add("active");
-          $("#fType").value = b.dataset.ftype || "expense";
-          // small UX: if income, default category salary
-          if($("#fType").value==="income") setCategory("salary");
+      document.getElementById('cancel').addEventListener('click', close);
+
+      const setCategory = (id) => {
+        document.getElementById('fCategory').value = id;
+        document.querySelectorAll('.finCatBtn').forEach(x => x.classList.toggle('active', x.dataset.cat === id));
+      };
+
+      const syncCatsForType = () => {
+        const t = typeEl.value || 'expense';
+        const buttons = Array.from(document.querySelectorAll('.finCatBtn'));
+        let firstVisible = null;
+        buttons.forEach(b => {
+          const types = (b.dataset.types || '').split(',').filter(Boolean);
+          const ok = types.includes(t);
+          b.style.display = ok ? '' : 'none';
+          if (ok && !firstVisible) firstVisible = b.dataset.cat;
+        });
+
+        const current = document.getElementById('fCategory').value || '';
+        const isVisible = buttons.some(b => b.dataset.cat === current && b.style.display !== 'none');
+        if (!isVisible) setCategory(firstVisible || (t === 'income' ? 'salary' : 'groceries'));
+      };
+
+      // default selections
+      setCategory(curCat);
+      syncCatsForType();
+
+      document.querySelectorAll('.finTypePill').forEach(b => {
+        b.addEventListener('click', () => {
+          document.querySelectorAll('.finTypePill').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+          typeEl.value = b.dataset.ftype || 'expense';
+          syncCatsForType();
+          updateAfterBalance();
         });
       });
 
-      const setCategory = (id)=>{
-        $("#fCategory").value = id;
-        $$(".finCatBtn").forEach(x=>x.classList.toggle("active", x.dataset.cat===id));
-      };
-
-      // default selection
-      setCategory("groceries");
-
-      $$(".finCatBtn").forEach(b=>{
-        b.addEventListener("click", ()=> setCategory(b.dataset.cat||"groceries"));
+      document.querySelectorAll('.finCatBtn').forEach(b => {
+        b.addEventListener('click', () => setCategory(b.dataset.cat || ''));
       });
 
-      $("#save").addEventListener("click", () => {
-        const type = ($("#fType").value || "expense");
-        const amount = Number($("#fAmount").value || 0);
-        const date = $("#fDate").value || todayISO();
-        const note = ($("#fNote").value || "").trim();
-        const category = $("#fCategory").value || "";
+      const updateAfterBalance = () => {
+        const t = typeEl.value || 'expense';
+        const amt = Number(amountEl.value || 0);
+        if (!amt || amt <= 0) {
+          afterEl.hidden = true;
+          afterEl.textContent = '';
+          return;
+        }
+        const delta = (t === 'income') ? amt : -amt;
+        const after = currentBalance + delta;
+        afterEl.hidden = false;
+        afterEl.textContent = `After save: ${fmtMoneyBGN(after)} (${delta >= 0 ? '+' : ''}${fmtMoneyBGN(delta)})`;
+      };
 
-        if(!amount || amount <= 0) return toast("Enter a valid amount.");
+      amountEl.addEventListener('input', updateAfterBalance);
+      updateAfterBalance();
+
+      const delBtn = document.getElementById('del');
+      if (delBtn) {
+        delBtn.addEventListener('click', () => {
+          if (!confirm('Delete this entry?')) return;
+          state.finances = state.finances || [];
+          state.finances.splice(idx, 1);
+          saveState();
+          close();
+        });
+      }
+
+      document.getElementById('save').addEventListener('click', () => {
+        const type = typeEl.value || 'expense';
+        const amount = Number(amountEl.value || 0);
+        const date = document.getElementById('fDate').value || todayISO();
+        const note = (document.getElementById('fNote').value || '').trim();
+        const category = document.getElementById('fCategory').value || '';
+
+        if (!amount || amount <= 0) return toast('Enter a valid amount.');
+
         state.finances = state.finances || [];
-        state.finances.push({ type, amount, date, note, category });
+        const payload = { type, amount, date, note, category };
+
+        if (mode === 'edit' && idx !== null) state.finances[idx] = payload;
+        else state.finances.push(payload);
+
         saveState();
         close();
-        render();
       });
     });
   }
@@ -1531,11 +1638,11 @@ function exportJSON(obj, filename) {
     openModal("New goal", `
       <div class="field">
         <label>Goal name</label>
-        <input id="gName" type="text" placeholder="e.g. Save 100 BGN" />
+        <input id="gName" type="text" placeholder="e.g. Save 100 €" />
       </div>
       <div class="grid2">
         <div class="field">
-          <label>Target (BGN)</label>
+          <label>Target (EUR)</label>
           <input id="gTarget" type="number" step="0.01" inputmode="decimal" placeholder="100" />
         </div>
         <div class="field">
@@ -1614,7 +1721,7 @@ function exportJSON(obj, filename) {
     openModal("Add progress", `
       <div class="small">Goal: <b>${escapeHtml(g.name||"Goal")}</b></div>
       <div class="field" style="margin-top:10px">
-        <label>Amount (BGN)</label>
+        <label>Amount (EUR)</label>
         <input id="gpAmount" type="number" step="0.01" inputmode="decimal" placeholder="20" />
       </div>
       <div class="row" style="justify-content:flex-end;margin-top:12px">

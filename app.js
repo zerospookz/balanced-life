@@ -1,5 +1,5 @@
 
-/* LifeSync v9.2 (cleanup build) - static SPA */
+/* LifeSync v9.5 - responsive nav icon sets */
 (() => {
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
@@ -296,7 +296,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "9.4";
+const APP_VERSION = "9.5";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -329,6 +329,23 @@ function saveState() {
   updateHeaderUI();
   validateRuntime();
 // ---------- Router ----------
+  function updateBottomNavIcons(){
+    const nav = document.querySelector('.bottomnav');
+    if(!nav) return;
+    const compact = window.matchMedia('(max-width: 420px)').matches;
+    const base = compact ? 'icons/nav/compact/' : 'icons/nav/';
+    nav.querySelectorAll('.tab').forEach(btn=>{
+      const key = btn.dataset.route;
+      const img = btn.querySelector('img.icoImg');
+      if(!img) return;
+      const file = (key==='workouts') ? 'workouts.png' : (key + '.png');
+      const next = base + file;
+      if(img.getAttribute('src') !== next) img.setAttribute('src', next);
+      // In compact mode the icon is tiny; keep it crisp
+      btn.classList.toggle('compactIcons', compact);
+    });
+  }
+
   function setRoute(route) {
     state.route = route;
     const hash = "#" + route;
@@ -1267,6 +1284,16 @@ function render() {
 
     // attach internal route buttons
     $$("[data-route]").forEach(btn=>btn.addEventListener("click", ()=>setRoute(btn.dataset.route)));
+
+    // responsive nav icons (swap to compact set on small screens)
+    if(!window.__navIconResizeBound){
+      window.__navIconResizeBound = true;
+      window.addEventListener("resize", () => {
+        clearTimeout(window.__navIconResizeT);
+        window.__navIconResizeT = setTimeout(updateBottomNavIcons, 80);
+      });
+    }
+    updateBottomNavIcons();
 
     // bottom nav active
     $$(".bottomnav .tab").forEach(t=>t.classList.toggle("active", t.dataset.route===route));

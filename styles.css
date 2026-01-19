@@ -1750,3 +1750,19 @@ html, body { overflow-x: hidden; }
   .finStatsOverlay .finStatValue, .finStatsOverlay .finBalanceValue{font-size:16px}
   .finStatsOverlay .finStatLabel, .finStatsOverlay .finBalanceLabel{font-size:11px}
 }
+
+/* Compact nav icon set (<=420px) */
+.tab.compactIcons .ico{
+  background: rgba(255,255,255,0.06);
+}
+.tab.compactIcons .icoImg{
+  width:28px;
+  height:28px;
+  object-fit:contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+@media (max-width:420px){
+  .tab.compactIcons .ico{width:54px;height:48px;border-radius:14px;}
+  .tab.compactIcons{gap:6px;}
+}

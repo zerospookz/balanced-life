@@ -1,5 +1,5 @@
 
-/* Balanced life v5.8 (workouts plan + import/export) - static SPA */
+/* LifeSync v9.2 (cleanup build) - static SPA */
 (() => {
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
@@ -296,7 +296,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "8.6";
+const APP_VERSION = "9.2";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -1134,25 +1134,8 @@ function viewFinances() {
         <div class="sub">Build: <b>${APP_VERSION}</b></div>
         <div class="sub">Appearance</div>
         <div class="row" style="margin-top:10px;align-items:center">
-          <div class="pill">🌓 Theme:
-            <select id="themeSelect" data-action="setTheme" style="padding:8px 10px;border-radius:12px">
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </div>
+          <div class="pill">🌓 Theme: <b>Dark</b> <span class="small" style="opacity:.8">(locked)</span></div>
         </div>
-        <div class="sub">Feedback</div>
-        <div class="row" style="margin-top:10px;gap:12px;flex-wrap:wrap">
-          <label class="pill" style="display:flex;gap:10px;align-items:center">
-            <input type="checkbox" data-action="toggleHaptics" ${state.prefs && state.prefs.haptics ? "checked" : ""}>
-            Haptics
-          </label>
-          <label class="pill" style="display:flex;gap:10px;align-items:center">
-            <input type="checkbox" data-action="toggleSound" ${state.prefs && state.prefs.sound ? "checked" : ""}>
-            Sound
-          </label>
-        </div>
-
         <div class="sub">Feedback</div>
         <div class="row" style="margin-top:10px;gap:12px;flex-wrap:wrap">
           <label class="pill" style="display:flex;gap:10px;align-items:center">

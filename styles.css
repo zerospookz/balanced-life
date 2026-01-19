@@ -144,9 +144,24 @@ body{
 }
 .tab:active{transform:translateY(1px) scale(.985)}
 
-/* Bottom nav icons: use the image as-is (the file defines the contour) */
-.tab .ico{line-height:0}
-.tab .icoImg{width:74px;height:74px;display:block}
+/* Bottom nav icons: "old" premium style = white tile + clipped image (nothing can bleed outside) */
+.tab .ico{
+  line-height:0;
+  width:74px;
+  height:74px;
+  display:grid;
+  place-items:center;
+  background:rgba(245,246,248,.96);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 8px 20px rgba(0,0,0,.22);
+}
+.tab .icoImg{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover; /* clips any glow/overflow from the PNG */
+}
 .tab span:last-child{font-size:18px;font-weight:700;letter-spacing:.2px}
 
 .tab:not(.active) .icoImg{opacity:.92;filter:saturate(.92) brightness(.92)}
@@ -156,7 +171,7 @@ body{
 @media (max-width:420px){
   .bottomnav{gap:14px;padding:0 12px;bottom:calc(14px + env(safe-area-inset-bottom));}
   .tab{gap:10px;}
-  .tab .icoImg{width:64px;height:64px;}
+  .tab .ico{width:64px;height:64px;border-radius:18px;}
   .tab span:last-child{font-size:16px;}
 }
 

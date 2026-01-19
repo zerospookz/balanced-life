@@ -1010,6 +1010,17 @@ body{overflow-x:hidden}
 
 .finSectionHead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
 .finSearch{min-width:min(340px,100%)}
+.finSearch{
+  width:100%;
+  padding:12px 14px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.06);
+  color:var(--text);
+  outline:none;
+  transition:border-color .18s ease, transform .18s ease;
+}
+.finSearch:focus{border-color:rgba(167,139,250,.45);transform: translateY(-1px)}
 .finSearchInput{width:100%;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:var(--text);outline:none;transition:border-color .18s ease, transform .18s ease}
 .finSearchInput:focus{border-color:rgba(167,139,250,.45);transform: translateY(-1px)}
 
@@ -1075,6 +1086,32 @@ body{overflow-x:hidden}
   .finGoalsGrid2{grid-template-columns:1fr;}
 }
 /* ===== end finances ===== */
+
+/* Finances: match the dark "glass" look from the reference UI */
+:root[data-sky="night"] .finGlass,
+:root[data-sky="night"] .finStatCard,
+:root[data-sky="night"] .finBalancePill,
+:root[data-sky="night"] .finChart,
+:root[data-sky="night"] .finGoalCard2,
+:root[data-sky="night"] .finEntryCard{
+  background: rgba(11,28,45,.72);
+  border-color: rgba(255,255,255,0.10);
+}
+
+:root[data-sky="night"] .finHero::before{
+  opacity: .95;
+}
+
+:root[data-sky="night"] .finEntryDel,
+:root[data-sky="night"] .finIconBtn{
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.14);
+}
+
+:root[data-sky="night"] .finSearch{
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.12);
+}
 
 /* Light theme tuning (finances) */
 :root[data-theme="light"] .finGlass,

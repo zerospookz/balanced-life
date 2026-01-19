@@ -220,12 +220,32 @@ function t(key){
 }
 
 
-function setTheme(theme){
-  // Hard lock to dark for now
-  const t = "dark";
-  document.documentElement.setAttribute("data-theme", t);
-  try{ localStorage.setItem("theme", t); }catch(_){}
+// ===== Theme (light/dark) + sky mode =====
+// data-theme: light|dark (component styling)
+// data-sky: day|night (background + glass tuning)
+const THEME_KEY = "bl_theme_mode"; // light | dark
+
+function applyTheme(mode){
+  const m = (mode === "light") ? "light" : "dark";
+  const root = document.documentElement;
+  root.setAttribute("data-theme", m);
+  root.setAttribute("data-sky", m === "dark" ? "night" : "day");
+  try{ localStorage.setItem(THEME_KEY, m); }catch(_){ }
 }
+
+function getSavedTheme(){
+  try{ return localStorage.getItem(THEME_KEY) || "dark"; }catch(_){ return "dark"; }
+}
+
+function toggleThemeQuick(){
+  const cur = document.documentElement.getAttribute("data-theme") || getSavedTheme();
+  applyTheme(cur === "dark" ? "light" : "dark");
+  // keep the UI consistent
+  render();
+}
+
+// apply theme immediately on load
+applyTheme(getSavedTheme());
 function setLang(lang){
   state.lang = (lang === "bg") ? "bg" : "en";
   updateHeaderUI();
@@ -285,27 +305,6 @@ function habitDisplayName(h){
     }
   }
 
-  
-  // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "6.4.4";
-const THEME_KEY = "bl_theme_mode"; // light | dark
-
-// NOTE v6.9.2: Light theme is temporarily locked.
-function applyTheme(_mode){
-  const root = document.documentElement;
-  const m = "light";
-  root.setAttribute("data-theme", m);
-  root.setAttribute("data-sky", "day");
-  localStorage.setItem(THEME_KEY, m);
-}
-
-applyTheme("light");
-
-function toggleThemeQuick(){
-  // locked for now
-  applyTheme("light");
-}
-
 function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     render(); // keep UI consistent after any write
@@ -313,10 +312,6 @@ function saveState() {
 
   let state = loadState();
 
-  
-  
-  // THEME_LOCK_v702
-  setTheme("dark");
   updateHeaderUI();
   validateRuntime();
 // ---------- Router ----------

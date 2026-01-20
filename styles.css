@@ -2102,9 +2102,11 @@ body{ line-height: 1.45; }
 
 .habitAddBtn.cometWebglBtn .cometWebgl{
   position:absolute;
-  left:-180px;
+  /* v10.1.6: shift canvas slightly right so the comet head sits closer
+     to the pill's right end (matches reference) */
+  left:-140px;
   top:-70px;
-  width: calc(100% + 220px);
+  width: calc(100% + 180px);
   height: calc(100% + 140px);
   z-index:0;
   pointer-events:none;

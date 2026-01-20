@@ -296,7 +296,7 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "9.6";
+const APP_VERSION = "9.7";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -329,19 +329,9 @@ function saveState() {
   updateHeaderUI();
   validateRuntime();
 // ---------- Router ----------
-  function updateBottomNavIcons(){
-    const nav = document.querySelector('.bottomnav');
-    if(!nav) return;
-    nav.querySelectorAll('.tab').forEach(btn=>{
-      const key = btn.dataset.route;
-      const img = btn.querySelector('img.icoImg');
-      if(!img) return;
-      const active = btn.classList.contains('active');
-      const file = `${key}_${active ? 'active' : 'inactive'}.png`;
-      const next = 'icons/nav/full/' + file;
-      if(img.getAttribute('src') !== next) img.setAttribute('src', next);
-    });
-  }
+  // v9.7: Nav uses a single icon per tab (no active/inactive swaps).
+  // Active state is purely CSS-driven.
+  function updateBottomNavIcons(){ /* no-op */ }
 
   function setRoute(route) {
     state.route = route;
@@ -1282,17 +1272,9 @@ function render() {
     // attach internal route buttons
     $$("[data-route]").forEach(btn=>btn.addEventListener("click", ()=>setRoute(btn.dataset.route)));
 
-    // nav icons (active/inactive set)
-    if(!window.__navIconResizeBound){
-      window.__navIconResizeBound = true;
-      window.addEventListener("resize", () => {
-        clearTimeout(window.__navIconResizeT);
-        window.__navIconResizeT = setTimeout(updateBottomNavIcons, 80);
-      });
-    }
     // bottom nav active (set before we compute icon sources)
     $$(".bottomnav .tab").forEach(t=>t.classList.toggle("active", t.dataset.route===route));
-    updateBottomNavIcons();
+    // v9.7: no icon source swapping; active state is handled via CSS.
 
     // actions
     $$("[data-action]").forEach(el=>{ if((el.dataset.action==="selectPlanDay" && el.tagName==="SELECT") || (el.dataset.action==="finQuery" && el.tagName==="INPUT")) return; el.addEventListener("click", handleAction); });

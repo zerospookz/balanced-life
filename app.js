@@ -1336,6 +1336,7 @@ function render() {
 
 // ===== v10.0.4: Habit hero FX (scroll-based comet parallax + tap ripple energy) =====
 let __habitFxBound = false;
+let __habitCometPosBound = false;
 
 function initHabitFX(){
   // Attach ripple handlers on every render (DOM is replaced)
@@ -1344,10 +1345,37 @@ function initHabitFX(){
   // Attach WebGL comet button on every render (DOM is replaced)
   initWebglCometButtons();
 
+  // v10.1.7: Keep the WEEK comet positioned correctly (no scroll-parallax).
+  // Without this, the comet defaults to 0,0 and appears as a bright blob in the card corner.
+  positionHabitComets();
+
   // v10.1.6: Disable scroll-based comet parallax.
   // It can read like the background is moving. Keep ripple + WebGL only.
   if(__habitFxBound) return;
   __habitFxBound = true;
+}
+
+// v10.1.7: position the WEEK comet once (and on resize) without scroll-based motion.
+function positionHabitComets(){
+  const update = ()=>{
+    $$(".habitControls").forEach(el=>{
+      const r = el.getBoundingClientRect();
+      const week = el.querySelector(".weekComfyPill");
+      const fxWeek = el.querySelector(".cometWeek");
+      if(!week || !fxWeek) return;
+      const wr = week.getBoundingClientRect();
+      const ax = (wr.left - r.left) + (wr.width * 0.78);
+      const ay = (wr.top  - r.top)  + (wr.height * 0.18);
+      fxWeek.style.setProperty("--fx-x", ax.toFixed(2) + "px");
+      fxWeek.style.setProperty("--fx-y", ay.toFixed(2) + "px");
+    });
+  };
+
+  requestAnimationFrame(update);
+
+  if(__habitCometPosBound) return;
+  __habitCometPosBound = true;
+  window.addEventListener("resize", ()=>requestAnimationFrame(update), {passive:true});
 }
 
 // ===== v10.1.4: WebGL comet button for + Habit =====
@@ -1363,7 +1391,7 @@ function initWebglCometButtons(){
 
     const vsrc = `\n      attribute vec2 aPos;\n      varying vec2 vUv;\n      void main(){\n        vUv = aPos * 0.5 + 0.5;\n        gl_Position = vec4(aPos, 0.0, 1.0);\n      }\n    `;
 
-    const fsrc = `\n      precision mediump float;\n      varying vec2 vUv;\n      uniform vec2 uRes;\n      uniform float uTime;\n      uniform float uHover;\n\n      float hash(vec2 p){\n        p = fract(p*vec2(123.34, 345.45));\n        p += dot(p, p+34.345);\n        return fract(p.x*p.y);\n      }\n      float noise(vec2 p){\n        vec2 i = floor(p);\n        vec2 f = fract(p);\n        float a = hash(i);\n        float b = hash(i+vec2(1.,0.));\n        float c = hash(i+vec2(0.,1.));\n        float d = hash(i+vec2(1.,1.));\n        vec2 u = f*f*(3.0-2.0*f);\n        return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;\n      }\n\n      float softCircle(vec2 p, vec2 c, float r, float blur){\n        float d = length(p-c);\n        return smoothstep(r+blur, r-blur, d);\n      }\n\n      void main(){\n        vec2 uv = vUv;\n        vec2 p = (uv*2.0 - 1.0);\n        p.x *= uRes.x / uRes.y;\n\n        // v10.1.6: move the comet head closer to the button end (right side)\n        // so the brightest part sits near the capsule tip.\n        vec2 head = vec2(0.78, 0.0);\n        float t = uTime;\n        head.y += 0.03*sin(t*0.9);\n        head.x += 0.01*sin(t*0.6);\n\n        vec2 d = p - head;\n        float along = -d.x;\n        float perp  = abs(d.y);\n\n        float thick = mix(0.10, 0.02, clamp(along*0.6, 0.0, 1.0));\n        float tailCore = exp(-perp*perp/(thick*thick)) * smoothstep(0.0, 0.1, along);\n        float lenFade = exp(-along*1.3);\n        float tail = tailCore * lenFade;\n\n        float headCore = softCircle(p, head, 0.065, 0.05);\n        float headBloom = softCircle(p, head, 0.13, 0.10)*0.85;\n\n        float n = noise(vec2(along*6.0, d.y*18.0 + t*2.2));\n        float sparks = smoothstep(0.78, 0.98, n) * tail * (0.6 + 0.9*uHover);\n\n        vec3 coreCol  = vec3(1.00, 0.93, 0.70);\n        vec3 hotCol   = vec3(1.00, 0.55, 0.25);\n        vec3 rimCol   = vec3(1.00, 0.78, 0.30);\n\n        vec3 col = mix(hotCol, rimCol, clamp(along*0.4, 0.0, 1.0));\n        col = mix(col, coreCol, headCore);\n\n        float shimmer = 0.12 * noise(vec2(uv.x*40.0 + t*0.7, uv.y*40.0 - t*0.9));\n        col += shimmer * vec3(1.0, 0.6, 0.3) * tail;\n\n        float intensity = (headCore*1.4 + headBloom*1.1 + tail*1.0 + sparks*1.2);\n        intensity *= (0.85 + 0.35*uHover);\n        float alpha = clamp(intensity, 0.0, 1.0);\n        col *= (0.75 + 0.65*alpha);\n\n        gl_FragColor = vec4(col, alpha);\n      }\n    `;
+    const fsrc = `\n      precision mediump float;\n      varying vec2 vUv;\n      uniform vec2 uRes;\n      uniform float uTime;\n      uniform float uHover;\n\n      float hash(vec2 p){\n        p = fract(p*vec2(123.34, 345.45));\n        p += dot(p, p+34.345);\n        return fract(p.x*p.y);\n      }\n      float noise(vec2 p){\n        vec2 i = floor(p);\n        vec2 f = fract(p);\n        float a = hash(i);\n        float b = hash(i+vec2(1.,0.));\n        float c = hash(i+vec2(0.,1.));\n        float d = hash(i+vec2(1.,1.));\n        vec2 u = f*f*(3.0-2.0*f);\n        return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;\n      }\n\n      float softCircle(vec2 p, vec2 c, float r, float blur){\n        float d = length(p-c);\n        return smoothstep(r+blur, r-blur, d);\n      }\n\n      void main(){\n        vec2 uv = vUv;\n        vec2 p = (uv*2.0 - 1.0);\n        p.x *= uRes.x / uRes.y;\n\n        // v10.1.6: move the comet head closer to the button end (right side)\n        // so the brightest part sits near the capsule tip.\n        vec2 head = vec2(0.92, 0.0);\n        float t = uTime;\n        head.y += 0.03*sin(t*0.9);\n        head.x += 0.01*sin(t*0.6);\n\n        vec2 d = p - head;\n        float along = -d.x;\n        float perp  = abs(d.y);\n\n        float thick = mix(0.10, 0.02, clamp(along*0.6, 0.0, 1.0));\n        float tailCore = exp(-perp*perp/(thick*thick)) * smoothstep(0.0, 0.1, along);\n        float lenFade = exp(-along*1.3);\n        float tail = tailCore * lenFade;\n\n        float headCore = softCircle(p, head, 0.065, 0.05);\n        float headBloom = softCircle(p, head, 0.13, 0.10)*0.85;\n\n        float n = noise(vec2(along*6.0, d.y*18.0 + t*2.2));\n        float sparks = smoothstep(0.78, 0.98, n) * tail * (0.6 + 0.9*uHover);\n\n        vec3 coreCol  = vec3(1.00, 0.93, 0.70);\n        vec3 hotCol   = vec3(1.00, 0.55, 0.25);\n        vec3 rimCol   = vec3(1.00, 0.78, 0.30);\n\n        vec3 col = mix(hotCol, rimCol, clamp(along*0.4, 0.0, 1.0));\n        col = mix(col, coreCol, headCore);\n\n        float shimmer = 0.12 * noise(vec2(uv.x*40.0 + t*0.7, uv.y*40.0 - t*0.9));\n        col += shimmer * vec3(1.0, 0.6, 0.3) * tail;\n\n        float intensity = (headCore*1.4 + headBloom*1.1 + tail*1.0 + sparks*1.2);\n        intensity *= (0.85 + 0.35*uHover);\n        float alpha = clamp(intensity, 0.0, 1.0);\n        col *= (0.75 + 0.65*alpha);\n\n        gl_FragColor = vec4(col, alpha);\n      }\n    `;
 
     function compile(type, src){
       const s = gl.createShader(type);

@@ -2065,8 +2065,9 @@ body{ line-height: 1.45; }
   /* Match the reference: dark capsule with hot orange rim + strong right-side glow */
   position: relative;
   border-radius:999px !important;
-  padding:16px 30px !important;
-  min-height:56px;
+  /* v10.1.7: make the button a bit smaller/cleaner */
+  padding:12px 22px !important;
+  min-height:46px;
   color: rgba(255,255,255,0.96) !important;
   border: 2px solid rgba(255,190,110,0.82) !important;
   background:
@@ -2102,12 +2103,11 @@ body{ line-height: 1.45; }
 
 .habitAddBtn.cometWebglBtn .cometWebgl{
   position:absolute;
-  /* v10.1.6: shift canvas slightly right so the comet head sits closer
-     to the pill's right end (matches reference) */
-  left:-140px;
-  top:-70px;
-  width: calc(100% + 180px);
-  height: calc(100% + 140px);
+  /* v10.1.7: extend a bit more to the right and push the head toward the end */
+  left:-170px;
+  top:-60px;
+  width: calc(100% + 250px);
+  height: calc(100% + 120px);
   z-index:0;
   pointer-events:none;
   filter: saturate(1.15) contrast(1.05);
@@ -2119,12 +2119,12 @@ body{ line-height: 1.45; }
   z-index:1;
   display:inline-flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
 }
 
 .habitAddBtn.cometWebglBtn .cometBtnPlus{
   font-weight:900;
-  font-size:26px;
+  font-size:22px;
   line-height:1;
   padding: 0;
   border-radius:0;
@@ -2134,7 +2134,7 @@ body{ line-height: 1.45; }
 }
 
 .habitAddBtn.cometWebglBtn .cometBtnText{
-  font-size:22px;
+  font-size:18px;
   font-weight:900;
   letter-spacing:-0.01em;
   text-shadow: 0 2px 10px rgba(0,0,0,0.35);

@@ -33,26 +33,15 @@ body::before{
   content:'';
   position:fixed;
   inset:0;
-  /* v10.0.0: layered gradients (replaces static background image) */
-  background:
-    radial-gradient(1100px 700px at 12% 8%, rgba(255, 77, 255, .12), transparent 60%),
-    radial-gradient(1000px 760px at 88% 18%, rgba(96, 165, 250, .10), transparent 62%),
-    radial-gradient(1200px 900px at 50% 110%, rgba(168, 85, 247, .16), transparent 58%),
-    linear-gradient(180deg, #060918 0%, #140b2a 55%, #040612 100%);
+  background:url('background.png') center/cover no-repeat;
   z-index:-2;
 }
 body::after{
   content:'';
   position:fixed;
   inset:0;
-  /* v10.0.0: grain/noise overlay + subtle vignette */
-  background:
-    radial-gradient(120% 120% at 50% 0%, rgba(0,0,0,.22), transparent 55%),
-    radial-gradient(120% 140% at 50% 120%, rgba(0,0,0,.40), transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-  background-size: auto, auto, 180px 180px;
-  background-repeat: no-repeat, no-repeat, repeat;
-  opacity: 0.85;
+  /* subtle dark overlay so text stays readable while keeping the background image visible */
+  background: linear-gradient(180deg, rgba(5,10,20,.55), rgba(5,10,20,.68));
   z-index:-1;
   pointer-events:none;
 }
@@ -69,36 +58,6 @@ body{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 4px 14px;
   backdrop-filter: blur(10px);
-}
-.brand{display:flex;gap:10px;align-items:center}
-.logo{
-  width:42px;
-  height:42px;
-  /* IMPORTANT: the icon image itself defines the contours (rounded corners/glow).
-     The container must NOT clip or add a frame, otherwise it looks like an icon-in-a-box. */
-  display:block;
-  background:transparent;
-  border:none;
-  box-shadow:none;
-  border-radius:0;
-  overflow:visible;
-}
-.logo:active .logoImg{transform:translateY(1px) scale(.97)}
-.logoImg{
-  width:100%;
-  height:100%;
-  display:block;
-  /* The PNG itself is the square (rounded corners, glow). Fill the slot 1:1. */
-  object-fit:cover;
-  padding:0;
-  border-radius:0;
-  transition: transform .16s ease;
-}
-
-/* Premium micro-interaction just for the logo */
-.logoImg{will-change:transform}
-@media (hover:hover){
-  .logo:hover .logoImg{transform:translateY(-1px) scale(1.03)}
 }
 
 .brandTitle{font-weight:800}

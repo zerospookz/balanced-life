@@ -1987,12 +1987,16 @@ body{ line-height: 1.45; }
 
 /* Comfy week selector container (dark pill with purple glow) */
 .weekComfy{
-  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
-  border:1px solid rgba(255,255,255,0.14);
+  background:
+    radial-gradient(120px 70px at 30% 20%, rgba(255,255,255,0.10), transparent 55%),
+    linear-gradient(180deg, rgba(25,18,55,0.65), rgba(12,10,28,0.55));
+  border:1px solid rgba(210, 140, 255, 0.22);
   box-shadow:
-    0 18px 36px rgba(0,0,0,0.45),
-    0 0 0 1px rgba(185, 70, 255, 0.10) inset,
-    0 0 18px rgba(185, 70, 255, 0.25);
+    0 18px 36px rgba(0,0,0,0.50),
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    inset 0 0 0 2px rgba(140, 70, 255, 0.14),
+    0 0 18px rgba(170, 70, 255, 0.28),
+    0 0 34px rgba(70, 170, 255, 0.14);
   backdrop-filter: blur(10px);
 }
 
@@ -2005,13 +2009,16 @@ body{ line-height: 1.45; }
 /* Inner cyan/blue pill (matches reference) */
 .weekComfyPill{
   position:relative;
-  border:1px solid rgba(120,220,255,0.35);
-  background: linear-gradient(90deg, rgba(20,120,200,0.42), rgba(30,220,255,0.50));
+  border:1px solid rgba(120,220,255,0.48);
+  background:
+    radial-gradient(80px 40px at 35% 25%, rgba(255,255,255,0.18), transparent 60%),
+    linear-gradient(90deg, rgba(0,150,210,0.62), rgba(20,230,255,0.60));
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.22),
+    inset 0 0 0 1px rgba(255,255,255,0.10),
     0 16px 30px rgba(0,0,0,0.40),
-    0 0 22px rgba(70, 170, 255, 0.35),
-    0 0 34px rgba(170, 60, 255, 0.18);
+    0 0 26px rgba(70, 200, 255, 0.42),
+    0 0 38px rgba(170, 60, 255, 0.16);
 }
 
 .weekComfyValue{
@@ -2031,15 +2038,17 @@ body{ line-height: 1.45; }
   border-radius:999px !important;
   padding:14px 22px !important;
   min-height:54px;
-  border:1px solid rgba(255,255,255,0.16) !important;
+  border:1px solid rgba(255,255,255,0.18) !important;
   color: rgba(255,255,255,0.95) !important;
   background:
-    radial-gradient(120px 60px at 30% 20%, rgba(255,255,255,0.22), transparent 55%),
-    linear-gradient(90deg, rgba(255,85,60,0.92), rgba(255,170,40,0.92)) !important;
+    radial-gradient(140px 70px at 30% 25%, rgba(255,255,255,0.20), transparent 55%),
+    linear-gradient(90deg, rgba(255,55,70,0.95), rgba(255,170,40,0.92)) !important;
   box-shadow:
-    0 18px 34px rgba(0,0,0,0.45),
-    0 0 26px rgba(255,70,70,0.55),
-    0 0 42px rgba(255,160,40,0.38);
+    0 18px 36px rgba(0,0,0,0.48),
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    inset 0 0 0 2px rgba(255,255,255,0.10),
+    0 0 30px rgba(255,70,70,0.62),
+    0 0 46px rgba(255,160,40,0.40);
   backdrop-filter: blur(6px);
   transform: translateZ(0);
 }
@@ -2105,67 +2114,42 @@ body{ line-height: 1.45; }
   --c2y: 0px;
 }
 
-/* Shared settings */
-.habitControls::before,
-.habitControls::after{
+/* Match reference precisely: use a real comet plate image behind the controls.
+   We keep it behind the pills but above the card background. */
+.habitControls::before{
   content:"";
   position:absolute;
   pointer-events:none;
-  /* Keep comets visible: behind the pills, not behind the whole card */
   z-index:0;
-  opacity:0.95;
+
+  /* Placement tuned for the control cluster (week + add) */
+  right:-220px;
+  top:-150px;
+  width:980px;
+  height:420px;
+
+  /* Use the user-provided reference plate (contains both comets) */
+  background-image: url('./assets/ui/habit_comets_ref.png');
+  background-repeat: no-repeat;
+  background-size: 980px auto;
+  background-position: 0 0;
+
+  /* Parallax offsets */
+  transform: translate3d(calc(var(--c1x) * 1), calc(var(--c1y) * 1), 0);
+
+  /* Make it pop like the reference */
+  opacity: 0.98;
   mix-blend-mode: screen;
+  filter:
+    saturate(1.25)
+    contrast(1.08)
+    drop-shadow(0 0 22px rgba(90,180,255,0.35))
+    drop-shadow(0 0 28px rgba(180,80,255,0.28))
+    drop-shadow(0 0 26px rgba(255,140,60,0.30));
 }
 
-/* Blue/purple comet (behind week selector) */
-.habitControls::before{
-  right:140px;
-  top:-26px;
-  width:420px;
-  height:190px;
-  transform: translate3d(var(--c1x), var(--c1y), 0) rotate(-10deg);
-  background:
-    radial-gradient(60px 60px at 18% 55%, rgba(255,255,255,0.65), transparent 60%),
-    radial-gradient(140px 90px at 22% 52%, rgba(160,60,255,0.85), transparent 65%),
-    radial-gradient(180px 120px at 34% 58%, rgba(0,210,255,0.70), transparent 70%),
-    linear-gradient(115deg,
-      transparent 0%,
-      rgba(0,210,255,0.0) 28%,
-      rgba(0,210,255,0.55) 40%,
-      rgba(165,70,255,0.55) 52%,
-      rgba(255,255,255,0.18) 58%,
-      transparent 72%
-    );
-  filter:
-    blur(0.2px)
-    drop-shadow(0 0 18px rgba(120,70,255,0.55))
-    drop-shadow(0 0 30px rgba(0,210,255,0.35));
-}
-
-/* Orange comet (behind +Habit button) */
-.habitControls::after{
-  right:-40px;
-  top:-34px;
-  width:420px;
-  height:220px;
-  transform: translate3d(var(--c2x), var(--c2y), 0) rotate(12deg);
-  background:
-    radial-gradient(70px 70px at 38% 48%, rgba(255,255,255,0.70), transparent 62%),
-    radial-gradient(160px 110px at 45% 52%, rgba(255,120,40,0.85), transparent 68%),
-    radial-gradient(220px 140px at 60% 56%, rgba(255,40,60,0.65), transparent 72%),
-    linear-gradient(60deg,
-      transparent 0%,
-      rgba(255,70,60,0.0) 30%,
-      rgba(255,70,60,0.55) 44%,
-      rgba(255,165,40,0.62) 56%,
-      rgba(255,255,255,0.16) 62%,
-      transparent 78%
-    );
-  filter:
-    blur(0.2px)
-    drop-shadow(0 0 18px rgba(255,90,60,0.60))
-    drop-shadow(0 0 34px rgba(255,170,40,0.40));
-}
+/* Disable the old synthetic second layer */
+.habitControls::after{ content:none; }
 
 /* Make pills sit "on top" of the comets */
 .weekComfy,

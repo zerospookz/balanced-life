@@ -2080,6 +2080,51 @@ body{ line-height: 1.45; }
   transform: translateZ(0);
 }
 
+/* ===== v10.1.4: WebGL Comet Button for + Habit (no comet plate image) ===== */
+.habitAddBtn.cometWebglBtn{
+  position: relative;
+  overflow: visible; /* canvas extends past the pill */
+}
+
+.habitAddBtn.cometWebglBtn .cometWebgl{
+  position:absolute;
+  left:-180px;
+  top:-70px;
+  width: calc(100% + 220px);
+  height: calc(100% + 140px);
+  z-index:0;
+  pointer-events:none;
+  filter: saturate(1.15) contrast(1.05);
+  mix-blend-mode: screen;
+}
+
+.habitAddBtn.cometWebglBtn .cometBtnContent{
+  position:relative;
+  z-index:1;
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+}
+
+.habitAddBtn.cometWebglBtn .cometBtnPlus{
+  font-weight:900;
+  font-size:26px;
+  line-height:1;
+  padding: 6px 12px;
+  border-radius:999px;
+  background: rgba(0,0,0,0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    0 10px 18px rgba(0,0,0,0.25);
+}
+
+.habitAddBtn.cometWebglBtn .cometBtnText{
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-0.01em;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+}
+
 .habitAddBtn:hover{
   filter: brightness(1.04);
 }

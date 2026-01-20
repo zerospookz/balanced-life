@@ -524,7 +524,7 @@ function saveState() {
           </div>
           <div class="habitControls">
             <div class="cometFx cometWeek" aria-hidden="true"></div>
-            <div class="cometFx cometAdd" aria-hidden="true"></div>
+            <!-- Add-comet is now rendered by a WebGL canvas inside the + Habit button (v10.1.4) -->
             <div class="weekComfy" title="${t("week")}">
               <div class="weekComfyLabel">${t("week")}</div>
               <div class="weekComfyPill rippleHost" data-ripple="cyan">
@@ -535,10 +535,11 @@ function saveState() {
               </select>
               </div>
             </div>
-            <button class="btn addPill habitAddBtn rippleHost" data-ripple="orange" type="button" data-action="addHabit">
-              <span class="addPillInner">
-                <span class="addPillPlus">+</span>
-                <span class="addPillText">${t("addHabit")}</span>
+            <button class="btn habitAddBtn cometWebglBtn" type="button" data-action="addHabit" aria-label="${t("addHabit")}">
+              <canvas class="cometWebgl" aria-hidden="true"></canvas>
+              <span class="cometBtnContent">
+                <span class="cometBtnPlus">+</span>
+                <span class="cometBtnText">${t("addHabit").replace(/^\+\s*/,"")}</span>
               </span>
             </button>
           </div>
@@ -1340,10 +1341,119 @@ function initHabitFX(){
   // Attach ripple handlers on every render (DOM is replaced)
   initRipples();
 
+  // Attach WebGL comet button on every render (DOM is replaced)
+  initWebglCometButtons();
+
   // Bind one global scroll/resize loop for comet parallax
   if(__habitFxBound) return;
   __habitFxBound = true;
   initCometParallax();
+}
+
+// ===== v10.1.4: WebGL comet button for + Habit =====
+function initWebglCometButtons(){
+  $$(".cometWebglBtn").forEach(btn=>{
+    if(btn.__glCometInit) return;
+    const canvas = btn.querySelector("canvas.cometWebgl");
+    if(!canvas) return;
+
+    btn.__glCometInit = true;
+    const gl = canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false });
+    if(!gl) return;
+
+    const vsrc = `\n      attribute vec2 aPos;\n      varying vec2 vUv;\n      void main(){\n        vUv = aPos * 0.5 + 0.5;\n        gl_Position = vec4(aPos, 0.0, 1.0);\n      }\n    `;
+
+    const fsrc = `\n      precision mediump float;\n      varying vec2 vUv;\n      uniform vec2 uRes;\n      uniform float uTime;\n      uniform float uHover;\n\n      float hash(vec2 p){\n        p = fract(p*vec2(123.34, 345.45));\n        p += dot(p, p+34.345);\n        return fract(p.x*p.y);\n      }\n      float noise(vec2 p){\n        vec2 i = floor(p);\n        vec2 f = fract(p);\n        float a = hash(i);\n        float b = hash(i+vec2(1.,0.));\n        float c = hash(i+vec2(0.,1.));\n        float d = hash(i+vec2(1.,1.));\n        vec2 u = f*f*(3.0-2.0*f);\n        return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;\n      }\n\n      float softCircle(vec2 p, vec2 c, float r, float blur){\n        float d = length(p-c);\n        return smoothstep(r+blur, r-blur, d);\n      }\n\n      void main(){\n        vec2 uv = vUv;\n        vec2 p = (uv*2.0 - 1.0);\n        p.x *= uRes.x / uRes.y;\n\n        // head slightly to the right so the tail flows left\n        vec2 head = vec2(0.55, 0.0);\n        float t = uTime;\n        head.y += 0.03*sin(t*0.9);\n        head.x += 0.01*sin(t*0.6);\n\n        vec2 d = p - head;\n        float along = -d.x;\n        float perp  = abs(d.y);\n\n        float thick = mix(0.10, 0.02, clamp(along*0.6, 0.0, 1.0));\n        float tailCore = exp(-perp*perp/(thick*thick)) * smoothstep(0.0, 0.1, along);\n        float lenFade = exp(-along*1.3);\n        float tail = tailCore * lenFade;\n\n        float headCore = softCircle(p, head, 0.065, 0.05);\n        float headBloom = softCircle(p, head, 0.13, 0.10)*0.85;\n\n        float n = noise(vec2(along*6.0, d.y*18.0 + t*2.2));\n        float sparks = smoothstep(0.78, 0.98, n) * tail * (0.6 + 0.9*uHover);\n\n        vec3 coreCol  = vec3(1.00, 0.93, 0.70);\n        vec3 hotCol   = vec3(1.00, 0.55, 0.25);\n        vec3 rimCol   = vec3(1.00, 0.78, 0.30);\n\n        vec3 col = mix(hotCol, rimCol, clamp(along*0.4, 0.0, 1.0));\n        col = mix(col, coreCol, headCore);\n\n        float shimmer = 0.12 * noise(vec2(uv.x*40.0 + t*0.7, uv.y*40.0 - t*0.9));\n        col += shimmer * vec3(1.0, 0.6, 0.3) * tail;\n\n        float intensity = (headCore*1.4 + headBloom*1.1 + tail*1.0 + sparks*1.2);\n        intensity *= (0.85 + 0.35*uHover);\n        float alpha = clamp(intensity, 0.0, 1.0);\n        col *= (0.75 + 0.65*alpha);\n\n        gl_FragColor = vec4(col, alpha);\n      }\n    `;
+
+    function compile(type, src){
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+        console.error(gl.getShaderInfoLog(s));
+        gl.deleteShader(s);
+        return null;
+      }
+      return s;
+    }
+    function link(vs, fs){
+      const p = gl.createProgram();
+      gl.attachShader(p, vs);
+      gl.attachShader(p, fs);
+      gl.linkProgram(p);
+      if(!gl.getProgramParameter(p, gl.LINK_STATUS)){
+        console.error(gl.getProgramInfoLog(p));
+        gl.deleteProgram(p);
+        return null;
+      }
+      return p;
+    }
+
+    const vs = compile(gl.VERTEX_SHADER, vsrc);
+    const fs = compile(gl.FRAGMENT_SHADER, fsrc);
+    const prog = (vs && fs) ? link(vs, fs) : null;
+    if(!prog) return;
+
+    const quad = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1,-1,  1,-1, -1, 1,
+      -1, 1,  1,-1,  1, 1
+    ]), gl.STATIC_DRAW);
+
+    const aPos = gl.getAttribLocation(prog, "aPos");
+    const uRes = gl.getUniformLocation(prog, "uRes");
+    const uTime = gl.getUniformLocation(prog, "uTime");
+    const uHover = gl.getUniformLocation(prog, "uHover");
+
+    let hover = 0;
+    btn.addEventListener("mouseenter", ()=> hover = 1);
+    btn.addEventListener("mouseleave", ()=> hover = 0);
+    btn.addEventListener("focus", ()=> hover = 1);
+    btn.addEventListener("blur", ()=> hover = 0);
+
+    function resizeToButton(){
+      const r = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const w = Math.floor(r.width * dpr);
+      const h = Math.floor(r.height * dpr);
+      if (canvas.width !== w || canvas.height !== h){
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0,0,w,h);
+      }
+      gl.useProgram(prog);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+    }
+
+    const ro = ("ResizeObserver" in window) ? new ResizeObserver(()=>resizeToButton()) : null;
+    if(ro) ro.observe(canvas);
+
+    const start = performance.now();
+    function frame(now){
+      if(!btn.isConnected){
+        try{ ro && ro.disconnect(); }catch(_e){}
+        return;
+      }
+      resizeToButton();
+      const t = (now - start) / 1000;
+
+      gl.useProgram(prog);
+      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+      gl.clearColor(0,0,0,0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      gl.uniform1f(uTime, t);
+      gl.uniform1f(uHover, hover);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
 }
 
 function initRipples(){

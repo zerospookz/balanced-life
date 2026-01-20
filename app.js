@@ -522,7 +522,7 @@ function saveState() {
               <span class="mutedInline">${t("thisWeek")}</span> • ${start} → ${days[6]}
             </div>
           </div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+          <div class="habitControls">
             <div class="weekComfy" title="${t("week")}">
               <div class="weekComfyLabel">${t("week")}</div>
               <div class="weekComfyPill">

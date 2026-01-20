@@ -523,6 +523,8 @@ function saveState() {
             </div>
           </div>
           <div class="habitControls">
+            <div class="cometFx cometWeek" aria-hidden="true"></div>
+            <div class="cometFx cometAdd" aria-hidden="true"></div>
             <div class="weekComfy" title="${t("week")}">
               <div class="weekComfyLabel">${t("week")}</div>
               <div class="weekComfyPill rippleHost" data-ripple="cyan">
@@ -535,8 +537,8 @@ function saveState() {
             </div>
             <button class="btn addPill habitAddBtn rippleHost" data-ripple="orange" type="button" data-action="addHabit">
               <span class="addPillInner">
-                <span class="addPillText">${t("addHabit")}</span>
                 <span class="addPillPlus">+</span>
+                <span class="addPillText">${t("addHabit")}</span>
               </span>
             </button>
           </div>
@@ -1384,15 +1386,33 @@ function initCometParallax(){
       // Normalize around viewport center; clamp to avoid extreme jumps
       let d = (center - vCenter) / vh;
       if(d>0.6) d=0.6; if(d<-0.6) d=-0.6;
-      // Subtle offsets (px)
-      const c1x = (d * 14);
-      const c1y = (d * -18);
-      const c2x = (d * 18);
-      const c2y = (d * -14);
-      el.style.setProperty("--c1x", c1x.toFixed(2) + "px");
-      el.style.setProperty("--c1y", c1y.toFixed(2) + "px");
-      el.style.setProperty("--c2x", c2x.toFixed(2) + "px");
-      el.style.setProperty("--c2y", c2y.toFixed(2) + "px");
+
+      // Parallax offsets (px)
+      const px = (d * 16);
+      const py = (d * -22);
+
+      // Position comet FX so it always sits behind the pills (desktop + mobile)
+      const week = el.querySelector(".weekComfyPill");
+      const add  = el.querySelector(".habitAddBtn");
+      const fxWeek = el.querySelector(".cometWeek");
+      const fxAdd  = el.querySelector(".cometAdd");
+
+      if(week && fxWeek){
+        const wr = week.getBoundingClientRect();
+        // anchor near the right side of the pill (comet head behind it)
+        const ax = (wr.left - r.left) + (wr.width * 0.68);
+        const ay = (wr.top  - r.top)  + (wr.height * 0.15);
+        fxWeek.style.setProperty("--fx-x", (ax + px).toFixed(2) + "px");
+        fxWeek.style.setProperty("--fx-y", (ay + py).toFixed(2) + "px");
+      }
+
+      if(add && fxAdd){
+        const ar = add.getBoundingClientRect();
+        const ax = (ar.left - r.left) + (ar.width * 0.68);
+        const ay = (ar.top  - r.top)  + (ar.height * 0.08);
+        fxAdd.style.setProperty("--fx-x", (ax + px).toFixed(2) + "px");
+        fxAdd.style.setProperty("--fx-y", (ay + py).toFixed(2) + "px");
+      }
     }
   };
 

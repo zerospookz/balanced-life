@@ -2141,42 +2141,93 @@ body{ line-height: 1.45; }
   --c2y: 0px;
 }
 
-/* Match reference precisely: use a real comet plate image behind the controls.
-   We keep it behind the pills but above the card background. */
-.habitControls::before{
+/* v10.0.9: Remove comet image plate and recreate the effect procedurally.
+   Two layered comets sit behind the pills but above the card background.
+   Built from gradients + spark dots, so it scales and doesn't introduce hard bands. */
+.habitControls::before,
+.habitControls::after{
   content:"";
   position:absolute;
   pointer-events:none;
-  z-index:0;
-
-  /* Placement tuned for the control cluster (week + add) */
-  right:-220px;
-  top:-150px;
-  width:980px;
-  height:420px;
-
-  /* Use the user-provided reference plate (contains both comets) */
-  background-image: url('./assets/ui/habit_comets_ref.png');
-  background-repeat: no-repeat;
-  background-size: 980px auto;
-  background-position: 0 0;
-
-  /* Parallax offsets */
-  transform: translate3d(calc(var(--c1x) * 1), calc(var(--c1y) * 1), 0);
-
-  /* Make it pop like the reference */
-  opacity: 0.98;
+  z-index:1;
+  opacity:0.98;
   mix-blend-mode: screen;
+  transform: translate3d(0,0,0) rotate(-12deg);
+  filter:
+    saturate(1.2)
+    contrast(1.05)
+    blur(0.6px)
+    drop-shadow(0 0 18px rgba(120,180,255,0.32))
+    drop-shadow(0 0 22px rgba(180,80,255,0.22));
+}
+
+/* Blue/Purple comet behind the Week selector */
+.habitControls::before{
+  right:-120px;
+  top:-78px;
+  width:540px;
+  height:190px;
+  transform:
+    translate3d(calc(var(--c1x) * 1), calc(var(--c1y) * 1), 0)
+    rotate(-12deg);
+  background:
+    /* spark dots */
+    radial-gradient(circle at 52% 44%, rgba(255,255,255,0.85) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 60% 48%, rgba(255,255,255,0.65) 0 1px, transparent 2px),
+    radial-gradient(circle at 66% 40%, rgba(210,240,255,0.55) 0 1.1px, transparent 2.2px),
+    radial-gradient(circle at 72% 52%, rgba(210,240,255,0.40) 0 1px, transparent 2.4px),
+    radial-gradient(circle at 76% 36%, rgba(255,120,255,0.35) 0 1px, transparent 2.6px),
+    /* wide glow */
+    radial-gradient(closest-side at 46% 56%, rgba(90,210,255,0.55), transparent 72%),
+    radial-gradient(closest-side at 42% 58%, rgba(170,90,255,0.55), transparent 74%),
+    /* core streak */
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(60,160,255,0.00) 18%,
+      rgba(210,255,255,0.85) 40%,
+      rgba(80,200,255,1.00) 48%,
+      rgba(140,120,255,0.80) 56%,
+      rgba(255,255,255,0.00) 78%,
+      transparent 100%
+    );
+}
+
+/* Orange/Red comet behind the + Habit button */
+.habitControls::after{
+  right:-12px;
+  top:-62px;
+  width:520px;
+  height:190px;
+  transform:
+    translate3d(calc(var(--c2x) * 1), calc(var(--c2y) * 1), 0)
+    rotate(-12deg);
   filter:
     saturate(1.25)
     contrast(1.08)
-    drop-shadow(0 0 22px rgba(90,180,255,0.35))
-    drop-shadow(0 0 28px rgba(180,80,255,0.28))
-    drop-shadow(0 0 26px rgba(255,140,60,0.30));
+    blur(0.6px)
+    drop-shadow(0 0 18px rgba(255,140,60,0.34))
+    drop-shadow(0 0 22px rgba(255,80,60,0.22));
+  background:
+    /* spark dots */
+    radial-gradient(circle at 58% 44%, rgba(255,255,255,0.80) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 64% 50%, rgba(255,255,255,0.55) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 40%, rgba(255,220,180,0.55) 0 1.1px, transparent 2.2px),
+    radial-gradient(circle at 74% 56%, rgba(255,220,180,0.38) 0 1px, transparent 2.4px),
+    radial-gradient(circle at 80% 36%, rgba(255,120,80,0.35) 0 1px, transparent 2.6px),
+    /* wide glow */
+    radial-gradient(closest-side at 54% 56%, rgba(255,140,60,0.62), transparent 72%),
+    radial-gradient(closest-side at 48% 58%, rgba(255,80,60,0.40), transparent 74%),
+    /* core streak */
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(255,140,60,0.00) 18%,
+      rgba(255,255,200,0.75) 40%,
+      rgba(255,170,80,1.00) 50%,
+      rgba(255,90,60,0.80) 60%,
+      rgba(255,255,255,0.00) 80%,
+      transparent 100%
+    );
 }
-
-/* Disable the old synthetic second layer */
-.habitControls::after{ content:none; }
 
 /* Make pills sit "on top" of the comets */
 .weekComfy,

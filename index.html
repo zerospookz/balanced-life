@@ -36,13 +36,74 @@
 
     <main id="view" class="view"></main>
 
-    <nav class="bottomnav" aria-label="Bottom navigation">
-      <!-- v9.8.x: Standard text navigation (icons removed completely) -->
-      <button class="tab" data-route="home" aria-label="Home"><span class="label">Home</span></button>
-      <button class="tab" data-route="finances" aria-label="Finances"><span class="label">Finances</span></button>
-      <button class="tab" data-route="nutrition" aria-label="Nutrition"><span class="label">Nutrition</span></button>
-      <button class="tab" data-route="habits" aria-label="Habits"><span class="label">Habits</span></button>
-      <button class="tab" data-route="workouts" aria-label="Workouts"><span class="label">Workouts</span></button>
+    <nav class="bottomnav neonNav" aria-label="Bottom navigation">
+      <!-- v9.9.x: Neon icon navigation (NO image icons; inline SVG only) -->
+
+      <button class="tab neonTab home" data-route="home" aria-label="Home">
+        <span class="navIcon" aria-hidden="true">
+          <!-- Home -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 10.5L12 3l9 7.5" />
+            <path d="M5 10.5V21h14V10.5" />
+            <path d="M9 21v-6h6v6" />
+          </svg>
+        </span>
+        <span class="label">Home</span>
+      </button>
+
+      <button class="tab neonTab finance" data-route="finances" aria-label="Finances">
+        <span class="navIcon" aria-hidden="true">
+          <!-- Wallet -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7a3 3 0 0 1 3-3h11a2 2 0 0 1 2 2v1" />
+            <path d="M3 7v12a3 3 0 0 0 3 3h13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H6a3 3 0 0 1-3-3Z" />
+            <path d="M19 13h3" />
+          </svg>
+        </span>
+        <span class="label">Finance</span>
+      </button>
+
+      <button class="tab neonTab nutrition" data-route="nutrition" aria-label="Nutrition">
+        <span class="navIcon" aria-hidden="true">
+          <!-- Carrot -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 3c-2 1-3 2-4 4" />
+            <path d="M21 8c-2-1-4-1-6 0" />
+            <path d="M4 20c5-1 10-6 12-12" />
+            <path d="M4 20c1-5 6-10 12-12" />
+          </svg>
+        </span>
+        <span class="label">Nutrition</span>
+      </button>
+
+      <button class="tab neonTab workouts" data-route="workouts" aria-label="Workouts">
+        <span class="navIcon" aria-hidden="true">
+          <!-- Dumbbell -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 10v4" />
+            <path d="M7 9v6" />
+            <path d="M17 9v6" />
+            <path d="M21 10v4" />
+            <path d="M7 12h10" />
+          </svg>
+        </span>
+        <span class="label">Workouts</span>
+      </button>
+
+      <button class="tab neonTab habits" data-route="habits" aria-label="Habits">
+        <span class="navIcon" aria-hidden="true">
+          <!-- Checklist -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 6h12" />
+            <path d="M9 12h12" />
+            <path d="M9 18h12" />
+            <path d="M3.5 6.5l1.5 1.5 2.5-3" />
+            <path d="M3.5 12.5l1.5 1.5 2.5-3" />
+            <path d="M3.5 18.5l1.5 1.5 2.5-3" />
+          </svg>
+        </span>
+        <span class="label">Habits</span>
+      </button>
     </nav>
   </div>
 

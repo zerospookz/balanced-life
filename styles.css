@@ -130,60 +130,6 @@ body{
    purple bar. NO image icons are used.
 ------------------------------------------------------------- */
 
-/* ------------------------------------------------------------
-   v10.0.5 — Image-based navigation
-   Uses a single background image for the nav visuals and places
-   5 invisible click zones on top (one per tab).
-------------------------------------------------------------- */
-
-.bottomnav.imageNav{
-  align-items:stretch;
-  padding:0;
-  border:0;
-  border-radius:0;
-  background: transparent;
-  box-shadow:none;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-
-  /* The provided navigation artwork */
-  background-image: url("assets/nav_buttons.png");
-  background-repeat:no-repeat;
-  background-position: center bottom;
-  background-size: contain;
-
-  /* Keep a predictable hit area and preserve iOS/Android tap size */
-  height: 150px;
-}
-
-/* The 5 click zones are real buttons but visually invisible */
-.bottomnav.imageNav .navZone{
-  flex:1;
-  border:0;
-  margin:0;
-  padding:0;
-  display:block;
-  height:100%;
-  background:transparent;
-  color:transparent;
-  cursor:pointer;
-}
-
-/* Disable legacy button press transforms for this image-based nav */
-.bottomnav.imageNav .navZone:active{ transform:none; }
-
-/* Accessibility: allow keyboard users to see focus */
-.bottomnav.imageNav .navZone:focus{ outline:none; }
-.bottomnav.imageNav .navZone:focus-visible{
-  outline:2px solid rgba(255,255,255,.55);
-  outline-offset:-6px;
-  border-radius:18px;
-}
-
-@media (max-width:420px){
-  .bottomnav.imageNav{ height: 130px; }
-}
-
 .bottomnav.neonNav{
   align-items:center;
   padding:14px 14px 12px;
@@ -2144,6 +2090,9 @@ body{ line-height: 1.45; }
 /* ===== v10.0.3 Habit tracker: comet streaks behind Week/+Habit controls (match reference) ===== */
 .habitControls{
   position:relative;
+  /* Local stacking context so comet layers can sit behind pills but above the card background */
+  isolation:isolate;
+  z-index:0;
   display:flex;
   gap:12px;
   align-items:center;
@@ -2162,7 +2111,8 @@ body{ line-height: 1.45; }
   content:"";
   position:absolute;
   pointer-events:none;
-  z-index:-1;
+  /* Keep comets visible: behind the pills, not behind the whole card */
+  z-index:0;
   opacity:0.95;
   mix-blend-mode: screen;
 }
@@ -2221,7 +2171,7 @@ body{ line-height: 1.45; }
 .weekComfy,
 .habitAddBtn{
   position:relative;
-  z-index:1;
+  z-index:2;
 }
 
 /* ===== v10.0.4 Tap ripple energy (buttons) ===== */

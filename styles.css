@@ -2095,6 +2095,11 @@ body{ line-height: 1.45; }
   align-items:center;
   flex-wrap:wrap;
   justify-content:flex-end;
+  /* v10.0.4: scroll-parallax offsets for comet layers */
+  --c1x: 0px;
+  --c1y: 0px;
+  --c2x: 0px;
+  --c2y: 0px;
 }
 
 /* Shared settings */
@@ -2114,7 +2119,7 @@ body{ line-height: 1.45; }
   top:-26px;
   width:420px;
   height:190px;
-  transform: rotate(-10deg);
+  transform: translate3d(var(--c1x), var(--c1y), 0) rotate(-10deg);
   background:
     radial-gradient(60px 60px at 18% 55%, rgba(255,255,255,0.65), transparent 60%),
     radial-gradient(140px 90px at 22% 52%, rgba(160,60,255,0.85), transparent 65%),
@@ -2139,7 +2144,7 @@ body{ line-height: 1.45; }
   top:-34px;
   width:420px;
   height:220px;
-  transform: rotate(12deg);
+  transform: translate3d(var(--c2x), var(--c2y), 0) rotate(12deg);
   background:
     radial-gradient(70px 70px at 38% 48%, rgba(255,255,255,0.70), transparent 62%),
     radial-gradient(160px 110px at 45% 52%, rgba(255,120,40,0.85), transparent 68%),
@@ -2163,6 +2168,38 @@ body{ line-height: 1.45; }
 .habitAddBtn{
   position:relative;
   z-index:1;
+}
+
+/* ===== v10.0.4 Tap ripple energy (buttons) ===== */
+.rippleHost{
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ripple{
+  position: absolute;
+  border-radius: 999px;
+  transform: scale(0);
+  opacity: 0.9;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: rippleEnergy 520ms ease-out forwards;
+  background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0.12) 35%, transparent 70%);
+}
+
+.ripple[data-tone="cyan"]{
+  background: radial-gradient(circle, rgba(140,230,255,0.75), rgba(0,210,255,0.18) 38%, transparent 72%);
+}
+
+.ripple[data-tone="orange"]{
+  background: radial-gradient(circle, rgba(255,235,170,0.75), rgba(255,140,60,0.22) 40%, transparent 74%);
+}
+
+@keyframes rippleEnergy{
+  0%{ transform: scale(0); opacity: 0.0; }
+  8%{ opacity: 0.95; }
+  100%{ transform: scale(1); opacity: 0; }
 }
 
 /* Slightly punchier button glows to match reference */

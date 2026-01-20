@@ -525,7 +525,7 @@ function saveState() {
           <div class="habitControls">
             <div class="weekComfy" title="${t("week")}">
               <div class="weekComfyLabel">${t("week")}</div>
-              <div class="weekComfyPill">
+              <div class="weekComfyPill rippleHost" data-ripple="cyan">
                 <span class="weekComfyValue">${escapeHtml(savedLabel)}</span>
                 <span class="weekComfyCaret">▾</span>
                 <select class="weekComfySelect" data-action="setHabitWeekFull">
@@ -533,7 +533,7 @@ function saveState() {
               </select>
               </div>
             </div>
-            <button class="btn addPill habitAddBtn" type="button" data-action="addHabit">
+            <button class="btn addPill habitAddBtn rippleHost" data-ripple="orange" type="button" data-action="addHabit">
               <span class="addPillInner">
                 <span class="addPillText">${t("addHabit")}</span>
                 <span class="addPillPlus">+</span>
@@ -1289,7 +1289,91 @@ function render() {
     $$("[data-action='importPlanFile']").forEach(el=>el.addEventListener("change", handleImportPlan));
     $$("[data-action='importAllFile']").forEach(el=>el.addEventListener("change", handleImportAll));
     if(route==="finances") requestAnimationFrame(()=>initFinancesUI());
+
+    // v10.0.4: habit hero effects (comet parallax + tap ripple)
+    initHabitFX();
   });
+}
+
+// ===== v10.0.4: Habit hero FX (scroll-based comet parallax + tap ripple energy) =====
+let __habitFxBound = false;
+
+function initHabitFX(){
+  // Attach ripple handlers on every render (DOM is replaced)
+  initRipples();
+
+  // Bind one global scroll/resize loop for comet parallax
+  if(__habitFxBound) return;
+  __habitFxBound = true;
+  initCometParallax();
+}
+
+function initRipples(){
+  $$(".rippleHost").forEach(el=>{
+    if(el.__hasRipple) return;
+    el.__hasRipple = true;
+    el.addEventListener("pointerdown", (e)=>{
+      // Only primary pointer
+      if(e.button!==undefined && e.button!==0) return;
+      const rect = el.getBoundingClientRect();
+      const size = Math.ceil(Math.max(rect.width, rect.height) * 1.6);
+      const x = (e.clientX - rect.left) - size/2;
+      const y = (e.clientY - rect.top) - size/2;
+      const r = document.createElement("span");
+      r.className = "ripple";
+      r.style.width = size + "px";
+      r.style.height = size + "px";
+      r.style.left = x + "px";
+      r.style.top = y + "px";
+      // Optional: pick a tone
+      const tone = el.getAttribute("data-ripple") || "white";
+      r.setAttribute("data-tone", tone);
+      el.appendChild(r);
+      r.addEventListener("animationend", ()=> r.remove(), {once:true});
+      // Fallback cleanup
+      setTimeout(()=>{ try{ r.remove(); }catch(_){} }, 900);
+    }, {passive:true});
+  });
+}
+
+function initCometParallax(){
+  const update = ()=>{
+    const els = $$(".habitControls");
+    if(!els.length) return;
+    const vh = window.innerHeight || 1;
+    const vCenter = vh / 2;
+    for(const el of els){
+      const r = el.getBoundingClientRect();
+      const center = r.top + r.height/2;
+      // Normalize around viewport center; clamp to avoid extreme jumps
+      let d = (center - vCenter) / vh;
+      if(d>0.6) d=0.6; if(d<-0.6) d=-0.6;
+      // Subtle offsets (px)
+      const c1x = (d * 14);
+      const c1y = (d * -18);
+      const c2x = (d * 18);
+      const c2y = (d * -14);
+      el.style.setProperty("--c1x", c1x.toFixed(2) + "px");
+      el.style.setProperty("--c1y", c1y.toFixed(2) + "px");
+      el.style.setProperty("--c2x", c2x.toFixed(2) + "px");
+      el.style.setProperty("--c2y", c2y.toFixed(2) + "px");
+    }
+  };
+
+  let raf = 0;
+  const tick = ()=>{
+    raf = 0;
+    update();
+  };
+  const schedule = ()=>{
+    if(raf) return;
+    raf = requestAnimationFrame(tick);
+  };
+
+  window.addEventListener("scroll", schedule, {passive:true});
+  window.addEventListener("resize", schedule, {passive:true});
+  // Initial
+  requestAnimationFrame(update);
 }
 
 function handleAction(e) {

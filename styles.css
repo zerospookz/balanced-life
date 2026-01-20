@@ -2141,23 +2141,50 @@ body{ line-height: 1.45; }
   position:absolute;
   pointer-events:none;
   z-index:1;
-  width:640px;
-  height:240px;
-  opacity:1;
+  /* Smaller plate so it doesn't smear across the whole card */
+  width:520px;
+  height:180px;
+  opacity:0.95;
   mix-blend-mode: screen;
-  transform: translate3d(var(--fx-x, 0px), var(--fx-y, 0px), 0) rotate(-12deg);
-  /* stronger presence + glow, and avoid mask-composite (inconsistent across browsers) */
-  filter: saturate(1.55) contrast(1.28) drop-shadow(0 0 18px rgba(255,255,255,0.12));
-  /* streak silhouette (cross-browser) */
-  clip-path: polygon(0% 44%, 18% 34%, 62% 18%, 100% 34%, 100% 66%, 62% 82%, 18% 66%, 0% 56%);
+  /* Anchor comet HEAD near the button; tail flows left */
+  transform:
+    translate3d(
+      calc(var(--fx-x, 0px) - 460px),
+      calc(var(--fx-y, 0px) - 70px),
+      0
+    )
+    rotate(var(--fx-rot, -12deg));
+  filter: saturate(1.75) contrast(1.35)
+          drop-shadow(0 0 22px rgba(255,255,255,0.16))
+          drop-shadow(0 0 46px rgba(120,120,255,0.10));
+  /* comet silhouette (tapered tail + rounded head) */
+  clip-path: polygon(
+    0% 58%,
+    30% 46%,
+    62% 26%,
+    100% 40%,
+    100% 60%,
+    62% 78%,
+    30% 60%,
+    0% 48%
+  );
 }
 
 @media (max-width: 520px){
   .cometFx{
-    width:560px;
-    height:220px;
-    opacity:1;
-    filter: saturate(1.6) contrast(1.3) drop-shadow(0 0 20px rgba(255,255,255,0.14));
+    width:480px;
+    height:170px;
+    opacity:0.98;
+    transform:
+      translate3d(
+        calc(var(--fx-x, 0px) - 430px),
+        calc(var(--fx-y, 0px) - 74px),
+        0
+      )
+      rotate(var(--fx-rot, -12deg));
+    filter: saturate(1.8) contrast(1.4)
+            drop-shadow(0 0 24px rgba(255,255,255,0.18))
+            drop-shadow(0 0 52px rgba(120,120,255,0.12));
   }
 }
 
@@ -2174,79 +2201,111 @@ body{ line-height: 1.45; }
 .cometWeek{
   left:0;
   top:0;
+  --fx-rot: -12deg;
 }
 
 .cometWeek::before{
-  /* wide glow + tail */
+  /* Head burst + glow body + tail fade (looks like a comet, not a prism) */
   background:
-    radial-gradient(closest-side at 78% 50%, rgba(255,255,255,0.95), rgba(120,240,255,0.55) 26%, rgba(90,180,255,0.18) 55%, transparent 78%),
-    radial-gradient(closest-side at 72% 44%, rgba(190,110,255,0.70), rgba(120,80,255,0.22) 56%, transparent 78%),
+    /* HEAD burst (electric) */
+    radial-gradient(circle at 96% 50%,
+      rgba(255,255,255,1) 0 14px,
+      rgba(120,240,255,0.95) 14px 36px,
+      rgba(160,110,255,0.70) 36px 62px,
+      transparent 64px),
+    /* Body glow */
+    radial-gradient(ellipse at 86% 50%,
+      rgba(90,220,255,0.42),
+      rgba(80,160,255,0.18) 52%,
+      transparent 74%),
+    /* Tail tint */
     linear-gradient(90deg,
       rgba(60,120,255,0.00) 0%,
       rgba(80,120,255,0.10) 18%,
-      rgba(90,220,255,0.28) 42%,
-      rgba(0,0,0,0) 72%);
-  filter: blur(6px);
+      rgba(90,220,255,0.26) 46%,
+      rgba(0,0,0,0) 78%);
+  filter: blur(7px);
 }
 
 .cometWeek::after{
-  /* laser core + sparks */
+  /* Core streak + dense sparks + tiny trail particles */
   background:
-    /* ultra-thin core */
+    /* CORE (thin bright spine) */
     linear-gradient(90deg,
       transparent 0%,
-      transparent 20%,
-      rgba(255,255,255,0.00) 46%,
-      rgba(240,255,255,1.00) 49.2%,
-      rgba(90,220,255,1.00) 50.0%,
-      rgba(170,120,255,0.85) 50.8%,
-      rgba(255,255,255,0.00) 56%,
+      transparent 14%,
+      rgba(255,255,255,0.0) 44%,
+      rgba(255,255,255,1.0) 49.3%,
+      rgba(120,240,255,1.0) 50.0%,
+      rgba(190,110,255,0.95) 50.7%,
+      rgba(255,255,255,0.0) 54%,
       transparent 100%),
-    /* sparks near head */
-    radial-gradient(circle at 74% 40%, rgba(255,255,255,0.95) 0 1.2px, transparent 3.2px),
-    radial-gradient(circle at 76% 60%, rgba(255,255,255,0.75) 0 1.1px, transparent 3.0px),
-    radial-gradient(circle at 82% 46%, rgba(210,240,255,0.70) 0 1.3px, transparent 3.4px),
-    radial-gradient(circle at 86% 56%, rgba(255,120,255,0.55) 0 1.2px, transparent 3.6px),
-    radial-gradient(circle at 70% 52%, rgba(140,220,255,0.55) 0 1.1px, transparent 3.2px);
-  filter: blur(1.3px);
+    /* Spark explosion near head */
+    radial-gradient(circle at 92% 44%, rgba(255,255,255,0.95) 0 1.6px, transparent 4.6px),
+    radial-gradient(circle at 94% 58%, rgba(255,255,255,0.78) 0 1.4px, transparent 4.3px),
+    radial-gradient(circle at 90% 52%, rgba(210,240,255,0.80) 0 1.6px, transparent 4.7px),
+    radial-gradient(circle at 88% 40%, rgba(255,120,255,0.70) 0 1.4px, transparent 4.4px),
+    radial-gradient(circle at 96% 50%, rgba(140,220,255,0.85) 0 1.8px, transparent 5.1px),
+    /* Tail particles */
+    radial-gradient(circle at 70% 48%, rgba(180,220,255,0.35) 0 1px, transparent 3.4px),
+    radial-gradient(circle at 58% 56%, rgba(220,170,255,0.28) 0 1px, transparent 3.4px),
+    radial-gradient(circle at 46% 44%, rgba(160,220,255,0.22) 0 1px, transparent 3.2px);
+  filter: blur(0.9px);
 }
 
 /* ADD comet (orange/red) */
 .cometAdd{
   left:0;
   top:0;
-  transform: translate3d(var(--fx-x, 0px), var(--fx-y, 0px), 0) rotate(-10deg);
+  --fx-rot: -10deg;
 }
 
 .cometAdd::before{
   background:
-    radial-gradient(closest-side at 78% 50%, rgba(255,255,255,0.95), rgba(255,220,150,0.55) 24%, rgba(255,120,60,0.22) 54%, transparent 78%),
-    radial-gradient(closest-side at 72% 44%, rgba(255,80,50,0.78), rgba(255,60,60,0.24) 58%, transparent 80%),
+    /* HEAD burst (fiery) */
+    radial-gradient(circle at 96% 50%,
+      rgba(255,255,255,1) 0 14px,
+      rgba(255,230,160,0.95) 14px 34px,
+      rgba(255,120,60,0.78) 34px 62px,
+      rgba(255,70,50,0.45) 62px 78px,
+      transparent 80px),
+    /* Body glow */
+    radial-gradient(ellipse at 86% 50%,
+      rgba(255,180,90,0.36),
+      rgba(255,120,60,0.16) 52%,
+      transparent 74%),
+    /* Tail tint */
     linear-gradient(90deg,
       rgba(255,80,60,0.00) 0%,
-      rgba(255,80,60,0.14) 20%,
-      rgba(255,180,90,0.22) 44%,
-      rgba(0,0,0,0) 74%);
-  filter: blur(6px);
+      rgba(255,80,60,0.14) 22%,
+      rgba(255,180,90,0.20) 50%,
+      rgba(0,0,0,0) 80%);
+  filter: blur(7px);
 }
 
 .cometAdd::after{
   background:
+    /* CORE (thin bright spine) */
     linear-gradient(90deg,
       transparent 0%,
-      transparent 20%,
-      rgba(255,255,255,0.00) 46%,
-      rgba(255,255,230,1.00) 49.2%,
-      rgba(255,170,90,1.00) 50.0%,
-      rgba(255,90,60,0.92) 50.8%,
-      rgba(255,255,255,0.00) 56%,
+      transparent 14%,
+      rgba(255,255,255,0.0) 44%,
+      rgba(255,255,240,1.0) 49.3%,
+      rgba(255,190,110,1.0) 50.0%,
+      rgba(255,90,60,0.98) 50.7%,
+      rgba(255,255,255,0.0) 54%,
       transparent 100%),
-    radial-gradient(circle at 74% 40%, rgba(255,255,255,0.95) 0 1.2px, transparent 3.2px),
-    radial-gradient(circle at 76% 60%, rgba(255,255,255,0.72) 0 1.1px, transparent 3.0px),
-    radial-gradient(circle at 82% 46%, rgba(255,220,180,0.70) 0 1.3px, transparent 3.5px),
-    radial-gradient(circle at 86% 56%, rgba(255,120,80,0.65) 0 1.2px, transparent 3.7px),
-    radial-gradient(circle at 70% 52%, rgba(255,190,120,0.55) 0 1.1px, transparent 3.2px);
-  filter: blur(1.3px);
+    /* Spark explosion near head */
+    radial-gradient(circle at 92% 44%, rgba(255,255,255,0.95) 0 1.6px, transparent 4.6px),
+    radial-gradient(circle at 94% 58%, rgba(255,255,255,0.76) 0 1.4px, transparent 4.3px),
+    radial-gradient(circle at 90% 52%, rgba(255,220,180,0.78) 0 1.6px, transparent 4.7px),
+    radial-gradient(circle at 88% 40%, rgba(255,140,90,0.74) 0 1.4px, transparent 4.4px),
+    radial-gradient(circle at 96% 50%, rgba(255,190,120,0.82) 0 1.8px, transparent 5.1px),
+    /* Tail particles */
+    radial-gradient(circle at 70% 48%, rgba(255,210,150,0.28) 0 1px, transparent 3.4px),
+    radial-gradient(circle at 58% 56%, rgba(255,150,100,0.22) 0 1px, transparent 3.4px),
+    radial-gradient(circle at 46% 44%, rgba(255,220,160,0.18) 0 1px, transparent 3.2px);
+  filter: blur(0.9px);
 }
 
 /* Pills above FX */

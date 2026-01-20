@@ -723,6 +723,19 @@ function viewFinances() {
     const incomePct = pctChange(thisM.income, prevM.income);
     const expensePct = pctChange(thisM.expense, prevM.expense);
 
+    // v10.0.8: focus/highlight logic
+    // - default focus is based on dominant totals (income vs expenses)
+    // - user can click the stat cards to focus a series
+    const dominant = (() => {
+      const incV = Number(thisM.income || 0);
+      const expV = Number(thisM.expense || 0);
+      if (!incV && !expV) return "both";
+      return (incV >= expV) ? "income" : "expense";
+    })();
+    const focus = (state._finFocus && ["income","expense","both"].includes(state._finFocus))
+      ? state._finFocus
+      : dominant;
+
     // last 28 days chart
     const start28 = (() => {
       const d = new Date(today + "T00:00:00");
@@ -740,6 +753,9 @@ function viewFinances() {
       const points = (key) => series.map((d, i) => `${(pad + i * xStep).toFixed(2)},${y(d[key]).toFixed(2)}`).join(" ");
       const pInc = points("income");
       const pExp = points("expense");
+
+      const hasIncome = series.some(x => Number(x.income || 0) > 0);
+      const hasExpense = series.some(x => Number(x.expense || 0) > 0);
 
       const last = series[series.length - 1] || { income: 0, expense: 0 };
       const lastX = (pad + (series.length - 1) * xStep).toFixed(2);
@@ -770,27 +786,35 @@ function viewFinances() {
               return `<line x1="${pad}" y1="${yy.toFixed(2)}" x2="${W - pad}" y2="${yy.toFixed(2)}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
             }).join("")}
 
-            <polyline id="finIncLine" points="${pInc}" fill="none" stroke="url(#gInc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="chart-line-income"/>
-            <polyline id="finExpLine" points="${pExp}" fill="none" stroke="url(#gExp)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="chart-line-expense"/>
+            ${hasIncome ? `<polyline id="finIncLine" points="${pInc}" fill="none" stroke="url(#gInc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="chart-line-income"/>` : ``}
+            ${hasExpense ? `<polyline id="finExpLine" points="${pExp}" fill="none" stroke="url(#gExp)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="chart-line-expense"/>` : ``}
 
             ${series.map((pt, i) => {
               const cx = (pad + i * xStep).toFixed(2);
               const cyI = y(pt.income).toFixed(2);
               const cyE = y(pt.expense).toFixed(2);
               return `
-                <circle class="chart-dot hit" cx="${cx}" cy="${cyI}" r="10" fill="transparent" data-kind="income" data-i="${i}" data-val="${pt.income}" />
-                <circle class="chart-dot hit" cx="${cx}" cy="${cyE}" r="10" fill="transparent" data-kind="expense" data-i="${i}" data-val="${pt.expense}" />
+                ${hasIncome ? `<circle class="chart-dot hit" cx="${cx}" cy="${cyI}" r="10" fill="transparent" data-kind="income" data-i="${i}" data-val="${pt.income}" />` : ``}
+                ${hasExpense ? `<circle class="chart-dot hit" cx="${cx}" cy="${cyE}" r="10" fill="transparent" data-kind="expense" data-i="${i}" data-val="${pt.expense}" />` : ``}
               `;
             }).join("")}
 
-            <circle cx="${lastX}" cy="${y(last.income).toFixed(2)}" r="6" fill="rgba(52,211,153,1)"/>
-            <circle cx="${lastX}" cy="${y(last.expense).toFixed(2)}" r="6" fill="rgba(239,68,68,1)"/>
+            ${hasIncome ? `<circle cx="${lastX}" cy="${y(last.income).toFixed(2)}" r="6" fill="rgba(52,211,153,1)"/>` : ``}
+            ${hasExpense ? `<circle cx="${lastX}" cy="${y(last.expense).toFixed(2)}" r="6" fill="rgba(239,68,68,1)"/>` : ``}
           </svg>
           <div id="finChartTip" class="finChartTip" hidden></div>
 
           <div class="finLegend">
-            <span class="finLegendItem"><span class="finDot inc"></span>Income</span>
-            <span class="finLegendItem"><span class="finDot exp"></span>Expenses</span>
+            ${hasIncome ? `
+              <span class="finLegendItem ${focus === "income" ? "active" : ""}" data-action="finFocus" data-kind="income" role="button" tabindex="0" aria-label="Focus income">
+                <span class="finDot inc"></span>Income
+              </span>
+            ` : ``}
+            ${hasExpense ? `
+              <span class="finLegendItem ${focus === "expense" ? "active" : ""}" data-action="finFocus" data-kind="expense" role="button" tabindex="0" aria-label="Focus expenses">
+                <span class="finDot exp"></span>Expenses
+              </span>
+            ` : ``}
           </div>
         </div>
       `;
@@ -966,9 +990,9 @@ function viewFinances() {
             </button>
           </div>
 
-          <div class="finChartShell">
+          <div class="finChartShell ${focus === "income" ? "focus-income" : (focus === "expense" ? "focus-expense" : "focus-both")}">
             <div class="finStats finStatsOverlay">
-              <div class="finStatCard positive">
+              <div class="finStatCard positive ${focus === "income" ? "active" : ""}" data-action="finFocus" data-kind="income" role="button" tabindex="0" aria-label="Focus income">
                 <div class="finStatLabel">Income</div>
                 <div class="finStatRow">
                   <div class="finStatValue">+ ${fmtMoneyBGN(thisM.income)}</div>
@@ -982,7 +1006,7 @@ function viewFinances() {
                 <div class="finPager"><span></span><span></span><span class="on"></span><span></span><span></span></div>
               </div>
 
-              <div class="finStatCard negative">
+              <div class="finStatCard negative ${focus === "expense" ? "active" : ""}" data-action="finFocus" data-kind="expense" role="button" tabindex="0" aria-label="Focus expenses">
                 <div class="finStatLabel">Expenses</div>
                 <div class="finStatRow">
                   <div class="finStatValue">- ${fmtMoneyBGN(thisM.expense)}</div>
@@ -1235,6 +1259,18 @@ function initFinancesUI(){
       h.addEventListener("mouseleave", ()=> tip.hidden=true);
     });
   }
+
+  // keyboard accessibility for focus toggles
+  $$('[data-action="finFocus"]').forEach(el=>{
+    if(el.__finFocusKey) return;
+    el.__finFocusKey = true;
+    el.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        el.click();
+      }
+    });
+  });
 }
 
 // ===== APP_GUARD_v697 (refactor barrier) =====
@@ -1386,6 +1422,16 @@ function handleAction(e) {
     if(a==="setHabitWeekFull") { state._habitWeekFull = e.currentTarget.value; saveState(); return render(); }
     if(a==="addHabit") return openAddHabit();
     if(a==="addFinance") return openAddFinance();
+
+    // ----- Finances: focus income/expenses (chart + stat highlight) -----
+    if(a==="finFocus") {
+      const kind = (e.currentTarget.dataset.kind || "both");
+      const cur = state._finFocus || "";
+      // toggle: clicking the same focus resets to both
+      state._finFocus = (cur === kind) ? "both" : (kind === "income" || kind === "expense" ? kind : "both");
+      saveState();
+      return render();
+    }
 
     // ----- Finances goals -----
     if(a==="addGoal") return openAddGoal();
@@ -1579,16 +1625,25 @@ function exportJSON(obj, filename) {
       const close = () => closeModal();
       $("#cancel").addEventListener("click", close);
 
+      const pillWrap = document.querySelector('.finTypePills');
+
       // type pills
       $$(".finTypePill").forEach(b=>{
         b.addEventListener("click", ()=>{
           $$(".finTypePill").forEach(x=>x.classList.remove("active"));
           b.classList.add("active");
           $("#fType").value = b.dataset.ftype || "expense";
+          if(pillWrap){
+            pillWrap.classList.toggle('is-income', $("#fType").value === 'income');
+            pillWrap.classList.toggle('is-expense', $("#fType").value === 'expense');
+          }
           // small UX: if income, default category salary
           if($("#fType").value==="income") setCategory("salary");
         });
       });
+
+      // initial
+      if(pillWrap){ pillWrap.classList.add('is-expense'); }
 
       const setCategory = (id)=>{
         $("#fCategory").value = id;

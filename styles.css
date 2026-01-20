@@ -33,15 +33,26 @@ body::before{
   content:'';
   position:fixed;
   inset:0;
-  background:url('background.png') center/cover no-repeat;
+  /* v10.0.0: layered gradients (replaces static background image) */
+  background:
+    radial-gradient(1100px 700px at 12% 8%, rgba(255, 77, 255, .12), transparent 60%),
+    radial-gradient(1000px 760px at 88% 18%, rgba(96, 165, 250, .10), transparent 62%),
+    radial-gradient(1200px 900px at 50% 110%, rgba(168, 85, 247, .16), transparent 58%),
+    linear-gradient(180deg, #060918 0%, #140b2a 55%, #040612 100%);
   z-index:-2;
 }
 body::after{
   content:'';
   position:fixed;
   inset:0;
-  /* subtle dark overlay so text stays readable while keeping the background image visible */
-  background: linear-gradient(180deg, rgba(5,10,20,.55), rgba(5,10,20,.68));
+  /* v10.0.0: grain/noise overlay + subtle vignette */
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(0,0,0,.22), transparent 55%),
+    radial-gradient(120% 140% at 50% 120%, rgba(0,0,0,.40), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  background-size: auto, auto, 180px 180px;
+  background-repeat: no-repeat, no-repeat, repeat;
+  opacity: 0.85;
   z-index:-1;
   pointer-events:none;
 }
@@ -178,6 +189,21 @@ body{
   -webkit-backdrop-filter: none;
 }
 
+/* v10.0.0: ambient glow anchor behind the nav */
+.bottomnav.neonNav::before{
+  content:"";
+  position:absolute;
+  inset:-18px -10px -26px -10px;
+  border-radius:36px;
+  background:
+    radial-gradient(80% 140% at 50% 120%, rgba(255,77,255,.18), transparent 65%),
+    radial-gradient(70% 140% at 20% 120%, rgba(96,165,250,.12), transparent 70%),
+    radial-gradient(70% 140% at 80% 120%, rgba(168,85,247,.10), transparent 70%);
+  filter: blur(10px);
+  z-index:-1;
+  pointer-events:none;
+}
+
 .tab.neonTab{
   color:rgba(255,255,255,.92);
   gap:6px;
@@ -199,17 +225,33 @@ body{
 
 .tab.neonTab .label{
   font-size:13px;
-  font-weight:800;
-  letter-spacing:.2px;
+  font-weight:700;
+  letter-spacing:.25px;
   text-shadow: 0 0 10px rgba(0,0,0,.35);
+  transition: transform .16s ease, opacity .16s ease;
 }
 
+/* v10.0.0: micro-animations */
+.tab.neonTab .navIcon svg{
+  transition: transform .16s ease, filter .16s ease, opacity .16s ease;
+  opacity: .88;
+}
+.tab.neonTab.active .navIcon svg{
+  opacity: 1;
+  transform: translateY(-1px) scale(1.04);
+  filter: drop-shadow(0 0 10px rgba(255,77,255,.55));
+}
+.tab.neonTab:active .navIcon svg{
+  transform: translateY(0px) scale(0.98);
+}
+.tab.neonTab.active .label{ transform: translateY(1px); }
+
 /* Per-tab accent used for underline + label emphasis (icons are multi-color via SVG gradients) */
-.tab.neonTab.home{ --neon:#ff4dff; }
-.tab.neonTab.finance{ --neon:#8b5cf6; }
-.tab.neonTab.nutrition{ --neon:#f59e0b; }
-.tab.neonTab.workouts{ --neon:#fb7185; }
-.tab.neonTab.habits{ --neon:#ff7ad9; }
+/* v10.0.0: tighten color hierarchy
+   - One PRIMARY neon drives interaction (underline + glow)
+   - Icons can stay multi-color, but the selection language is consistent */
+:root{ --primaryNeon:#ff4dff; }
+.tab.neonTab{ --neon: var(--primaryNeon); }
 
 /* Active state: stronger glow + subtle underline */
 .tab.neonTab{ position:relative; }
@@ -518,6 +560,47 @@ body{
 .card{
   border: 1px solid var(--cardBorder, rgba(0,0,0,.06));
   box-shadow: var(--shadow);
+}
+
+/* ============================================================
+   v10.0.0 — Final spacing + typography pass (global polish)
+   - Slightly more breathing room
+   - Cleaner hierarchy
+   - Better readability against neon/space background
+============================================================ */
+
+.app{ padding:16px 16px 112px; }
+
+.section{ padding:18px; margin:14px 0; }
+
+.h1{
+  font-size:20px;
+  letter-spacing:-0.01em;
+  line-height:1.2;
+}
+
+.sub{
+  font-size:13px;
+  letter-spacing:0.01em;
+  opacity:0.92;
+}
+
+.card{
+  border:1px solid rgba(255,255,255,.10);
+}
+
+.kpi{
+  background: rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.kpi .v{ font-size:24px; letter-spacing:-0.01em; }
+
+/* Better tap rhythm on small screens */
+@media (max-width:420px){
+  .app{ padding:14px 14px 106px; }
+  .section{ padding:16px; }
+  .h1{ font-size:18px; }
 }
 .modalCard{ border: 1px solid var(--cardBorder, rgba(0,0,0,.08)); }
 .modalHead{ border-bottom: 1px solid var(--cardDivider, rgba(0,0,0,.06)); }
@@ -1848,4 +1931,48 @@ html, body { overflow-x: hidden; }
 @media (max-width:420px){
   .tab.compactIcons .ico{width:54px;height:48px;border-radius:14px;}
   .tab.compactIcons{gap:6px;}
+}
+
+/* ============================================================
+   v10.0.0 — Global polish overrides (final)
+   These are placed at the end of the file to win specificity.
+============================================================ */
+
+:root{
+  --primaryNeon:#ff4dff;
+  --textSoft: rgba(255,255,255,.88);
+}
+
+body{ line-height: 1.45; }
+
+.app{ padding:16px 16px 112px; }
+
+.h1{ font-size:20px; letter-spacing:-0.01em; }
+.sub{ opacity:.92; }
+
+.section{ padding:18px; margin:14px 0; }
+.card{ border-color: rgba(255,255,255,.08); }
+
+.kpi{ background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); }
+.kpi .l{ opacity:.92; }
+
+.bottomnav.neonNav{ box-shadow: 0 20px 65px rgba(0,0,0,.65), 0 0 44px rgba(255,77,255,.10); }
+
+.tab.neonTab{ color: var(--textSoft); }
+.tab.neonTab.active{ color:#fff; }
+
+.tab.neonTab.active::after{
+  transition: transform .16s ease, opacity .16s ease, filter .16s ease;
+  transform: translateY(0);
+}
+
+.tab.neonTab:not(.active)::after{
+  opacity: 0;
+  transform: translateY(2px);
+}
+
+@media (max-width:520px){
+  .app{ padding:14px 14px 110px !important; }
+  .h1{ font-size:18px; }
+  .section{ padding:16px; }
 }

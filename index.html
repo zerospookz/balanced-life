@@ -92,28 +92,28 @@
 
       <button class="tab neonTab nutrition" data-route="nutrition" aria-label="Nutrition">
         <span class="navIcon" aria-hidden="true">
-          <!-- Nutrition (carrot, neon multi-color) -->
+          <!-- Nutrition (fork + knife, neon outline) -->
           <svg class="navSvg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <defs>
-              <linearGradient id="g_nut_carrot" x1="6" y1="20" x2="18" y2="6" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stop-color="#fb923c"/>
-                <stop offset="0.6" stop-color="#f59e0b"/>
-                <stop offset="1" stop-color="#fbbf24"/>
-              </linearGradient>
-              <linearGradient id="g_nut_leaf" x1="14" y1="3" x2="22" y2="11" gradientUnits="userSpaceOnUse">
+              <linearGradient id="g_nut" x1="4" y1="20" x2="20" y2="4" gradientUnits="userSpaceOnUse">
                 <stop offset="0" stop-color="#22c55e"/>
-                <stop offset="1" stop-color="#86efac"/>
+                <stop offset="0.55" stop-color="#38bdf8"/>
+                <stop offset="1" stop-color="#a78bfa"/>
               </linearGradient>
               <filter id="f_nut" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="0" dy="0" stdDeviation="1.2" flood-color="#f59e0b" flood-opacity="0.75"/>
-                <feDropShadow dx="0" dy="0" stdDeviation="2.6" flood-color="#22c55e" flood-opacity="0.40"/>
+                <feDropShadow dx="0" dy="0" stdDeviation="1.4" flood-color="#38bdf8" flood-opacity="0.75"/>
+                <feDropShadow dx="0" dy="0" stdDeviation="2.8" flood-color="#22c55e" flood-opacity="0.35"/>
               </filter>
             </defs>
-            <g fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" filter="url(#f_nut)">
-              <path d="M20 3c-2 1-3 2-4 4" stroke="url(#g_nut_leaf)" />
-              <path d="M21 8c-2-1-4-1-6 0" stroke="url(#g_nut_leaf)" />
-              <path d="M4 20c5-1 10-6 12-12" stroke="url(#g_nut_carrot)" />
-              <path d="M4 20c1-5 6-10 12-12" stroke="url(#g_nut_carrot)" />
+            <g fill="none" stroke="url(#g_nut)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" filter="url(#f_nut)">
+              <!-- Fork -->
+              <path d="M7 3v7" />
+              <path d="M5.5 3v7" />
+              <path d="M8.5 3v7" />
+              <path d="M7 10v11" />
+              <!-- Knife -->
+              <path d="M15 3c2 3 2 6 0 9v9" />
+              <path d="M17 3v18" />
             </g>
           </svg>
         </span>

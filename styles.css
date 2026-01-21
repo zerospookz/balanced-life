@@ -1801,7 +1801,11 @@ body{overflow-x:hidden}
     position:sticky;
     top:0;
     z-index:5;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(180deg, rgba(6,14,28,0.72), rgba(6,14,28,0.35));
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-top: env(safe-area-inset-top, 0px);
   }
 }
 
@@ -2685,9 +2689,11 @@ body{ font-feature-settings: "tnum"; }
 .habitStats .kpi .v{ letter-spacing: -0.02em; }
 
 @media (max-width:520px){
-  .habitHeadRow,.habitRow{ grid-template-columns: minmax(150px,1.2fr) repeat(7, 34px); }
-  .habitBox{ width: 26px; height: 26px; border-radius: 10px; }
+  /* v10.2.3: tighter phone grid so ALL 7 days always fit (no cutoff) */
+  .habitHeadRow,.habitRow{ grid-template-columns: minmax(120px, 1fr) repeat(7, minmax(22px, 1fr)); }
+  .habitBox{ width: clamp(22px, 6vw, 26px); height: clamp(22px, 6vw, 26px); border-radius: 10px; }
   .habitHeadRow{ padding: 8px 10px 10px; }
+  .habitDay{ font-size: 11px; }
 }
 
 /* ===== v10.2.1 Habit tracker: header layout polish + ensure 7-day grid fits on phones ===== */
@@ -2726,24 +2732,37 @@ body{ font-feature-settings: "tnum"; }
   text-shadow: 0 6px 20px rgba(0,0,0,0.45);
 }
 
-/* Phone: stack controls if space is too tight */
+/* Phone: make header compact + balanced (week + add live on the same row) */
 @media (max-width: 420px){
   .habitSectionFix .cardHead{
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
   }
-  .habitSectionFix .cardHead > div:first-child{ grid-column: 1; grid-row: 1 / span 2; }
-  .habitControls{ justify-items:start; }
-  .habitControls .habitAddBtn{ grid-row: 4; justify-self:start; }
-  .habitControls .weekComfy{ grid-row: 3; justify-self:start; }
+  .habitSectionFix .cardHead > div:first-child{ width:100%; }
+  .habitControls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:flex-start;
+    align-items:center;
+    width:100%;
+  }
+  .habitControls .weekComfy{ flex: 1 1 220px; min-width: 0; }
+  .habitControls .habitAddBtn{ flex: 0 0 auto; }
+  /* keep the week pill from feeling oversized */
+  .weekComfy{ padding: 9px 12px; }
+  .weekComfyPill{ padding: 9px 12px; }
+  .weekComfyValue{ font-size: 12px; }
 }
 
 /* Ensure all 7 days are visible on narrow screens without horizontal scrolling */
 @media (max-width: 420px){
   .habitWrap{ overflow-x: hidden; }
   .habitHeadRow,.habitRow{
-    grid-template-columns: minmax(110px, 1fr) repeat(7, minmax(22px, 1fr));
-    gap: 8px;
+    /* slightly tighter than v10.2.1 to guarantee the last day never clips */
+    grid-template-columns: minmax(96px, 1fr) repeat(7, minmax(20px, 1fr));
+    gap: 6px;
   }
   .habitDay{ font-size: 11px; }
   .habitBox{
@@ -2751,10 +2770,12 @@ body{ font-feature-settings: "tnum"; }
     height: clamp(22px, 6vw, 26px);
     border-radius: 10px;
   }
+  .habitRow{ padding: 10px 10px; }
+  .habitHeadRow{ padding: 8px 10px 10px; }
 }
 
 @media (max-width: 360px){
-  .habitHeadRow,.habitRow{ grid-template-columns: minmax(96px, 1fr) repeat(7, minmax(20px, 1fr)); gap: 7px; }
+  .habitHeadRow,.habitRow{ grid-template-columns: minmax(88px, 1fr) repeat(7, minmax(18px, 1fr)); gap: 5px; }
   .habitIcon{ font-size: 16px; }
   .chip{ transform: scale(0.95); }
 }

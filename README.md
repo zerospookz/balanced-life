@@ -1,7 +1,7 @@
 # LifeSync
 
 ## Build
-**v10.1.8** — Habit hero: comet head aligned to button edge + blue energy wash expanded across the whole card
+**v10.2.0** — Visual refresh: clearer hierarchy + card-like habit rows + upgraded checkboxes + premium KPI tiles
 
 Static PWA (offline-first) - open index.html or serve with a static server.
 

@@ -1,7 +1,7 @@
 # LifeSync
 
 ## Build
-**v10.2.1** — Habit header layout polish (better hierarchy/spacing) + mobile fix to always show all 7 days
+**v10.2.2** — Logo blends into background (glass + subtle blend) + Finances page polish (better search input + premium cards)
 
 Static PWA (offline-first) - open index.html or serve with a static server.
 

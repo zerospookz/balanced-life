@@ -2592,3 +2592,72 @@ body{ font-feature-settings: "tnum"; }
   .habitBox{ width: 26px; height: 26px; border-radius: 10px; }
   .habitHeadRow{ padding: 8px 10px 10px; }
 }
+
+/* ===== v10.2.1 Habit tracker: header layout polish + ensure 7-day grid fits on phones ===== */
+
+/* Header: make the hero feel intentional (Title + Add on row 1, Range + Week on row 2) */
+.habitSectionFix .cardHead{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 10px 14px;
+  align-items:start;
+}
+
+/* Left block (title + range) */
+.habitSectionFix .cardHead > div:first-child{ grid-column: 1; grid-row: 1 / span 2; }
+
+/* Right block (week + add) becomes a 2-row grid */
+.habitControls{
+  display:grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  row-gap: 10px;
+  justify-items:end;
+  align-items:center;
+}
+
+/* Place +Habit on top-right, week selector under it */
+.habitControls .habitAddBtn{ grid-row: 1; }
+.habitControls .weekComfy{ grid-row: 2; }
+
+/* Slightly stronger readability for the title/range over the cinematic header */
+.habitTitle{
+  text-shadow: 0 8px 28px rgba(0,0,0,0.55);
+}
+.habitRange{
+  text-shadow: 0 6px 20px rgba(0,0,0,0.45);
+}
+
+/* Phone: stack controls if space is too tight */
+@media (max-width: 420px){
+  .habitSectionFix .cardHead{
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+  .habitSectionFix .cardHead > div:first-child{ grid-column: 1; grid-row: 1 / span 2; }
+  .habitControls{ justify-items:start; }
+  .habitControls .habitAddBtn{ grid-row: 4; justify-self:start; }
+  .habitControls .weekComfy{ grid-row: 3; justify-self:start; }
+}
+
+/* Ensure all 7 days are visible on narrow screens without horizontal scrolling */
+@media (max-width: 420px){
+  .habitWrap{ overflow-x: hidden; }
+  .habitHeadRow,.habitRow{
+    grid-template-columns: minmax(110px, 1fr) repeat(7, minmax(22px, 1fr));
+    gap: 8px;
+  }
+  .habitDay{ font-size: 11px; }
+  .habitBox{
+    width: clamp(22px, 6vw, 26px);
+    height: clamp(22px, 6vw, 26px);
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 360px){
+  .habitHeadRow,.habitRow{ grid-template-columns: minmax(96px, 1fr) repeat(7, minmax(20px, 1fr)); gap: 7px; }
+  .habitIcon{ font-size: 16px; }
+  .chip{ transform: scale(0.95); }
+}

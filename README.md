@@ -1,7 +1,7 @@
 # LifeSync
 
 ## Build
-**v10.2.0** — Visual refresh: clearer hierarchy + card-like habit rows + upgraded checkboxes + premium KPI tiles
+**v10.2.1** — Habit header layout polish (better hierarchy/spacing) + mobile fix to always show all 7 days
 
 Static PWA (offline-first) - open index.html or serve with a static server.
 

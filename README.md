@@ -1,7 +1,7 @@
 # LifeSync
 
 ## Build
-**v10.2.3** — Mobile habit tracker fixes: header layout tightened + topbar separation + guaranteed 7-day week visibility on low resolutions
+**v10.2.4** — Small-screen polish: smaller responsive text (no overlap), compact habit rows, upgraded Nutrition SVG icon in navbar, extra-tight 360px week grid
 
 Static PWA (offline-first) - open index.html or serve with a static server.
 

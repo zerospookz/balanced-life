@@ -2705,7 +2705,7 @@ body{ font-feature-settings: "tnum"; }
 .habitStats .kpi .v{ letter-spacing: -0.02em; }
 
 @media (max-width:520px){
-  /* v10.2.3: tighter phone grid so ALL 7 days always fit (no cutoff) */
+  /* v10.2.4: tighter phone grid so ALL 7 days always fit (no cutoff) */
   .habitHeadRow,.habitRow{ grid-template-columns: minmax(120px, 1fr) repeat(7, minmax(22px, 1fr)); }
   .habitBox{ width: clamp(22px, 6vw, 26px); height: clamp(22px, 6vw, 26px); border-radius: 10px; }
   .habitHeadRow{ padding: 8px 10px 10px; }
@@ -3391,3 +3391,13 @@ body{ font-feature-settings: "tnum"; }
 }
 
 /* Keep other cards intact */
+
+
+/* v10.2.4: remove blue header wash behind Week/+Habit (was painted via cardHead pseudo layer) */
+.habitSectionFix .cardHead{
+  background: transparent !important;
+}
+.habitSectionFix .cardHead::before{
+  display:none !important;
+  content:none !important;
+}

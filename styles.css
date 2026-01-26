@@ -3423,3 +3423,61 @@ body{ font-feature-settings: "tnum"; }
   .habitStats{grid-template-columns:1fr 1fr !important;}
   .app{padding-bottom:140px !important;}
 }
+
+
+/* ===== v10.2.7: Home screen modern refresh + desktop spacing ===== */
+
+/* More breathing room so bottom nav never overlaps content */
+.app{
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Centering and nicer max width on wide screens */
+@media (min-width: 1100px){
+  .app{ max-width: 1100px; }
+}
+
+/* Unified modern glass surfaces (dashboard + weekly overview) */
+:root[data-sky="night"] .card{
+  background: rgba(15,23,42,0.22) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: 0 18px 55px rgba(0,0,0,0.35) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+:root[data-sky="night"] .section{
+  padding: 18px !important;
+  margin: 14px 0 !important;
+}
+
+/* Softer, more premium dashboard cards */
+:root[data-sky="night"] .donutCard,
+:root[data-sky="night"] .weekTile{
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.32) !important;
+}
+
+/* Remove harsh light look in any mode */
+.donutCard, .weekTile{
+  border-radius: 22px !important;
+}
+
+/* Improve headline spacing on home */
+.section .h1{
+  font-size: 19px !important;
+  letter-spacing: -0.02em;
+}
+.section .sub{
+  opacity: 0.78;
+}
+
+/* Bottom nav: slightly more opaque on desktop to avoid visual "collision" */
+@media (min-width: 900px){
+  .bottomnav.neonNav{
+    background:
+      radial-gradient(120% 180% at 18% 0%, rgba(255,77,255,.18) 0%, rgba(0,0,0,0) 58%),
+      radial-gradient(120% 180% at 92% 12%, rgba(96,165,250,.12) 0%, rgba(0,0,0,0) 62%),
+      linear-gradient(180deg, rgba(126,34,206,.70) 0%, rgba(76,29,149,.78) 42%, rgba(24,9,64,.92) 100%);
+  }
+}

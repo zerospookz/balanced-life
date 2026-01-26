@@ -316,7 +316,7 @@ const BUILD_LOG = [
 ];
 
 
-const APP_VERSION = "10.6.0";
+const APP_VERSION = "10.6.1";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -2872,7 +2872,8 @@ function applyHabitLayout(habits){
 
 // ===== v10.6.0 Insight mode =====
 function computeInsights(){
-  const logs = state.logs || {};
+  const s = (typeof state !== "undefined" && state) ? state : { logs:{} };
+  const logs = s.logs || {};
   const days = Object.keys(logs);
   let totalChecks = 0, activeDays = new Set(), habitCount = new Set();
   days.forEach(d=>{

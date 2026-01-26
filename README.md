@@ -39,3 +39,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.0** — Insight mode: Home summary with checks count, active days, and habits used.
+
+
+**v10.6.1** — Hotfix: Insight mode crash fix when state is not initialized.

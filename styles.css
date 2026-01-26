@@ -3680,3 +3680,42 @@ body{ font-feature-settings: "tnum"; }
 @media (max-width:420px){
   .donut svg{ width: 190px; height: 190px; }
 }
+
+
+/* ===== v10.3.2 Micro-interactions ===== */
+
+/* Generic hover lift */
+.card:hover, .weekTile:hover, .donutCard:hover{
+  transform: translateY(-3px) scale(1.01);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+/* Active tap feedback */
+.card:active, .weekTile:active, .donutCard:active{
+  transform: translateY(0) scale(0.98);
+}
+
+/* Habit check micro pop */
+.habitDot{
+  transition: transform .18s ease, background-color .18s ease;
+}
+.habitDot.checked{
+  transform: scale(1.12);
+}
+
+/* Button spring */
+.btn, .add-habit-btn{
+  transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease;
+}
+.btn:hover, .add-habit-btn:hover{
+  transform: translateY(-1px);
+}
+.btn:active, .add-habit-btn:active{
+  transform: translateY(0) scale(0.96);
+}
+
+/* Reduce motion respect */
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important;}
+}
+/* ===== end v10.3.2 ===== */

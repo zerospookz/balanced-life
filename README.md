@@ -18,3 +18,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.3.1** — Dashboard KPI redesign: thinner donut rings, calmer contrast, clearer values.
+
+
+**v10.3.2** — Micro-interactions: subtle hover/tap feedback across dashboard cards, habits and buttons.

@@ -297,7 +297,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.3.1", d: "2026-01-26", t: "Dashboard donuts: cleaner premium ring (thinner ticks, softer glow, calmer bars), responsive sizing." },
+  { v: "10.3.2", d: "2026-01-26", t: "Micro-interactions: hover lift, tap feedback, habit check pop, button spring animations (reduced-motion safe)." },
+    { v: "10.3.1", d: "2026-01-26", t: "Dashboard donuts: cleaner premium ring (thinner ticks, softer glow, calmer bars), responsive sizing." },
   { v: "10.3.1", d: "2026-01-26", t: "Dashboard KPIs: redesigned donut visuals (thinner rings, calmer contrast, clearer numbers, subtle hover)." },
   { v: "10.3.0", d: "2026-01-26", t: "Dashboard refresh: premium glass cards, cleaner donuts/weekly tiles, improved desktop layout (3-column weekly tiles), softer insight bar." },
   { v: "10.2.9", d: "2026-01-26", t: "Home cleanup: removed embedded Habit Tracker from Dashboard; replaced with compact link card." },
@@ -309,7 +310,7 @@ const BUILD_LOG = [
 ];
 
 
-const APP_VERSION = "10.3.1";
+const APP_VERSION = "10.3.2";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.

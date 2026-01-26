@@ -60,3 +60,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.5** — Habits page single-background fix (removed all container cards, only global background remains).
+
+
+**v10.6.6** — Habits UX hotfix: fixed mobile tap animation jitter (screen tremble) by removing transform scaling on habit cells and using shadow/brightness pulse.

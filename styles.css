@@ -4068,3 +4068,35 @@ body{ font-feature-settings: "tnum"; }
   box-shadow: none !important;
 }
 /* ===== end v10.6.5 ===== */
+
+
+/* ===== v10.6.6 Habits tap animation fix (no screen tremble) ===== */
+/* Root cause: transform-based :active + pulse on habit cells could cause compositor jitter on mobile.
+   Fix: remove transform scaling for habit cells; use shadow/brightness feedback instead. */
+
+.habitBox{
+  will-change: box-shadow, filter, background, border-color;
+  transform: translateZ(0);
+  touch-action: manipulation;
+}
+
+/* Disable transform press on habit cells (keep for regular .btn) */
+.habitBox:active{
+  transform: none !important;
+}
+
+/* Replace pulse animation to avoid transform */
+.habitBox.pulse{
+  animation: hbPulse2 420ms var(--mi-ease) 1;
+}
+@keyframes hbPulse2{
+  0%{ filter: brightness(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
+  45%{ filter: brightness(1.12); box-shadow: 0 14px 34px rgba(0,0,0,.35); }
+  100%{ filter: brightness(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
+}
+
+/* Extra: reduce motion while keeping feedback */
+@media (prefers-reduced-motion: reduce){
+  .habitBox.pulse{ animation: none !important; }
+}
+/* ===== end v10.6.6 ===== */

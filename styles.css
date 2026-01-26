@@ -3218,3 +3218,48 @@ body{ font-feature-settings: "tnum"; }
 }
 
 /* Buttons stay animated */
+
+
+/* ===== Build 3.3: Header fully blends with page background ===== */
+.topbar{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Remove ALL blue / aurora / light effects */
+.topbar::before,
+.topbar::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* Calm text colors matching global background */
+.brandTitle{
+  color: rgba(255,255,255,0.92);
+}
+
+.brandSub{
+  color: rgba(203,213,225,0.70);
+}
+
+/* Buttons keep shape but no blue glow */
+.topbar .btn,
+.add-habit-btn{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: none;
+}
+
+/* Hover stays subtle */
+.topbar .btn:hover,
+.add-habit-btn:hover{
+  background: rgba(255,255,255,0.10);
+}
+
+/* Kill any leftover gradients */
+.topbar *{
+  background-image: none !important;
+}

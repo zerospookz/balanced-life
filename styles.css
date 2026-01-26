@@ -3371,3 +3371,23 @@ body{ font-feature-settings: "tnum"; }
   background: linear-gradient(180deg, rgba(20,30,60,0.55), rgba(10,15,35,0.45)) !important;
   border-bottom: 1px solid rgba(255,255,255,0.10) !important;
 }
+
+
+/* ===== Build 3.9: Remove blue box behind Habit/Week controls ONLY ===== */
+
+/* Target the home header card */
+.card.section,
+.card.section.featured,
+.card.section.finHero{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Week selector container */
+.weekComfy,
+.weekComfyPill{
+  background: rgba(255,255,255,0.06);
+}
+
+/* Keep other cards intact */

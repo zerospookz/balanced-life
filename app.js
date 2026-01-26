@@ -297,12 +297,17 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
+  { v: "10.3.0", d: "2026-01-26", t: "Dashboard refresh: premium glass cards, cleaner donuts/weekly tiles, improved desktop layout (3-column weekly tiles), softer insight bar." },
+  { v: "10.2.9", d: "2026-01-26", t: "Home cleanup: removed embedded Habit Tracker from Dashboard; replaced with compact link card." },
+  { v: "10.2.8", d: "2026-01-26", t: "Theme behavior: default to dark + consistent sky mode; day mode cards no longer look flat/gray." },
+  { v: "10.2.7", d: "2026-01-26", t: "Layout polish: safer bottom padding to avoid nav overlap; minor home spacing tweaks." },
   { v: "10.2.6", d: "2026-01-26", t: "Habits UI: removed 0/7 counters; fixed phone KPI cut-off with responsive KPIs + more bottom padding." },
   { v: "10.2.5", d: "2026-01-26", t: "Habits header: fixed right-side cut-off by removing overflow clipping on header containers." },
   { v: "10.2.4", d: "2026-01-26", t: "Habits header cleanup: removed blue/gradient wash behind Week and +Habit controls." }
 ];
 
-const APP_VERSION = "10.2.6";
+
+const APP_VERSION = "10.3.0";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.

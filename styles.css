@@ -3502,3 +3502,135 @@ body{ font-feature-settings: "tnum"; }
 .app{
   padding-bottom: calc(160px + env(safe-area-inset-bottom)) !important;
 }
+
+
+/* v10.3.0 — Dashboard refinement (cleaner, lighter, modern) */
+
+/* Dashboard container */
+.dashboard{
+  background: transparent !important;
+  padding: 24px 0 8px;
+}
+
+/* Head message */
+.dashboardNotice{
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.10),
+    rgba(255,255,255,0.03)
+  );
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+/* KPI cards */
+.kpiCard{
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.10),
+    rgba(255,255,255,0.04)
+  );
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.kpiCard:hover{
+  transform: translateY(-4px);
+  box-shadow:
+    0 18px 45px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.18);
+}
+
+/* Weekly overview cards */
+.weekCard{
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.03)
+  );
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.30);
+}
+
+/* Bottom nav separation */
+.bottomNav{
+  backdrop-filter: blur(18px);
+  background: linear-gradient(
+    180deg,
+    rgba(88,34,165,0.55),
+    rgba(32,14,72,0.75)
+  );
+}
+
+
+/* ===== v10.3.0 Dashboard refresh (modern glass, better layout) ===== */
+
+/* Global card surface: lighter, more premium in night */
+:root[data-sky="night"] .card{
+  background: rgba(10, 14, 28, 0.55);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow:
+    0 18px 55px rgba(0,0,0,0.42),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Featured sections get a subtle gradient and stronger blur without looking like a box */
+:root[data-sky="night"] .card.section.featured{
+  background:
+    radial-gradient(900px circle at 15% 0%, rgba(99,102,241,0.10), transparent 60%),
+    radial-gradient(900px circle at 85% 100%, rgba(56,189,248,0.08), transparent 60%),
+    rgba(10, 14, 28, 0.52);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Make the dashboard sections feel less “framed” on big screens */
+.card.section{ border-radius: 22px; }
+.section{ padding:18px; margin:14px 0; }
+
+/* Donut cards: calmer, cleaner, better hover */
+.donutCard{
+  background: rgba(255,255,255,0.045) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: 0 16px 42px rgba(0,0,0,0.34) !important;
+  border-radius: 22px !important;
+}
+.donutCard:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 22px 58px rgba(0,0,0,0.44) !important;
+}
+.donutMeta{
+  color: rgba(203,213,225,0.72) !important;
+  font-weight: 800;
+}
+
+/* Weekly tiles: use 3 columns on desktop (no empty gap), softer surface */
+@media (min-width:900px){
+  .weekTiles{ grid-template-columns: repeat(3, 1fr) !important; }
+}
+.weekTile{
+  background: rgba(255,255,255,0.045) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.30) !important;
+  border-radius: 20px !important;
+}
+.weekTile:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 20px 52px rgba(0,0,0,0.40) !important;
+}
+
+/* Insight bar: more “pill” and less boxy */
+.insightRow{
+  background: rgba(255,255,255,0.035) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 16px !important;
+}
+
+/* Keep things safe on small screens */
+@media (max-width:420px){
+  .section{ padding:14px; }
+  .donutRow{ gap:12px; }
+}
+/* ===== end v10.3.0 ===== */

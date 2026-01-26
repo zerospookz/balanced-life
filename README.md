@@ -36,3 +36,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.5.1** — Personalization: reorder/hide habits from Settings; custom order respected everywhere.
+
+
+**v10.6.0** — Insight mode: Home summary with checks count, active days, and habits used.

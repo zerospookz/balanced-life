@@ -298,7 +298,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.5.1", d: "2026-01-26", t: "Personalization: reorder and hide individual habits from Settings; Home and Habits respect custom order." },
+  { v: "10.6.0", d: "2026-01-26", t: "Insight mode: weekly summary with total checks, active days, and habits used." },
+{ v: "10.5.1", d: "2026-01-26", t: "Personalization: reorder and hide individual habits from Settings; Home and Habits respect custom order." },
 { v: "10.5.0", d: "2026-01-26", t: "Personalization: hide habits, reorder (up/down), per-habit color accent." },
 { v: "10.4.2", d: "2026-01-26", t: "Habit notes indicator: small dot on day cells with a note; notes update instantly after save/delete." },
 { v: "10.4.1", d: "2026-01-26", t: "Habit UX upgrade: long-press opens real Notes modal (saved locally), Undo toast after check/uncheck, today highlight on grid." },
@@ -315,7 +316,7 @@ const BUILD_LOG = [
 ];
 
 
-const APP_VERSION = "10.5.1";
+const APP_VERSION = "10.6.0";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -2867,4 +2868,40 @@ function applyHabitLayout(habits){
     });
   }
   return out;
+}
+
+// ===== v10.6.0 Insight mode =====
+function computeInsights(){
+  const logs = state.logs || {};
+  const days = Object.keys(logs);
+  let totalChecks = 0, activeDays = new Set(), habitCount = new Set();
+  days.forEach(d=>{
+    const dayLogs = logs[d] || {};
+    Object.keys(dayLogs).forEach(h=>{
+      if(dayLogs[h]){
+        totalChecks++;
+        activeDays.add(d);
+        habitCount.add(h);
+      }
+    });
+  });
+  return {
+    totalChecks,
+    activeDays: activeDays.size,
+    habits: habitCount.size
+  };
+}
+
+function viewInsightsHome(){
+  const i = computeInsights();
+  return `
+    <section class="card section featured insightMode">
+      <div class="h1">Insights</div>
+      <div class="insightGrid">
+        <div class="insightItem"><strong>${i.totalChecks}</strong><span>Checks</span></div>
+        <div class="insightItem"><strong>${i.activeDays}</strong><span>Active days</span></div>
+        <div class="insightItem"><strong>${i.habits}</strong><span>Habits used</span></div>
+      </div>
+    </section>
+  `;
 }

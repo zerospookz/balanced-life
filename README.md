@@ -42,3 +42,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.1** — Hotfix: Insight mode crash fix when state is not initialized.
+
+
+**v10.6.2** — Hotfix: initialize state.habitPrefs to prevent crash in personalization/insight code.

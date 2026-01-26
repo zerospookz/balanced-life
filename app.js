@@ -1,4 +1,11 @@
 
+// ===== v10.6.2 hotfix: ensure state & habitPrefs =====
+if (typeof state === "undefined" || !state) {
+  window.state = { prefs:{}, logs:{}, habitPrefs:{} };
+}
+(state && (state.habitPrefs = state.habitPrefs || {}));
+
+
 /* LifeSync v9.5 - responsive nav icon sets */
 (() => {
   const $ = (sel, root=document) => root.querySelector(sel);
@@ -298,7 +305,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.6.0", d: "2026-01-26", t: "Insight mode: weekly summary with total checks, active days, and habits used." },
+  { v: "10.6.2", d: "2026-01-26", t: "Hotfix: restored Home render (removed stray path text), initialized state safely before personalization/insights code." },
+{ v: "10.6.0", d: "2026-01-26", t: "Insight mode: weekly summary with total checks, active days, and habits used." },
 { v: "10.5.1", d: "2026-01-26", t: "Personalization: reorder and hide individual habits from Settings; Home and Habits respect custom order." },
 { v: "10.5.0", d: "2026-01-26", t: "Personalization: hide habits, reorder (up/down), per-habit color accent." },
 { v: "10.4.2", d: "2026-01-26", t: "Habit notes indicator: small dot on day cells with a note; notes update instantly after save/delete." },
@@ -316,7 +324,8 @@ const BUILD_LOG = [
 ];
 
 
-const APP_VERSION = "10.6.1";
+let state;
+const APP_VERSION = "10.6.2";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -339,7 +348,7 @@ function saveState() {
     render(); // keep UI consistent after any write
   }
 
-  let state = loadState();
+  state = loadState();
 
   
   
@@ -712,7 +721,7 @@ function viewHome() {
 
     return `
       <div class="pageStack">
-        $/mnt/data/lifesync-v10.3.1.zip
+        ${out}
       </div>
     `;
   }
@@ -2814,7 +2823,7 @@ document.addEventListener('DOMContentLoaded', updateNoteIndicators);
 // ===== v10.5.0 Personalization =====
 
 // ensure prefs
-state.habitPrefs = state.habitPrefs || {}; // { [hid]: { hidden, order, color } }
+(state && (state.habitPrefs = state.habitPrefs || {})); // { [hid]: { hidden, order, color } }
 
 // apply preferences to habits list
 function applyHabitPrefs(habits){

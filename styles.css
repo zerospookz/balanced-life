@@ -3401,3 +3401,18 @@ body{ font-feature-settings: "tnum"; }
   display:none !important;
   content:none !important;
 }
+
+
+/* v10.2.5: fix right-side cut-off buttons (remove clipping container) */
+.topbar,
+.cardHead,
+.habitSectionFix{
+  overflow: visible !important;
+}
+
+/* ensure buttons are not masked */
+.topbar .btn,
+.add-habit-btn,
+.weekPill{
+  overflow: visible !important;
+}

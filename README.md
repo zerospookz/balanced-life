@@ -57,3 +57,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.4.1** — Hotfix: fixed duplicated Insight code causing a syntax error (Unexpected token '}').
+
+
+**v10.6.5** — Habits page single-background fix (removed all container cards, only global background remains).

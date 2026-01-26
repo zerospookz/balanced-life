@@ -305,7 +305,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.6.4.1", d: "2026-01-26", t: "Hotfix: fixed a syntax error caused by duplicated Insight code; app loads normally again." },
+  { v: "10.6.5", d: "2026-01-26", t: "Habits visual fix: removed double background by making Habits page container transparent (route-scoped) while keeping rows readable." },
+{ v: "10.6.4.1", d: "2026-01-26", t: "Hotfix: fixed a syntax error caused by duplicated Insight code; app loads normally again." },
 { v: "10.6.4", d: "2026-01-26", t: "Habits UI cleanup: removed double background so tracker uses a single visual surface." },
 { v: "10.6.3", d: "2026-01-26", t: "Insight mode: real weekly insights (last 7 days) with best day, weak day and total checks." },
 { v: "10.6.2", d: "2026-01-26", t: "Hotfix: restored Home render (removed stray path text), initialized state safely before personalization/insights code." },
@@ -328,7 +329,7 @@ const BUILD_LOG = [
 
 
 let state;
-const APP_VERSION = "10.6.4.1";
+const APP_VERSION = "10.6.5";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -1418,6 +1419,7 @@ function render() {
       route === "settings" ? viewSettings() :
       viewHome();
     view.innerHTML = html;
+    view.dataset.route = route;
 
     // attach internal route buttons
     $$("[data-route]").forEach(btn=>btn.addEventListener("click", ()=>setRoute(btn.dataset.route)));

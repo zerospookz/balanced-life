@@ -3288,3 +3288,16 @@ body{ font-feature-settings: "tnum"; }
 .topbar{
   pointer-events: auto;
 }
+
+
+/* ===== Build 3.5: Remove annoying blue streak (cometWeek) but keep button animations ===== */
+.cometFx.cometWeek{
+  display:none !important;
+  opacity:0 !important;
+}
+
+/* Safety: if any cometFx is used elsewhere, keep it subtle */
+.cometFx{
+  mix-blend-mode: normal !important;
+  filter: none !important;
+}

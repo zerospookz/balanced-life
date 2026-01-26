@@ -2795,3 +2795,113 @@ body{ font-feature-settings: "tnum"; }
   .habitIcon{ font-size: 16px; }
   .chip{ transform: scale(0.95); }
 }
+
+
+
+/* ===== Build 2: полностью нов header (balanced + modern glass) ===== */
+.topbar{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 14px;
+  margin: 8px 0 14px;
+  border-radius: 22px;
+
+  /* Let the space background breathe: subtle glass surface */
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.62),
+    rgba(2, 6, 23, 0.36)
+  );
+
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow:
+    0 18px 55px rgba(0,0,0,0.42),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  overflow: hidden;
+}
+
+/* Soft aurora glow (balanced, not neon) */
+.topbar::before{
+  content:"";
+  position:absolute;
+  inset:-40px;
+  pointer-events:none;
+  background:
+    radial-gradient(700px circle at 15% 35%, rgba(56,189,248,0.18), transparent 60%),
+    radial-gradient(700px circle at 85% 20%, rgba(99,102,241,0.18), transparent 62%),
+    radial-gradient(900px circle at 50% 120%, rgba(34,211,238,0.10), transparent 60%);
+  filter: blur(10px);
+  opacity: 0.9;
+}
+
+/* Make sure header children render above the glow layer */
+.topbar > *{position:relative;}
+
+/* Brand balance */
+.brandTitle{
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  color: rgba(255,255,255,0.92);
+}
+.brandSub{
+  color: rgba(203,213,225,0.72);
+  opacity: 1;
+}
+
+/* Logo card: calmer + cleaner */
+.logo{
+  background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 16px 38px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+/* Top action buttons: unified glass look */
+.topbar .btn{
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.92);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.32);
+}
+
+.topbar .btn:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.20);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.40);
+}
+
+.topbar .btn:active{
+  transform: translateY(0px) scale(0.98);
+}
+
+/* Language pill a bit more premium */
+.topbar .langPill{
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+}
+
+/* Light mode keeps the same geometry, softer colors */
+@media (prefers-color-scheme: light){
+  .topbar{
+    background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.46));
+    border: 1px solid rgba(15,23,42,0.08);
+    box-shadow: 0 18px 45px rgba(2,6,23,0.12), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .topbar::before{opacity:0.55;}
+  .brandTitle{color: rgba(15,23,42,0.92);}
+  .brandSub{color: rgba(30,41,59,0.68);}
+  .topbar .btn{
+    background: rgba(255,255,255,0.70);
+    border: 1px solid rgba(15,23,42,0.10);
+    color: rgba(15,23,42,0.92);
+    box-shadow: 0 12px 26px rgba(2,6,23,0.10);
+  }
+  .topbar .btn:hover{background: rgba(255,255,255,0.85);}
+}

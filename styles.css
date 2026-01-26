@@ -3719,3 +3719,130 @@ body{ font-feature-settings: "tnum"; }
   *{transition:none !important; animation:none !important;}
 }
 /* ===== end v10.3.2 ===== */
+
+
+/* ===== v10.4.0 Habit UX upgrade ===== */
+
+/* Today column highlight */
+.habitGrid .day.today{
+  box-shadow: inset 0 0 0 2px rgba(99,102,241,.55);
+}
+
+/* Checked state feedback */
+.habitBox.on{
+  background: color-mix(in srgb, var(--hc) 18%, rgba(255,255,255,.04));
+}
+.habitBox.on::after{
+  content:"✓";
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:white;
+  font-weight:800;
+}
+
+/* Streak subtle glow */
+.habitRow[data-streak="true"]{
+  box-shadow: 0 0 0 1px rgba(34,197,94,.35), 0 10px 30px rgba(34,197,94,.18);
+}
+
+/* Long press hint */
+.habitRow .hint{
+  font-size:12px;
+  opacity:.55;
+}
+
+
+/* ===== v10.4.1 Habit notes modal + undo ===== */
+.noteModal{
+  position:fixed; inset:0; z-index:1000;
+  display:none; place-items:center;
+  background: rgba(2,6,23,.55);
+  backdrop-filter: blur(8px);
+}
+.noteModal.open{ display:grid; }
+.noteCard{
+  width:min(92vw,420px);
+  background: rgba(15,23,42,.75);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 24px 60px rgba(0,0,0,.45);
+}
+.noteCard h3{ margin:0 0 8px; }
+.noteCard textarea{
+  width:100%; min-height:110px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;
+  color:white; padding:10px;
+}
+.noteActions{
+  display:flex; justify-content:flex-end; gap:10px; margin-top:10px;
+}
+.undoToast{
+  position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+  background: rgba(15,23,42,.85);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;
+  padding:8px 14px;
+  display:none; gap:10px; align-items:center;
+}
+.undoToast.show{ display:flex; }
+
+
+/* ===== v10.4.1 Notes + Undo UI ===== */
+.habitDay.today{
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 0 22px rgba(99,102,241,0.35);
+}
+.habitBox.today{
+  box-shadow: inset 0 0 0 2px rgba(99,102,241,0.45);
+}
+
+.undoToast{
+  position: fixed;
+  left: 50%;
+  bottom: 86px;
+  transform: translateX(-50%) translateY(18px);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(10, 14, 28, 0.72);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.42);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity:0;
+  pointer-events:none;
+  transition: opacity 180ms var(--mi-ease, ease), transform 220ms var(--mi-ease, ease);
+  z-index: 9999;
+}
+.undoToast.show{
+  opacity:1;
+  transform: translateX(-50%) translateY(0px);
+  pointer-events:auto;
+}
+.undoToast .undoMsg{ font-weight: 650; opacity:.92; }
+
+.noteModal .noteText{
+  width:100%;
+  min-height: 120px;
+  resize: vertical;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92);
+  padding: 10px 12px;
+  outline: none;
+}
+.noteActions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top: 12px;
+}
+/* ===== end v10.4.1 ===== */

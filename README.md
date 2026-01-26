@@ -21,3 +21,9 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.3.2** — Micro-interactions: subtle hover/tap feedback across dashboard cards, habits and buttons.
+
+
+**v10.4.0** — Habit UX upgrade: instant tap-to-check, long-press placeholder for notes/edit, today highlight, streak glow.
+
+
+**v10.4.1** — Habit UX: real notes modal on long-press, undo toast after check.

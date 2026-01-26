@@ -297,7 +297,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.3.2", d: "2026-01-26", t: "Micro-interactions: hover lift, tap feedback, habit check pop, button spring animations (reduced-motion safe)." },
+  { v: "10.4.1", d: "2026-01-26", t: "Habit UX upgrade: long-press opens real Notes modal (saved locally), Undo toast after check/uncheck, today highlight on grid." },
+{ v: "10.3.2", d: "2026-01-26", t: "Micro-interactions: hover lift, tap feedback, habit check pop, button spring animations (reduced-motion safe)." },
     { v: "10.3.1", d: "2026-01-26", t: "Dashboard donuts: cleaner premium ring (thinner ticks, softer glow, calmer bars), responsive sizing." },
   { v: "10.3.1", d: "2026-01-26", t: "Dashboard KPIs: redesigned donut visuals (thinner rings, calmer contrast, clearer numbers, subtle hover)." },
   { v: "10.3.0", d: "2026-01-26", t: "Dashboard refresh: premium glass cards, cleaner donuts/weekly tiles, improved desktop layout (3-column weekly tiles), softer insight bar." },
@@ -310,7 +311,7 @@ const BUILD_LOG = [
 ];
 
 
-const APP_VERSION = "10.3.2";
+const APP_VERSION = "10.4.1";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -492,6 +493,7 @@ function saveState() {
 
     const start = isoFromDate(startDate);
     const days = weekISOs(start);
+    const todayIso = todayISO();
 
     const dayLetters = (state.lang === "bg") ? ["П","В","С","Ч","П","С","Н"] : ["M","T","W","T","F","S","S"];
 
@@ -561,7 +563,7 @@ function saveState() {
         <div class="habitWrap">
           <div class="habitHeadRow" role="row">
             <div class="habitHeadName" role="columnheader">${t("habit")}</div>
-            ${days.map((d,i)=>`<div class="habitDay" role="columnheader">${dayLetters[i]||""}</div>`).join("")}
+            ${days.map((d,i)=>`<div class="habitDay ${d===todayIso?"today":""}" role="columnheader">${dayLetters[i]||""}</div>`).join("")}
           </div>
 
           ${habits.length ? habits.map((h,idx)=>`
@@ -576,7 +578,7 @@ function saveState() {
               ${days.map(d=>{
                 const on = !!(logs[d] && logs[d][h.id]);
                 const pulse = !!(lastT && lastT.hid===h.id && lastT.iso===d && (nowMs-lastT.ts<900));
-                return `<button class="habitBox ${on?"on":""} ${pulse?"pulse":""}" type="button" style="--hc:${h.color||"#60a5fa"}"
+                return `<button class="habitBox ${on?"on":""} ${pulse?"pulse":""} ${d===todayIso?"today":""}" type="button" style="--hc:${h.color||"#60a5fa"}"
                           data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
               }).join("")}
             </div>
@@ -1362,12 +1364,45 @@ function render() {
 let __habitFxBound = false;
 let __habitCometPosBound = false;
 
+
+function initHabitLongPress(){
+  // Attach long-press note editor for habit boxes (DOM is replaced every render)
+  const boxes = $$(".habitBox");
+  boxes.forEach(box=>{
+    // avoid double-binding
+    if(box.__lpBound) return;
+    box.__lpBound = true;
+
+    let fired = false;
+    let timer = null;
+
+    box.addEventListener("pointerdown", (e)=>{
+      fired = false;
+      // Start long-press timer
+      timer = setTimeout(()=>{
+        fired = true;
+        box.dataset.suppressClick = "1";
+        openHabitNote(box.dataset.habit, box.dataset.date);
+      }, 520);
+    });
+
+    const cancel = ()=>{
+      if(timer) clearTimeout(timer);
+      timer = null;
+    };
+    box.addEventListener("pointerup", cancel);
+    box.addEventListener("pointercancel", cancel);
+    box.addEventListener("pointerleave", cancel);
+  });
+}
+
 function initHabitFX(){
   // Attach ripple handlers on every render (DOM is replaced)
   initRipples();
 
   // Attach WebGL comet button on every render (DOM is replaced)
   initWebglCometButtons();
+  initHabitLongPress();
 
   // v10.1.7: Keep the WEEK comet positioned correctly (no scroll-parallax).
   // Without this, the comet defaults to 0,0 and appears as a bright blob in the card corner.
@@ -1600,7 +1635,10 @@ function handleAction(e) {
     // tap feedback for UI controls (optional via Settings)
     if(a!="toggleHabit") { feedbackTap(); tapBounce(e.currentTarget); }
 
-    if(a==="toggleHabit") return toggleHabit(e.currentTarget.dataset.habit, e.currentTarget.dataset.date);
+    if(a==="toggleHabit") {
+      if(e.currentTarget.dataset.suppressClick==="1"){ e.currentTarget.dataset.suppressClick="0"; return; }
+      return toggleHabit(e.currentTarget.dataset.habit, e.currentTarget.dataset.date);
+    }
     if(a==="setHabitWeekFull") { state._habitWeekFull = e.currentTarget.value; saveState(); return render(); }
     if(a==="addHabit") return openAddHabit();
     if(a==="addFinance") return openAddFinance();
@@ -2256,20 +2294,115 @@ function exportJSON(obj, filename) {
     });
   }
 
-  function toggleHabit(hid, iso){
+  
+// ===== v10.4.1 Habit UX upgrade: notes + undo =====
+let __undo = {hid:null, iso:null, prev:null, timer:null};
+function ensureUndoToast(){
+  let el = document.querySelector(".undoToast");
+  if(el) return el;
+  el = document.createElement("div");
+  el.className = "undoToast";
+  el.innerHTML = `<span class="undoMsg">Checked</span><button class="btn ghost undoBtn" type="button">Undo</button>`;
+  document.body.appendChild(el);
+  el.querySelector(".undoBtn").addEventListener("click", ()=>{
+    if(!__undo.hid || !__undo.iso) return;
+    // restore previous value
+    state.habitLogs = state.habitLogs || {};
+    state.habitLogs[__undo.iso] = state.habitLogs[__undo.iso] || {};
+    if(__undo.prev){
+      state.habitLogs[__undo.iso][__undo.hid] = true;
+    }else{
+      delete state.habitLogs[__undo.iso][__undo.hid];
+      if(Object.keys(state.habitLogs[__undo.iso]).length===0) delete state.habitLogs[__undo.iso];
+    }
+    saveState();
+    render();
+    hideUndoToast();
+  });
+  return el;
+}
+function showUndoToast(msg){
+  const el = ensureUndoToast();
+  el.querySelector(".undoMsg").textContent = msg || "Updated";
+  el.classList.add("show");
+  if(__undo.timer) clearTimeout(__undo.timer);
+  __undo.timer = setTimeout(()=>hideUndoToast(), 2500);
+}
+function hideUndoToast(){
+  const el = document.querySelector(".undoToast");
+  if(el) el.classList.remove("show");
+  if(__undo.timer) clearTimeout(__undo.timer);
+  __undo.timer = null;
+  __undo.hid = __undo.iso = null;
+  __undo.prev = null;
+}
+
+function openHabitNote(hid, iso){
+  const h = (state.habits||[]).find(x=>x.id===hid);
+  const name = h ? habitDisplayName(h) : t("habit");
+  state.habitNotes = state.habitNotes || {};
+  state.habitNotes[iso] = state.habitNotes[iso] || {};
+  const cur = state.habitNotes[iso][hid] || "";
+  const title = `${name} • ${iso}`;
+  openModal(title, `
+    <div class="noteModal">
+      <div class="small">${t("note") || "Note"}</div>
+      <textarea id="noteText" class="noteText" placeholder="${t("writeNote")||"Write a note..."}">${escapeHtml(cur)}</textarea>
+      <div class="noteActions">
+        <button class="btn ghost" type="button" data-action="closeModal">${t("cancel")||"Cancel"}</button>
+        <button class="btn" type="button" id="noteDelete">${t("delete")||"Delete"}</button>
+        <button class="btn" type="button" id="noteSave">${t("save")||"Save"}</button>
+      </div>
+    </div>
+  `);
+  const txt = document.querySelector("#noteText");
+  const btnSave = document.querySelector("#noteSave");
+  const btnDel = document.querySelector("#noteDelete");
+  const closeBtn = document.querySelector('[data-action="closeModal"]');
+  if(closeBtn) closeBtn.addEventListener("click", closeModal);
+  if(btnSave) btnSave.addEventListener("click", ()=>{
+    const val = (txt && txt.value) ? txt.value.trim() : "";
+    state.habitNotes = state.habitNotes || {};
+    state.habitNotes[iso] = state.habitNotes[iso] || {};
+    if(val) state.habitNotes[iso][hid] = val;
+    else delete state.habitNotes[iso][hid];
+    if(Object.keys(state.habitNotes[iso]).length===0) delete state.habitNotes[iso];
+    saveState();
+    closeModal();
+    showUndoToast(t("saved")||"Saved");
+  });
+  if(btnDel) btnDel.addEventListener("click", ()=>{
+    if(state.habitNotes && state.habitNotes[iso]) delete state.habitNotes[iso][hid];
+    if(state.habitNotes && state.habitNotes[iso] && Object.keys(state.habitNotes[iso]).length===0) delete state.habitNotes[iso];
+    saveState();
+    closeModal();
+    showUndoToast(t("deleted")||"Deleted");
+  });
+}
+// ===== end v10.4.1 =====
+function toggleHabit(hid, iso){
     if(!hid || !iso) return;
     feedbackTap();
     state._lastToggle = {hid, iso, ts: Date.now()};
     state.habitLogs = state.habitLogs || {};
     state.habitLogs[iso] = state.habitLogs[iso] || {};
-    state.habitLogs[iso][hid] = !state.habitLogs[iso][hid];
+    const prev = !!state.habitLogs[iso][hid];
+    const next = !prev;
+    state.habitLogs[iso][hid] = next;
     // remove empty
     if(!state.habitLogs[iso][hid]) delete state.habitLogs[iso][hid];
     if(Object.keys(state.habitLogs[iso]).length===0) delete state.habitLogs[iso];
+
+    // undo payload
+    __undo.hid = hid; __undo.iso = iso; __undo.prev = prev;
+
     saveState();
     render();
+    showUndoToast(next ? (t("checked")||"Checked") : (t("unchecked")||"Unchecked"));
+
     setTimeout(()=>{ state._lastToggle = null; }, 700);
   }
+
 
 
 // ---------- Init ----------
@@ -2535,4 +2668,6 @@ function radialBarsSVG({id, value=0.5, centerValue="0", centerLabel="", mode="si
   if(btnSettings){
     btnSettings.addEventListener("click", ()=> setRoute("settings"));
   }
+
+
 

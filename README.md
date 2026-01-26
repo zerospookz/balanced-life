@@ -48,3 +48,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.3** — Insight mode upgraded: real last-7-days analysis with best day, weak day and weekly checks.
+
+
+**v10.6.4** — Habits UI cleanup: removed double background, single surface only.

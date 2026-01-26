@@ -3860,3 +3860,49 @@ body{ font-feature-settings: "tnum"; }
   background: rgba(99,102,241,.9);
   box-shadow: 0 0 0 2px rgba(2,6,23,.6);
 }
+
+
+/* ===== v10.5.0 Personalization UI ===== */
+.habitActions{ display:flex; gap:8px; opacity:.65; }
+.habitRow:hover .habitActions{ opacity:1; }
+.habitActions .iconBtn{
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  border-radius:10px;
+  padding:6px;
+}
+.colorDot{
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.6);
+}
+
+/* ===== v10.5.0 Dashboard personalization UI ===== */
+.dashLayoutList{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.dashRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  border-radius:14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+.dashRowLeft{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.btn.mini{
+  padding:8px 10px;
+  min-height:34px;
+}
+.btn.mini[disabled]{
+  opacity:.45;
+  pointer-events:none;
+}
+/* ===== end v10.5.0 ===== */

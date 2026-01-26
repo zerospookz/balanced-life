@@ -42,6 +42,7 @@
     ],
     habitLogs: {},
     prefs: { haptics: false, sound: false },
+    dashLayout: { order: ["dash", "weekly", "habits"], hidden: {} },
     workoutPlan: {"Понеделник": {"Фокус": "Push + Planche (тежко) + Handstand", "Skill: Handstand (15–20 мин)": ["Chest-to-wall 5×30–45 сек (линия)", "Kick-ups 6–10 опита ×10–25 сек", "Scap shrugs в стойка 3×10"], "Skill: Planche (8–12 мин)": ["Tuck/Frog holds 6–10×6–12 сек", "Planche leans 3×20 сек"], "Skill: Flag (8–12 мин)": ["(по желание) 2–4 леки опита"], "Сила — Блок A (тежко)": ["Bench press ИЛИ Weighted dips 4×4–6", "Overhead press 3×5–8"], "Сила — Блок B": ["Pseudo planche push-ups 4×6–10", "Hollow hold 4×20–40 сек"], "Аксесоари / Прехаб": ["Lateral raise 3×12–20", "Китки: wrist rocks 2×10"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "RPE 7–8; спри при разпад на форма"}, "Вторник": {"Фокус": "Pull (тежко) + Flag + Набирания", "Skill: Handstand (15–20 мин)": ["(кратко: 3–5 леки опита по 10–15 сек)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": ["Tuck/ластик 6–10×5–10 сек", "Негативи 4×3–6 сек (контрол)"], "Сила — Блок A (тежко)": ["Weighted pull-ups 5×3–5", "Chin-ups 3×6–10"], "Сила — Блок B": ["Row (щанга/опора) 4×6–10", "Lat pulldown 3×10–15"], "Аксесоари / Прехаб": ["Face pulls 3×15–20", "External rotations 3×15–20", "Side plank/Copenhagen 4×20–40 сек/страна"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Фокус: стабилни рамене, лакът без болка"}, "Сряда": {"Фокус": "Крака (фитнес) + Core + лека стойка", "Skill: Handstand (15–20 мин)": ["Scap shrugs 3×10", "3–5 леки опита стойка (без борба)"], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": ["Squat (back/front) 4×3–6", "RDL 4×5–8"], "Сила — Блок B": ["Bulgarian split squat 3×8–12/крак", "Leg curl ИЛИ Nordic прогресия 3×8–12"], "Аксесоари / Прехаб": ["Calves 4×10–20", "Ab wheel ИЛИ Hanging knee raises 4×8–15"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Не до отказ (за да пазиш краката)"}, "Четвъртък": {"Фокус": "Кондиция: Бокс + Въже + Мобилност", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Прехаб 10 мин: scap push-ups 2×10", "Wrist rocks 2×10", "External rotations 3×15–20"], "Кондиция / Спорт": ["Въже 12×(40/40)", "Бокс 8–12 рунда × 2–3 мин"], "Център време (мин)": "45–75", "Бележки": "Дръж умерено (техника + дишане)"}, "Петък": {"Фокус": "Upper (обем/умение) + Planche + Pull-up вариации", "Skill: Handstand (15–20 мин)": ["6–10 опита ×10–25 сек (контрол)", "Wall line 2×30 сек"], "Skill: Planche (8–12 мин)": ["Holds 6–8×8–12 сек", "Lean 3×20 сек"], "Skill: Flag (8–12 мин)": ["4–6 леки опита ×5–8 сек (само чисто)"], "Сила — Блок A (тежко)": ["Explosive pull-ups / chest-to-bar 6×2–4", "Archer / Typewriter 4×3–6/страна"], "Сила — Блок B": ["Incline DB press 4×8–12", "Seated cable row 3×10–15"], "Аксесоари / Прехаб": ["Curls 3×10–15", "Triceps pushdown 3×10–15", "Farmer/Suitcase carry 6×20–40 м"], "Кондиция / Спорт": [], "Център време (мин)": "70–95", "Бележки": "Пази свежест за уикенда (без отказ)"}, "Събота": {"Фокус": "Футбол + кратък Skill/прехаб (леко)", "Skill: Handstand (15–20 мин)": ["8–12 мин лесни опита (или стена)"], "Skill: Planche (8–12 мин)": ["Lean 3×15–25 сек", "PPPUs 3×8 (леки)"], "Skill: Flag (8–12 мин)": ["Само ако си свеж: 1–3 опита ×5–8 сек"], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Face pulls 2×20", "External rotations 2×20", "Разтягане 5–10 мин"], "Кондиция / Спорт": ["Футбол (трен./мач)"], "Център време (мин)": "20–45 + футбол", "Бележки": "Ако мачът е тежък → само мобилност"}, "Неделя": {"Фокус": "Футбол + възстановяване", "Skill: Handstand (15–20 мин)": [], "Skill: Planche (8–12 мин)": [], "Skill: Flag (8–12 мин)": [], "Сила — Блок A (тежко)": [], "Сила — Блок B": [], "Аксесоари / Прехаб": ["Мобилност 10–15 мин (грасци/бедра/таз/гръб/рамене)"], "Кондиция / Спорт": ["Футбол", "Zone 2 20–40 мин (по желание)"], "Център време (мин)": "20–40 + футбол", "Бележки": "Цел: възстановяване"}},
   };
 
@@ -297,7 +298,9 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.4.2", d: "2026-01-26", t: "Habit notes indicator: small dot on day cells with a note; notes update instantly after save/delete." },
+  { v: "10.5.1", d: "2026-01-26", t: "Personalization: reorder and hide individual habits from Settings; Home and Habits respect custom order." },
+{ v: "10.5.0", d: "2026-01-26", t: "Personalization: hide habits, reorder (up/down), per-habit color accent." },
+{ v: "10.4.2", d: "2026-01-26", t: "Habit notes indicator: small dot on day cells with a note; notes update instantly after save/delete." },
 { v: "10.4.1", d: "2026-01-26", t: "Habit UX upgrade: long-press opens real Notes modal (saved locally), Undo toast after check/uncheck, today highlight on grid." },
 { v: "10.3.2", d: "2026-01-26", t: "Micro-interactions: hover lift, tap feedback, habit check pop, button spring animations (reduced-motion safe)." },
     { v: "10.3.1", d: "2026-01-26", t: "Dashboard donuts: cleaner premium ring (thinner ticks, softer glow, calmer bars), responsive sizing." },
@@ -312,7 +315,7 @@ const BUILD_LOG = [
 ];
 
 
-const APP_VERSION = "10.4.2";
+const APP_VERSION = "10.5.1";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -512,12 +515,20 @@ function saveState() {
         })).find(x=>x.val===saved)?.label)
       : null) || saved;
 
-    const habits = state.habits || [];
+    const baseHabits = state.habits || [];
+    const hLayout = state.habitLayout || { order: [], hidden: {} };
+    const hOrder = Array.isArray(hLayout.order) ? hLayout.order : [];
+    const hHidden = hLayout.hidden || {};
+    // Build ordered list: ordered ids first, then any new habits not yet in order
+    const byId = Object.fromEntries(baseHabits.map(h=>[h.id,h]));
+    const ordered = hOrder.map(id=>byId[id]).filter(Boolean);
+    const rest = baseHabits.filter(h=>!hOrder.includes(h.id));
+    const habits = ordered.concat(rest).filter(h=>!hHidden[h.id]);
     const logs = state.habitLogs || {};
     const nowMs = Date.now();
     const lastT = state._lastToggle;
 
-    const weekCounts = habits.map(h=>{
+    const weekCounts = applyHabitLayout(habits).map(h=>{
       let c=0;
       for(const iso of days){
         if(logs[iso] && logs[iso][h.id]) c++;
@@ -607,9 +618,9 @@ function saveState() {
 
 function viewHome() {
     const d = computeDashboard();
-    return `
-      <div class="pageStack">
-      <section class="card section featured">
+
+    const blocks = {
+      dash: `<section class="card section featured">
         <div class="h1">Dashboard</div>
         <div class="sub">${t("dashboardToday")}</div>
         <div class="insightRow">${escapeHtml(d.insight||t("insightOnTrack"))}</div>
@@ -653,9 +664,8 @@ function viewHome() {
             </div>
           </button>
         </div>
-      </section>
-
-      <section class="card section featured">
+      </section>`,
+      weekly: `<section class="card section featured">
         <div class="h1">Weekly overview</div>
         <div class="sub">${t("quickLook7")}</div>
         <div class="weekTiles">
@@ -686,8 +696,22 @@ function viewHome() {
             <div class="weekTileSub">Last 7 days • ${Math.round(d.wsess||0)} sessions<br/>Plan inside</div>
           </button>
 </div>
-</section>
-      ${viewHabitsHome()}
+</section>`,
+      habits: viewHabitsHome()
+    };
+
+    const layout = state.dashLayout || { order: ["dash","weekly","habits"], hidden: {} };
+    const order = Array.isArray(layout.order) && layout.order.length ? layout.order : ["dash","weekly","habits"];
+    const hidden = layout.hidden || {};
+
+    const out = order
+      .filter(id => blocks[id] && !hidden[id])
+      .map(id => blocks[id])
+      .join("");
+
+    return `
+      <div class="pageStack">
+        $/mnt/data/lifesync-v10.3.1.zip
       </div>
     `;
   }
@@ -1191,6 +1215,52 @@ function viewFinances() {
             <div class="small" style="opacity:.65;white-space:nowrap">${x.d}</div>
           </div>`).join("")}
         </div>
+        
+        <div class="sub" style="margin-top:16px">Dashboard layout</div>
+        <div class="small" style="opacity:.75;margin-top:6px">Show/hide and reorder sections on the Home screen.</div>
+        <div class="dashLayoutList" style="margin-top:10px">
+          ${(()=>{
+            const names = { dash:"Dashboard", weekly:"Weekly overview", habits: (t("habitTracker")||"Habits") };
+            const layout = state.dashLayout || { order:["dash","weekly","habits"], hidden:{} };
+            const order = Array.isArray(layout.order) ? layout.order : ["dash","weekly","habits"];
+            const hidden = layout.hidden || {};
+            return order.map((id, idx)=>`
+              <div class="dashRow">
+                <label class="dashRowLeft">
+                  <input type="checkbox" data-action="dashToggle" data-id="${id}" ${hidden[id] ? "" : "checked"}>
+                  <span>${names[id] || id}</span>
+                </label>
+                <div class="dashRowRight">
+                  <button class="btn ghost mini" type="button" data-action="dashUp" data-id="${id}" ${idx===0?"disabled":""} aria-label="Move up">↑</button>
+                  <button class="btn ghost mini" type="button" data-action="dashDown" data-id="${id}" ${idx===order.length-1?"disabled":""} aria-label="Move down">↓</button>
+                </div>
+              </div>
+            `).join("");
+          })()}
+        </div>
+
+        <div class="sub">Habits layout</div>
+        <div class="small" style="opacity:.75;margin-top:6px">Reorder or hide habits.</div>
+        <div class="dashLayoutList" style="margin-top:10px">
+          ${(()=>{
+            const layout = state.habitLayout || { order: [], hidden: {} };
+            const order = layout.order || [];
+            const hidden = layout.hidden || {};
+            return state.habits.map(h=>`
+              <div class="dashRow">
+                <label class="dashRowLeft">
+                  <input type="checkbox" data-action="habitToggle" data-id="${h.id}" ${hidden[h.id] ? "" : "checked"}>
+                  <span>${h.name}</span>
+                </label>
+                <div class="dashRowRight">
+                  <button class="btn ghost mini" type="button" data-action="habitUp" data-id="${h.id}">↑</button>
+                  <button class="btn ghost mini" type="button" data-action="habitDown" data-id="${h.id}">↓</button>
+                </div>
+              </div>
+            `).join("");
+          })()}
+        </div>
+
         <div class="sub">Appearance</div>
         <div class="row" style="margin-top:10px;align-items:center">
           <div class="pill">🌓 Theme: <b>Dark</b> <span class="small" style="opacity:.8">(locked)</span></div>
@@ -1640,6 +1710,50 @@ function handleAction(e) {
     if(a==="toggleHabit") {
       if(e.currentTarget.dataset.suppressClick==="1"){ e.currentTarget.dataset.suppressClick="0"; return; }
       return toggleHabit(e.currentTarget.dataset.habit, e.currentTarget.dataset.date);
+    }
+
+    if(a==="dashToggle") {
+      const id = e.currentTarget.dataset.id;
+      state.dashLayout = state.dashLayout || { order:["dash","weekly","habits"], hidden:{} };
+      state.dashLayout.hidden = state.dashLayout.hidden || {};
+      // checkbox checked => visible
+      const checked = e.currentTarget.checked;
+      if(checked) delete state.dashLayout.hidden[id];
+      else state.dashLayout.hidden[id] = true;
+      saveState();
+      return render();
+    }
+
+    if(a==="habitToggle"){
+      const id = e.currentTarget.dataset.id;
+      state.habitLayout = state.habitLayout || { order: [], hidden:{} };
+      state.habitLayout.hidden = state.habitLayout.hidden || {};
+      if(e.currentTarget.checked) delete state.habitLayout.hidden[id];
+      else state.habitLayout.hidden[id]=true;
+      saveState(); return render();
+    }
+    if(a==="habitUp" || a==="habitDown"){
+      const id = e.currentTarget.dataset.id;
+      state.habitLayout = state.habitLayout || { order: [], hidden:{} };
+      const order = state.habitLayout.order = Array.isArray(state.habitLayout.order)?state.habitLayout.order:[];
+      if(!order.includes(id)) order.push(id);
+      const i = order.indexOf(id);
+      const j = a==="habitUp"? i-1 : i+1;
+      if(j<0 || j>=order.length) return;
+      [order[i],order[j]]=[order[j],order[i]];
+      saveState(); return render();
+    }
+    if(a==="dashUp" || a==="dashDown") {
+      const id = e.currentTarget.dataset.id;
+      state.dashLayout = state.dashLayout || { order:["dash","weekly","habits"], hidden:{} };
+      const order = state.dashLayout.order = Array.isArray(state.dashLayout.order) ? state.dashLayout.order : ["dash","weekly","habits"];
+      const i = order.indexOf(id);
+      if(i<0) return;
+      const j = a==="dashUp" ? i-1 : i+1;
+      if(j<0 || j>=order.length) return;
+      const tmp = order[i]; order[i]=order[j]; order[j]=tmp;
+      saveState();
+      return render();
     }
     if(a==="setHabitWeekFull") { state._habitWeekFull = e.currentTarget.value; saveState(); return render(); }
     if(a==="addHabit") return openAddHabit();
@@ -2172,8 +2286,16 @@ function exportJSON(obj, filename) {
     }
 
     function currentListHtml(){
-      const habits = state.habits || [];
-      return habits.map(h=>`
+      const baseHabits = state.habits || [];
+    const hLayout = state.habitLayout || { order: [], hidden: {} };
+    const hOrder = Array.isArray(hLayout.order) ? hLayout.order : [];
+    const hHidden = hLayout.hidden || {};
+    // Build ordered list: ordered ids first, then any new habits not yet in order
+    const byId = Object.fromEntries(baseHabits.map(h=>[h.id,h]));
+    const ordered = hOrder.map(id=>byId[id]).filter(Boolean);
+    const rest = baseHabits.filter(h=>!hOrder.includes(h.id));
+    const habits = ordered.concat(rest).filter(h=>!hHidden[h.id]);
+      return applyHabitLayout(habits).map(h=>`
         <div class="row" style="justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--cardDivider, rgba(15,23,42,.06))">
           <div style="display:flex;align-items:center;gap:10px">
             <span style="font-size:18px">${h.icon||"✅"}</span>
@@ -2687,3 +2809,62 @@ function updateNoteIndicators(){
 }
 document.addEventListener('notes-updated', updateNoteIndicators);
 document.addEventListener('DOMContentLoaded', updateNoteIndicators);
+
+// ===== v10.5.0 Personalization =====
+
+// ensure prefs
+state.habitPrefs = state.habitPrefs || {}; // { [hid]: { hidden, order, color } }
+
+// apply preferences to habits list
+function applyHabitPrefs(habits){
+  return habits
+    .map(h=>({ ...h, ...(state.habitPrefs[h.id]||{}) }))
+    .filter(h=>!h.hidden)
+    .sort((a,b)=>(a.order??0)-(b.order??0));
+}
+
+// save color
+function setHabitColor(hid, color){
+  state.habitPrefs[hid] = state.habitPrefs[hid] || {};
+  state.habitPrefs[hid].color = color;
+  saveState(); render();
+}
+
+// toggle hide
+function toggleHabitHidden(hid){
+  state.habitPrefs[hid] = state.habitPrefs[hid] || {};
+  state.habitPrefs[hid].hidden = !state.habitPrefs[hid].hidden;
+  saveState(); render();
+}
+
+// simple reorder (move up/down)
+function moveHabit(hid, dir){
+  const prefs = state.habitPrefs;
+  const items = Object.keys(prefs).map(id=>({id, order:prefs[id].order||0}));
+  const idx = items.findIndex(i=>i.id===hid);
+  if(idx<0) return;
+  const swap = items[idx+dir];
+  if(!swap) return;
+  const o = prefs[hid].order||0;
+  prefs[hid].order = swap.order||0;
+  prefs[swap.id].order = o;
+  saveState(); render();
+}
+
+// ===== v10.5.1 Habit personalization helpers =====
+function applyHabitLayout(habits){
+  const layout = state.habitLayout || { order: [], hidden: {} };
+  const hidden = layout.hidden || {};
+  let out = habits.filter(h => !hidden[h.id]);
+  if(layout.order && layout.order.length){
+    out.sort((a,b)=>{
+      const ia = layout.order.indexOf(a.id);
+      const ib = layout.order.indexOf(b.id);
+      if(ia === -1 && ib === -1) return 0;
+      if(ia === -1) return 1;
+      if(ib === -1) return -1;
+      return ia - ib;
+    });
+  }
+  return out;
+}

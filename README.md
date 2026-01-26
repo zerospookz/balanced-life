@@ -30,3 +30,9 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.4.2** — Habit notes indicator: subtle dot on days with notes; zero clutter.
+
+
+**v10.5.0** — Personalization: hide habits, reorder them, and set per-habit color accents.
+
+
+**v10.5.1** — Personalization: reorder/hide habits from Settings; custom order respected everywhere.

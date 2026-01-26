@@ -45,3 +45,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.2** — Hotfix: initialize state.habitPrefs to prevent crash in personalization/insight code.
+
+
+**v10.6.3** — Insight mode upgraded: real last-7-days analysis with best day, weak day and weekly checks.

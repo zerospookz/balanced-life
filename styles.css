@@ -3933,3 +3933,41 @@ body{ font-feature-settings: "tnum"; }
   font-size:12px;
 }
 /* ===== end v10.6.0 ===== */
+
+/* ===== v10.6.3 Insight mode upgrade ===== */
+.insightTop{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.insightTop .pill{
+  padding:6px 10px;
+  border-radius:999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-weight:800;
+  font-size:12px;
+  opacity:.85;
+}
+.insightGrid2{
+  display:grid;
+  grid-template-columns: repeat(3,1fr);
+  gap:12px;
+  margin-top:12px;
+}
+.insightMini{
+  padding:12px 12px;
+  border-radius:16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.10);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.insightMini span{opacity:.7;font-size:12px}
+.insightMini strong{font-size:14px}
+@media (max-width:520px){
+  .insightGrid2{ grid-template-columns:1fr; }
+}
+/* ===== end v10.6.3 ===== */

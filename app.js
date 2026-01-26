@@ -305,7 +305,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.6.2", d: "2026-01-26", t: "Hotfix: restored Home render (removed stray path text), initialized state safely before personalization/insights code." },
+  { v: "10.6.3", d: "2026-01-26", t: "Insight mode: real weekly insights (last 7 days) with best day, weak day and total checks." },
+{ v: "10.6.2", d: "2026-01-26", t: "Hotfix: restored Home render (removed stray path text), initialized state safely before personalization/insights code." },
 { v: "10.6.0", d: "2026-01-26", t: "Insight mode: weekly summary with total checks, active days, and habits used." },
 { v: "10.5.1", d: "2026-01-26", t: "Personalization: reorder and hide individual habits from Settings; Home and Habits respect custom order." },
 { v: "10.5.0", d: "2026-01-26", t: "Personalization: hide habits, reorder (up/down), per-habit color accent." },
@@ -325,7 +326,7 @@ const BUILD_LOG = [
 
 
 let state;
-const APP_VERSION = "10.6.2";
+const APP_VERSION = "10.6.3";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -2880,19 +2881,73 @@ function applyHabitLayout(habits){
 }
 
 // ===== v10.6.0 Insight mode =====
+
 function computeInsights(){
-  const s = (typeof state !== "undefined" && state) ? state : { logs:{} };
+  // v10.6.3: insights over the last 7 days (including today)
+  const s = (typeof state !== "undefined" && state) ? state : { logs:{}, habits:[] };
   const logs = s.logs || {};
-  const days = Object.keys(logs);
-  let totalChecks = 0, activeDays = new Set(), habitCount = new Set();
-  days.forEach(d=>{
-    const dayLogs = logs[d] || {};
-    Object.keys(dayLogs).forEach(h=>{
-      if(dayLogs[h]){
+  const habitsArr = s.habits || [];
+  const habitNameById = Object.fromEntries(habitsArr.map(h=>[h.id, h.name || h.id]));
+
+  const today = new Date();
+  const days = [];
+  for(let i=0;i<7;i++){
+    const d = new Date(today);
+    d.setDate(today.getDate()-i);
+    const iso = d.toISOString().slice(0,10);
+    days.push(iso);
+  }
+
+  let totalChecks = 0;
+  const activeDays = new Set();
+  const habitCounts = {};
+  const dayCounts = {};
+  days.forEach(iso=>{
+    const dayLogs = logs[iso] || {};
+    let c = 0;
+    Object.keys(dayLogs).forEach(hid=>{
+      if(dayLogs[hid]){
+        c++;
         totalChecks++;
-        activeDays.add(d);
-        habitCount.add(h);
+        habitCounts[hid] = (habitCounts[hid]||0)+1;
       }
+    });
+    dayCounts[iso] = c;
+    if(c>0) activeDays.add(iso);
+  });
+
+  const habitsUsed = Object.keys(habitCounts).length;
+
+  // best / weak day (weak day among days with activity; if none, null)
+  let bestDay = null, weakDay = null;
+  days.forEach(iso=>{
+    const c = dayCounts[iso] || 0;
+    if(bestDay===null || c>bestDay.count) bestDay = { iso, count:c };
+    if(c>0){
+      if(weakDay===null || c<weakDay.count) weakDay = { iso, count:c };
+    }
+  });
+
+  // top habit
+  let topHabit = null;
+  Object.keys(habitCounts).forEach(hid=>{
+    const c = habitCounts[hid];
+    if(topHabit===null || c>topHabit.count){
+      topHabit = { id: hid, name: habitNameById[hid] || hid, count:c };
+    }
+  });
+
+  return {
+    windowDays: days,
+    totalChecks,
+    activeDays: activeDays.size,
+    habits: habitsUsed,
+    bestDay,
+    weakDay,
+    topHabit
+  };
+}
+
     });
   });
   return {
@@ -2902,16 +2957,47 @@ function computeInsights(){
   };
 }
 
+
 function viewInsightsHome(){
   const i = computeInsights();
+
+  const fmt = (iso)=>{
+    try{
+      const d = new Date(iso+"T00:00:00");
+      return d.toLocaleDateString(undefined, { weekday:"short" });
+    }catch(e){ return iso; }
+  };
+
+  const best = i.bestDay ? `${fmt(i.bestDay.iso)} (${i.bestDay.count})` : "—";
+  const weak = i.weakDay ? `${fmt(i.weakDay.iso)} (${i.weakDay.count})` : "—";
+  const top = i.topHabit ? `${i.topHabit.name} (${i.topHabit.count})` : "—";
+
+  const summary = (i.totalChecks===0)
+    ? "No activity in the last 7 days. Start with one small check today."
+    : `Last 7 days: ${i.totalChecks} checks across ${i.activeDays} active days.`;
+
   return `
     <section class="card section featured insightMode">
-      <div class="h1">Insights</div>
+      <div class="insightTop">
+        <div>
+          <div class="h1">Insights</div>
+          <div class="sub">${summary}</div>
+        </div>
+        <div class="pill">7d</div>
+      </div>
+
       <div class="insightGrid">
         <div class="insightItem"><strong>${i.totalChecks}</strong><span>Checks</span></div>
         <div class="insightItem"><strong>${i.activeDays}</strong><span>Active days</span></div>
         <div class="insightItem"><strong>${i.habits}</strong><span>Habits used</span></div>
       </div>
+
+      <div class="insightGrid2">
+        <div class="insightMini"><span>Best day</span><strong>${best}</strong></div>
+        <div class="insightMini"><span>Weak day</span><strong>${weak}</strong></div>
+        <div class="insightMini"><span>Top habit</span><strong>${top}</strong></div>
+      </div>
     </section>
   `;
 }
+

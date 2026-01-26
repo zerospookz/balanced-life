@@ -3301,3 +3301,32 @@ body{ font-feature-settings: "tnum"; }
   mix-blend-mode: normal !important;
   filter: none !important;
 }
+
+
+/* ===== Build 3.6: Remove remaining blue container box ===== */
+
+/* Remove section/container background under header */
+.section,
+.sectionHeader,
+.headerWrap,
+.hero,
+.weekHeader{
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* If header sits inside a card */
+.card,
+.panel,
+.box{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure nothing tints the top area */
+.section *{
+  backdrop-filter: none !important;
+}

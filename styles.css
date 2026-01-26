@@ -3330,3 +3330,30 @@ body{ font-feature-settings: "tnum"; }
 .section *{
   backdrop-filter: none !important;
 }
+
+
+/* ===== Build 3.7: Remove ALL card/box surfaces (full blend into background) ===== */
+.card{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Habits header row shouldn't paint a bar */
+.habitHeadRow{
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255,255,255,0.10) !important;
+}
+
+/* Pills / rows: remove any panel tint */
+.habitSectionFix,
+.habitWrap{
+  background: transparent !important;
+}
+
+/* If any generic surface classes exist */
+.surface, .panel, .sheet, .box, .glass{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}

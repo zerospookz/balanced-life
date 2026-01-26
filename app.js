@@ -681,9 +681,11 @@ function viewHome() {
   }
 
   
+    
     function viewHabitsHome(){
+    // v10.2.9: Home should not embed the full Habit Tracker (it causes huge “intersection” with other sections).
+    // Instead, show a compact link card that opens the Habits page.
     return `
-      <div class="homeHabitsInline">${viewHabitTracker()}</div>
       <section class="card section homeHabitsLink" data-route="habits" role="button" aria-label="Open habit tracker">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
           <div>
@@ -691,10 +693,11 @@ function viewHome() {
             <div class="sub">${t("openHabits")}</div>
           </div>
           <div class="chev" aria-hidden="true">›</div>
-</div>
+        </div>
       </section>
     `;
   }
+
 
 function viewHabitsPage(){
     return `

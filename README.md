@@ -1,7 +1,7 @@
 # LifeSync
 
 ## Build
-**v10.2.8** — Home screen modern refresh: unified glass cards, better spacing on desktop (no overlap with bottom nav), cleaner dashboard visuals
+**v10.2.9** — Home screen modern refresh: unified glass cards, better spacing on desktop (no overlap with bottom nav), cleaner dashboard visuals
 
 Static PWA (offline-first) - open index.html or serve with a static server.
 

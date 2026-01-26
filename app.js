@@ -310,15 +310,14 @@ function applyTheme(_mode){
   const root = document.documentElement;
   const m = "light";
   root.setAttribute("data-theme", m);
-  root.setAttribute("data-sky", "day");
-  localStorage.setItem(THEME_KEY, m);
+  root.setAttribute("data-sky", m==="dark" ? "night" : "day");
+localStorage.setItem(THEME_KEY, m);
 }
 
-applyTheme("light");
-
+applyTheme(localStorage.getItem(THEME_KEY) || "dark");
 function toggleThemeQuick(){
   // locked for now
-  applyTheme("light");
+  applyTheme(localStorage.getItem(THEME_KEY) || "dark");
 }
 
 function saveState() {

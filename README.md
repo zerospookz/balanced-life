@@ -51,3 +51,9 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.4** — Habits UI cleanup: removed double background, single surface only.
+
+
+**v10.7.0** — Finance page hotfix: syntax error fixed, finance overview restored.
+
+
+**v10.6.4.1** — Hotfix: fixed duplicated Insight code causing a syntax error (Unexpected token '}').

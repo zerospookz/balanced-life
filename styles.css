@@ -3357,3 +3357,17 @@ body{ font-feature-settings: "tnum"; }
   border: none !important;
   box-shadow: none !important;
 }
+
+
+/* ===== Build 3.8: Restore subtle glass cards (match reference) ===== */
+.card{
+  background: linear-gradient(180deg, rgba(20,30,60,0.55), rgba(10,15,35,0.45)) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35) !important;
+  backdrop-filter: blur(8px);
+}
+
+.habitHeadRow{
+  background: linear-gradient(180deg, rgba(20,30,60,0.55), rgba(10,15,35,0.45)) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.10) !important;
+}

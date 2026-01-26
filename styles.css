@@ -3846,3 +3846,17 @@ body{ font-feature-settings: "tnum"; }
   margin-top: 12px;
 }
 /* ===== end v10.4.1 ===== */
+
+
+/* ===== v10.4.2 Notes indicator (subtle, non-intrusive) ===== */
+.habitBox.hasNote::after{
+  content:"";
+  position:absolute;
+  top:6px;
+  right:6px;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background: rgba(99,102,241,.9);
+  box-shadow: 0 0 0 2px rgba(2,6,23,.6);
+}

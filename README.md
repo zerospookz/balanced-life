@@ -27,3 +27,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.4.1** — Habit UX: real notes modal on long-press, undo toast after check.
+
+
+**v10.4.2** — Habit notes indicator: subtle dot on days with notes; zero clutter.

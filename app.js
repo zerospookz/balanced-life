@@ -297,7 +297,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.4.1", d: "2026-01-26", t: "Habit UX upgrade: long-press opens real Notes modal (saved locally), Undo toast after check/uncheck, today highlight on grid." },
+  { v: "10.4.2", d: "2026-01-26", t: "Habit notes indicator: small dot on day cells with a note; notes update instantly after save/delete." },
+{ v: "10.4.1", d: "2026-01-26", t: "Habit UX upgrade: long-press opens real Notes modal (saved locally), Undo toast after check/uncheck, today highlight on grid." },
 { v: "10.3.2", d: "2026-01-26", t: "Micro-interactions: hover lift, tap feedback, habit check pop, button spring animations (reduced-motion safe)." },
     { v: "10.3.1", d: "2026-01-26", t: "Dashboard donuts: cleaner premium ring (thinner ticks, softer glow, calmer bars), responsive sizing." },
   { v: "10.3.1", d: "2026-01-26", t: "Dashboard KPIs: redesigned donut visuals (thinner rings, calmer contrast, clearer numbers, subtle hover)." },
@@ -311,7 +312,7 @@ const BUILD_LOG = [
 ];
 
 
-const APP_VERSION = "10.4.1";
+const APP_VERSION = "10.4.2";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -578,8 +579,9 @@ function saveState() {
               ${days.map(d=>{
                 const on = !!(logs[d] && logs[d][h.id]);
                 const pulse = !!(lastT && lastT.hid===h.id && lastT.iso===d && (nowMs-lastT.ts<900));
-                return `<button class="habitBox ${on?"on":""} ${pulse?"pulse":""} ${d===todayIso?"today":""}" type="button" style="--hc:${h.color||"#60a5fa"}"
-                          data-action="toggleHabit" data-habit="${h.id}" data-date="${d}"></button>`;
+                const hasNote = !!(state.habitNotes && state.habitNotes[d] && state.habitNotes[d][h.id]);
+                return `<button class="habitBox ${on?"on":""} ${pulse?"pulse":""} ${hasNote?"hasNote":""} ${d===todayIso?"today":""}" type="button" style="--hc:${h.color||"#60a5fa"}"
+                          data-action="toggleHabit" data-habit="${h.id}" data-date="${d}" aria-label="${hasNote ? (t("note")||"Note")+": " : ""}${name} ${d}"></button>`;
               }).join("")}
             </div>
           `).join("") : `<div class="muted" style="padding:10px 6px">${t("noHabits")}</div>`}
@@ -2369,6 +2371,7 @@ function openHabitNote(hid, iso){
     if(Object.keys(state.habitNotes[iso]).length===0) delete state.habitNotes[iso];
     saveState();
     closeModal();
+    render();
     showUndoToast(t("saved")||"Saved");
   });
   if(btnDel) btnDel.addEventListener("click", ()=>{
@@ -2376,6 +2379,7 @@ function openHabitNote(hid, iso){
     if(state.habitNotes && state.habitNotes[iso] && Object.keys(state.habitNotes[iso]).length===0) delete state.habitNotes[iso];
     saveState();
     closeModal();
+    render();
     showUndoToast(t("deleted")||"Deleted");
   });
 }
@@ -2671,3 +2675,15 @@ function radialBarsSVG({id, value=0.5, centerValue="0", centerLabel="", mode="si
 
 
 
+
+// v10.4.2 mark habit cells with notes
+function updateNoteIndicators(){
+  document.querySelectorAll('.habitBox').forEach(box=>{
+    const key = box.dataset.noteKey;
+    if(!key) return;
+    const note = localStorage.getItem(key);
+    box.classList.toggle('hasNote', !!note);
+  });
+}
+document.addEventListener('notes-updated', updateNoteIndicators);
+document.addEventListener('DOMContentLoaded', updateNoteIndicators);

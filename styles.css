@@ -391,7 +391,7 @@ textarea{min-height:90px;resize:vertical}
   box-shadow:0 6px 14px rgba(37,99,235,.18);
 }
 .habitBox:active{transform:scale(.96)}
-.habitStats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.habitStats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
 .statMini{background:rgba(15,23,42,.03);border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:10px}
 .statLabel{font-size:12px;color:var(--muted)}
 .statValue{font-size:18px;font-weight:800;margin-top:4px}
@@ -3415,4 +3415,11 @@ body{ font-feature-settings: "tnum"; }
 .add-habit-btn,
 .weekPill{
   overflow: visible !important;
+}
+
+/* v10.2.6: phone-safe KPIs + remove 0/7 counters */
+@media (max-width:520px){
+  .kpi{min-width:0 !important;}
+  .habitStats{grid-template-columns:1fr 1fr !important;}
+  .app{padding-bottom:140px !important;}
 }

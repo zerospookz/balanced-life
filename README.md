@@ -1,7 +1,7 @@
 # LifeSync
 
 ## Build
-**v10.2.4** — Habits header cleanup: removed the blue/gradient header wash behind Week and +Habit controls; kept animations and layout fixes
+**v10.2.6** — Habits header cleanup: removed the blue/gradient header wash behind Week and +Habit controls; kept animations and layout fixes
 
 Static PWA (offline-first) - open index.html or serve with a static server.
 

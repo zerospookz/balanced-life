@@ -296,7 +296,13 @@ function habitDisplayName(h){
 
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
-const APP_VERSION = "9.7";
+const BUILD_LOG = [
+  { v: "10.2.6", d: "2026-01-26", t: "Habits UI: removed 0/7 counters; fixed phone KPI cut-off with responsive KPIs + more bottom padding." },
+  { v: "10.2.5", d: "2026-01-26", t: "Habits header: fixed right-side cut-off by removing overflow clipping on header containers." },
+  { v: "10.2.4", d: "2026-01-26", t: "Habits header cleanup: removed blue/gradient wash behind Week and +Habit controls." }
+];
+
+const APP_VERSION = "10.2.6";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -557,7 +563,7 @@ function saveState() {
                 <div class="habitNameInner">
                   <span class="habitIcon">${h.icon||"✅"}</span>
                   <span class="habitText" style="color:${h.color||"#60a5fa"}">${escapeHtml(habitDisplayName(h)||t("habit"))}</span>
-                  <span class="chip">${weekCounts[idx]}/7</span>
+                  
                 </div>
               </div>
               ${days.map(d=>{
@@ -1163,6 +1169,14 @@ function viewFinances() {
       <section class="card section">
         <div class="h1">Settings</div>
         <div class="sub">Build: <b>${APP_VERSION}</b></div>
+        <div class="sub" style="margin-top:10px">Recent builds</div>
+        <div class="card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);box-shadow:none;padding:10px;border-radius:14px">
+          ${BUILD_LOG.map(x=>`<div class="row" style="justify-content:space-between;gap:12px;align-items:flex-start">
+            <div style="min-width:86px"><b>${x.v}</b></div>
+            <div class="small" style="opacity:.8;flex:1">${escapeHtml(x.t)}</div>
+            <div class="small" style="opacity:.65;white-space:nowrap">${x.d}</div>
+          </div>`).join("")}
+        </div>
         <div class="sub">Appearance</div>
         <div class="row" style="margin-top:10px;align-items:center">
           <div class="pill">🌓 Theme: <b>Dark</b> <span class="small" style="opacity:.8">(locked)</span></div>

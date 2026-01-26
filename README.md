@@ -15,3 +15,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.3.0** — Dashboard visual refresh: lighter glass cards, improved spacing, hover depth, cleaner hierarchy.
+
+
+**v10.3.1** — Dashboard KPI redesign: thinner donut rings, calmer contrast, clearer values.

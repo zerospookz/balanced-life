@@ -3634,3 +3634,49 @@ body{ font-feature-settings: "tnum"; }
   .donutRow{ gap:12px; }
 }
 /* ===== end v10.3.0 ===== */
+
+
+/* ===== v10.3.1 Donut KPI redesign (thin, calm, modern) ===== */
+.donutRing{
+  stroke-width: 6 !important;
+  opacity: 0.85;
+}
+.donutTrack{
+  stroke-width: 6 !important;
+  opacity: 0.25;
+}
+.donutValue{
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+}
+.donutLabel{
+  font-size: 12px !important;
+  opacity: 0.7;
+}
+
+/* Reduce plastic feel */
+.donutCard{
+  background: rgba(255,255,255,0.035) !important;
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.32),
+    inset 0 1px 0 rgba(255,255,255,0.06) !important;
+}
+
+/* Hover micro interaction */
+.donutCard:hover .donutRing{
+  opacity: 1;
+}
+
+/* Mobile calm */
+@media (max-width:420px){
+  .donutValue{ font-size: 24px !important; }
+}
+/* ===== end v10.3.1 ===== */
+
+
+/* ===== v10.3.1 Donut visuals polish ===== */
+.donut svg{ width: 210px; height: 210px; }
+@media (max-width:420px){
+  .donut svg{ width: 190px; height: 190px; }
+}

@@ -297,6 +297,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
+  { v: "10.3.1", d: "2026-01-26", t: "Dashboard donuts: cleaner premium ring (thinner ticks, softer glow, calmer bars), responsive sizing." },
+  { v: "10.3.1", d: "2026-01-26", t: "Dashboard KPIs: redesigned donut visuals (thinner rings, calmer contrast, clearer numbers, subtle hover)." },
   { v: "10.3.0", d: "2026-01-26", t: "Dashboard refresh: premium glass cards, cleaner donuts/weekly tiles, improved desktop layout (3-column weekly tiles), softer insight bar." },
   { v: "10.2.9", d: "2026-01-26", t: "Home cleanup: removed embedded Habit Tracker from Dashboard; replaced with compact link card." },
   { v: "10.2.8", d: "2026-01-26", t: "Theme behavior: default to dark + consistent sky mode; day mode cards no longer look flat/gray." },
@@ -307,7 +309,7 @@ const BUILD_LOG = [
 ];
 
 
-const APP_VERSION = "10.3.0";
+const APP_VERSION = "10.3.1";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -2420,42 +2422,42 @@ function _hash01(str){
   return ((h >>> 0) % 10000) / 10000;
 }
 
-function radialBarsSVG({id, value=0.5, centerValue="0", centerLabel="", mode="single"}={}){
-  const size = 220;
-  const cx = size/2, cy = size/2;
-  const innerR = 42;
-  const baseR = 62;
-  const maxExtra = 26;
+function radialBarsSVG({id, value=0.5, centerValue="0", centerLabel="", mode="single"}={}) {
+  // v10.3.1: cleaner “premium” donut — thinner ticks, softer glow, less noisy bars
+  const size = 210;
+  const cx = size / 2, cy = size / 2;
+
+  const innerR = 46;          // center disc radius
+  const baseR  = 66;          // base ring radius
+  const maxExtra = 18;        // max bar height
   const bars = 56;
-  const gapDeg = 2.4; // gap between bars
+  const gapDeg = 2.8;
   const barDeg = (360 / bars) - gapDeg;
 
-  // palette close to reference (purple/pink/orange/blue)
-  const pal = ["#60A5FA", "#8B5CF6", "#D946EF", "#FB7185", "#FB923C"];
-  const bgRing = "rgba(255,255,255,0.10)";
+  const bgRing = "rgba(255,255,255,0.08)";
 
-  // create bar heights with a subtle wave pattern + deterministic noise
+  // deterministic “gentle” variation (much calmer than before)
   const seed = _hash01(id);
-  const wave = (i)=> (0.55 + 0.45*Math.sin((i/bars)*Math.PI*2 + seed*6.28));
-  const noise = (i)=> (0.75 + 0.25*Math.sin((i*12.9898 + seed*78.233)*0.6));
+  const wave = (i)=> (0.75 + 0.25*Math.sin((i/bars)*Math.PI*2 + seed*6.28));
+  const noise = (i)=> (0.88 + 0.12*Math.sin((i*12.9898 + seed*78.233)*0.6));
   const activeBars = Math.round(clamp01(value) * bars);
 
   const defs = `
     <defs>
       <linearGradient id="rg-${id}" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stop-color="#60A5FA"/>
-        <stop offset="35%" stop-color="#8B5CF6"/>
-        <stop offset="65%" stop-color="#D946EF"/>
-        <stop offset="82%" stop-color="#FB7185"/>
+        <stop offset="38%" stop-color="#8B5CF6"/>
+        <stop offset="68%" stop-color="#D946EF"/>
+        <stop offset="86%" stop-color="#FB7185"/>
         <stop offset="100%" stop-color="#FB923C"/>
       </linearGradient>
       <filter id="rbglow-${id}" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="3.0" result="blur"/>
+        <feGaussianBlur stdDeviation="2.0" result="blur"/>
         <feColorMatrix in="blur" type="matrix"
           values="1 0 0 0 0
                   0 1 0 0 0
                   0 0 1 0 0
-                  0 0 0 0.7 0" result="glow"/>
+                  0 0 0 0.45 0" result="glow"/>
         <feMerge>
           <feMergeNode in="glow"/>
           <feMergeNode in="SourceGraphic"/>
@@ -2486,30 +2488,32 @@ function radialBarsSVG({id, value=0.5, centerValue="0", centerLabel="", mode="si
   for(let i=0;i<bars;i++){
     const start = (i*(360/bars)) + (gapDeg/2) - 90;
     const end = start + barDeg;
-    const h = wave(i)*noise(i); // 0..~1
-    const r2 = baseR + (h*maxExtra);
-    const r1 = innerR + 18; // thickness
-    const active = i < activeBars;
 
+    const h = wave(i)*noise(i);               // ~0.75..1
+    const r2 = baseR + (h*maxExtra);
+    const r1 = innerR + 26;                   // thinner ring
+
+    const active = i < activeBars;
     const fill = active ? `url(#rg-${id})` : bgRing;
-    const op = active ? 1 : 0.35;
+    const op = active ? 1 : 0.22;
+
     shapes += `<path d="${arcPath(r1, r2, start, end)}" fill="${fill}" opacity="${op}" ${active?`filter="url(#rbglow-${id})"`:""} />`;
   }
 
-  // extra outer ticks ring (faint)
+  // outer micro ticks (very faint)
   let ticks = "";
   const tickBars = 84;
   for(let i=0;i<tickBars;i++){
     const ang = (i*(360/tickBars)) - 90;
     const p1 = polar(baseR + maxExtra + 8, ang);
-    const p2 = polar(baseR + maxExtra + 14, ang);
-    ticks += `<line x1="${p1.x.toFixed(2)}" y1="${p1.y.toFixed(2)}" x2="${p2.x.toFixed(2)}" y2="${p2.y.toFixed(2)}" stroke="rgba(255,255,255,0.10)" stroke-width="2" stroke-linecap="round" />`;
+    const p2 = polar(baseR + maxExtra + 12, ang);
+    ticks += `<line x1="${p1.x.toFixed(2)}" y1="${p1.y.toFixed(2)}" x2="${p2.x.toFixed(2)}" y2="${p2.y.toFixed(2)}" stroke="rgba(255,255,255,0.07)" stroke-width="1.3" stroke-linecap="round" />`;
   }
 
   const center = `
-    <circle cx="${cx}" cy="${cy}" r="${innerR+8}" fill="rgba(0,0,0,0.25)" />
-    <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="30" font-weight="900" fill="rgba(255,255,255,0.92)">${escapeHtml(centerValue)}</text>
-    <text x="${cx}" y="${cy+22}" text-anchor="middle" font-size="12" font-weight="800" fill="rgba(255,255,255,0.60)">${escapeHtml(centerLabel)}</text>
+    <circle cx="${cx}" cy="${cy}" r="${innerR+10}" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.10)" stroke-width="1" />
+    <text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="28" font-weight="850" fill="rgba(255,255,255,0.92)">${escapeHtml(centerValue)}</text>
+    <text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="12" font-weight="750" fill="rgba(255,255,255,0.62)">${escapeHtml(centerLabel)}</text>
   `;
 
   return `

@@ -66,3 +66,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.8** — Hotfix: removed listener accumulation (memory leak) via delegated handlers; disabled transform/lift interactions on Habits to stop full-screen tremble.
+
+
+**v10.6.9** — Hotfix: delegated event handlers now pass correct currentTarget to action dispatcher; Habits buttons and ticks work again.

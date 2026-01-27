@@ -305,7 +305,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.6.8", d: "2026-01-26", t: "Habits stability + performance: fixed memory leak (delegated event handling) and removed transform/lift interactions on Habits to stop full-screen tremble." },
+  { v: "10.6.9", d: "2026-01-26", t: "Hotfix: delegated events now pass correct currentTarget so buttons/toggles work again (no tremble, no leak)." },
+{ v: "10.6.8", d: "2026-01-26", t: "Habits stability + performance: fixed memory leak (delegated event handling) and removed transform/lift interactions on Habits to stop full-screen tremble." },
 { v: "10.6.6", d: "2026-01-26", t: "Habits UX: fixed mobile tap animation jitter (no full-screen tremble) by removing transform scaling on habit cells and using shadow/brightness pulse." },
 { v: "10.6.5", d: "2026-01-26", t: "Habits visual fix: removed double background by making Habits page container transparent (route-scoped) while keeping rows readable." },
 { v: "10.6.4.1", d: "2026-01-26", t: "Hotfix: fixed a syntax error caused by duplicated Insight code; app loads normally again." },
@@ -331,7 +332,7 @@ const BUILD_LOG = [
 
 
 let state;
-const APP_VERSION = "10.6.8";
+const APP_VERSION = "10.6.9";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -1437,13 +1438,13 @@ function render() {
         // allow native input handling for finQuery (handled in input listener)
         if(act.dataset.action==="finQuery" && act.tagName==="INPUT") return;
 
-        handleAction(e);
+        handleAction({ type: e.type, target: e.target, currentTarget: act, key: e.key, preventDefault: ()=>e.preventDefault() });
       }, {passive:true});
 
       document.addEventListener("change", (e)=>{
         const act = e.target.closest("[data-action]");
         if(!act) return;
-        handleAction(e);
+        handleAction({ type: e.type, target: e.target, currentTarget: act, key: e.key, preventDefault: ()=>e.preventDefault() });
       });
 
       document.addEventListener("input", (e)=>{

@@ -305,7 +305,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.6.10", d: "2026-01-26", t: "Hotfix: restored Habits interactions by exposing setRoute globally for delegated routing; buttons and ticks work again." },
+  { v: "10.6.11", d: "2026-01-26", t: "Hotfix: restored Habits interactions by routing actions via pointerup delegation (and suppressing duplicate click); buttons & ticks work again on mobile." },
+{ v: "10.6.10", d: "2026-01-26", t: "Hotfix: restored Habits interactions by exposing setRoute globally for delegated routing; buttons and ticks work again." },
 { v: "10.6.9", d: "2026-01-26", t: "Hotfix: delegated events now pass correct currentTarget so buttons/toggles work again (no tremble, no leak)." },
 { v: "10.6.8", d: "2026-01-26", t: "Habits stability + performance: fixed memory leak (delegated event handling) and removed transform/lift interactions on Habits to stop full-screen tremble." },
 { v: "10.6.6", d: "2026-01-26", t: "Habits UX: fixed mobile tap animation jitter (no full-screen tremble) by removing transform scaling on habit cells and using shadow/brightness pulse." },
@@ -333,7 +334,7 @@ const BUILD_LOG = [
 
 
 let state;
-const APP_VERSION = "10.6.10";
+const APP_VERSION = "10.6.11";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -1430,24 +1431,49 @@ function render() {
     // bind delegated listeners once (prevents listener accumulation / memory leak)
     if(!window.__lsDelegated){
       window.__lsDelegated = true;
+      // Avoid double-trigger (pointerup + click) on touch devices
+      let __lastPointerUpTs = 0;
 
-      document.addEventListener("click", (e)=>{
+      const dispatchAction = (act, e)=>{
+        handleAction({ type: e.type, target: e.target, currentTarget: act, key: e.key,
+          preventDefault: ()=>{ try{ e.preventDefault(); }catch(_){ } },
+          stopPropagation: ()=>{ try{ e.stopPropagation(); }catch(_){ } }
+        });
+      };
+
+      const dispatchRoute = (rBtn, e)=>{
+        const fn = (window.setRoute) ? window.setRoute : (typeof setRoute==="function" ? setRoute : null);
+        if(fn) fn(rBtn.dataset.route);
+      };
+
+      document.addEventListener("pointerup", (e)=>{
+        __lastPointerUpTs = Date.now();
+
         const rBtn = e.target.closest("[data-route]");
-        if(rBtn){ return (window.setRoute||setRoute)(rBtn.dataset.route); }
+        if(rBtn) return dispatchRoute(rBtn, e);
 
         const act = e.target.closest("[data-action]");
         if(!act) return;
+        dispatchAction(act, e);
+      });
 
-        // allow native input handling for finQuery (handled in input listener)
+      document.addEventListener("click", (e)=>{
+        // If we just handled a pointerup, ignore the synthetic click
+        if(Date.now() - __lastPointerUpTs < 450) return;
+
+        const rBtn = e.target.closest("[data-route]");
+        if(rBtn) return dispatchRoute(rBtn, e);
+
+        const act = e.target.closest("[data-action]");
+        if(!act) return;
         if(act.dataset.action==="finQuery" && act.tagName==="INPUT") return;
-
-        handleAction({ type: e.type, target: e.target, currentTarget: act, key: e.key, preventDefault: ()=>e.preventDefault() });
-      }, {passive:true});
+        dispatchAction(act, e);
+      });
 
       document.addEventListener("change", (e)=>{
         const act = e.target.closest("[data-action]");
         if(!act) return;
-        handleAction({ type: e.type, target: e.target, currentTarget: act, key: e.key, preventDefault: ()=>e.preventDefault() });
+        dispatchAction(act, e);
       });
 
       document.addEventListener("input", (e)=>{
@@ -1455,8 +1481,10 @@ function render() {
         if(!el) return;
         state._finQuery = e.target.value || "";
         render();
-      }, {passive:true});
+      });
     }
+
+    
 
     // bottom nav active (set before we compute icon sources)
     $$(".bottomnav .tab").forEach(t=>t.classList.toggle("active", t.dataset.route===route));

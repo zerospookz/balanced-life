@@ -72,3 +72,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.10** — Hotfix: expose setRoute globally so delegated navigation works; Habits buttons and ticks respond again.
+
+
+**v10.6.11** — Hotfix: interactions restored on mobile (Habits ticks/buttons) using pointerup delegation + duplicate click suppression.

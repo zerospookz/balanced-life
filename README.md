@@ -65,4 +65,4 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 **v10.6.6** — Habits UX hotfix: fixed mobile tap animation jitter (screen tremble) by removing transform scaling on habit cells and using shadow/brightness pulse.
 
 
-**v10.6.7** — Hotfix: fixed memory leak caused by event listeners being added on every render.
+**v10.6.8** — Hotfix: removed listener accumulation (memory leak) via delegated handlers; disabled transform/lift interactions on Habits to stop full-screen tremble.

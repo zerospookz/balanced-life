@@ -4100,3 +4100,25 @@ body{ font-feature-settings: "tnum"; }
   .habitBox.pulse{ animation: none !important; }
 }
 /* ===== end v10.6.6 ===== */
+
+
+/* ===== v10.6.8 Habits: Habits stability (no full-screen tremble) ===== */
+#view[data-route="habits"] .card.section,
+#view[data-route="habits"] .donutCard,
+#view[data-route="habits"] .weekTile,
+#view[data-route="habits"] .habitRow,
+#view[data-route="habits"] .habitBox{
+  transform: none !important;
+  transition-property: background, border-color, box-shadow, filter, opacity !important;
+}
+
+@media (hover:hover){
+  #view[data-route="habits"] .card.section:hover,
+  #view[data-route="habits"] .donutCard:hover,
+  #view[data-route="habits"] .weekTile:hover,
+  #view[data-route="habits"] .habitRow:hover,
+  #view[data-route="habits"] .habitBox:hover{
+    transform: none !important;
+  }
+}
+/* ===== end v10.6.8 ===== */

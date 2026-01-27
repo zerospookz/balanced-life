@@ -305,7 +305,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.6.6", d: "2026-01-26", t: "Habits UX: fixed mobile tap animation jitter (no full-screen tremble) by removing transform scaling on habit cells and using shadow/brightness pulse." },
+  { v: "10.6.7", d: "2026-01-26", t: "Hotfix: fixed memory leak by stopping per-render addEventListener accumulation (use onclick/onchange assignments in render)." },
+{ v: "10.6.6", d: "2026-01-26", t: "Habits UX: fixed mobile tap animation jitter (no full-screen tremble) by removing transform scaling on habit cells and using shadow/brightness pulse." },
 { v: "10.6.5", d: "2026-01-26", t: "Habits visual fix: removed double background by making Habits page container transparent (route-scoped) while keeping rows readable." },
 { v: "10.6.4.1", d: "2026-01-26", t: "Hotfix: fixed a syntax error caused by duplicated Insight code; app loads normally again." },
 { v: "10.6.4", d: "2026-01-26", t: "Habits UI cleanup: removed double background so tracker uses a single visual surface." },
@@ -330,7 +331,7 @@ const BUILD_LOG = [
 
 
 let state;
-const APP_VERSION = "10.6.6";
+const APP_VERSION = "10.6.7";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -1423,14 +1424,14 @@ function render() {
     view.dataset.route = route;
 
     // attach internal route buttons
-    $$("[data-route]").forEach(btn=>btn.addEventListener("click", ()=>setRoute(btn.dataset.route)));
+    $$("[data-route]").forEach(btn=>btn.onclick = ()=>setRoute(btn.dataset.route));
 
     // bottom nav active (set before we compute icon sources)
     $$(".bottomnav .tab").forEach(t=>t.classList.toggle("active", t.dataset.route===route));
     // v9.7: no icon source swapping; active state is handled via CSS.
 
     // actions
-    $$("[data-action]").forEach(el=>{ if((el.dataset.action==="selectPlanDay" && el.tagName==="SELECT") || (el.dataset.action==="finQuery" && el.tagName==="INPUT")) return; el.addEventListener("click", handleAction); });
+    $$("[data-action]").forEach(el=>{ if((el.dataset.action==="selectPlanDay" && el.tagName==="SELECT") || (el.dataset.action==="finQuery" && el.tagName==="INPUT")) return; el.onclick = handleAction; });
     // change actions
     $$("[data-action='selectPlanDay']").forEach(el=>el.addEventListener("change", handleAction));
     $$("[data-action='setTheme']").forEach(el=>el.addEventListener("change", handleAction));

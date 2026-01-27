@@ -305,7 +305,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.6.11", d: "2026-01-26", t: "Hotfix: restored Habits interactions by routing actions via pointerup delegation (and suppressing duplicate click); buttons & ticks work again on mobile." },
+  { v: "10.6.12", d: "2026-01-26", t: "Hotfix: action dispatcher now resolves element via closest() so Habits ticks/buttons work with delegated events (no tremble, no leak)." },
+{ v: "10.6.11", d: "2026-01-26", t: "Hotfix: restored Habits interactions by routing actions via pointerup delegation (and suppressing duplicate click); buttons & ticks work again on mobile." },
 { v: "10.6.10", d: "2026-01-26", t: "Hotfix: restored Habits interactions by exposing setRoute globally for delegated routing; buttons and ticks work again." },
 { v: "10.6.9", d: "2026-01-26", t: "Hotfix: delegated events now pass correct currentTarget so buttons/toggles work again (no tremble, no leak)." },
 { v: "10.6.8", d: "2026-01-26", t: "Habits stability + performance: fixed memory leak (delegated event handling) and removed transform/lift interactions on Habits to stop full-screen tremble." },
@@ -334,7 +335,7 @@ const BUILD_LOG = [
 
 
 let state;
-const APP_VERSION = "10.6.11";
+const APP_VERSION = "10.6.12";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -1772,21 +1773,25 @@ function initCometParallax(){
 
 function handleAction(e) {
   return safeRun("action", () => {
-    const a = e.currentTarget.dataset.action;
+    const el = (e && e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.action)
+      ? e.currentTarget
+      : (e && e.target ? e.target.closest("[data-action]") : null);
+    if(!el) return;
+    const a = el.dataset.action;
     // tap feedback for UI controls (optional via Settings)
-    if(a!="toggleHabit") { feedbackTap(); tapBounce(e.currentTarget); }
+    if(a!="toggleHabit") { feedbackTap(); tapBounce(el); }
 
     if(a==="toggleHabit") {
-      if(e.currentTarget.dataset.suppressClick==="1"){ e.currentTarget.dataset.suppressClick="0"; return; }
-      return toggleHabit(e.currentTarget.dataset.habit, e.currentTarget.dataset.date);
+      if(el.dataset.suppressClick==="1"){ el.dataset.suppressClick="0"; return; }
+      return toggleHabit(el.dataset.habit, el.dataset.date);
     }
 
     if(a==="dashToggle") {
-      const id = e.currentTarget.dataset.id;
+      const id = el.dataset.id;
       state.dashLayout = state.dashLayout || { order:["dash","weekly","habits"], hidden:{} };
       state.dashLayout.hidden = state.dashLayout.hidden || {};
       // checkbox checked => visible
-      const checked = e.currentTarget.checked;
+      const checked = el.checked;
       if(checked) delete state.dashLayout.hidden[id];
       else state.dashLayout.hidden[id] = true;
       saveState();
@@ -1794,15 +1799,15 @@ function handleAction(e) {
     }
 
     if(a==="habitToggle"){
-      const id = e.currentTarget.dataset.id;
+      const id = el.dataset.id;
       state.habitLayout = state.habitLayout || { order: [], hidden:{} };
       state.habitLayout.hidden = state.habitLayout.hidden || {};
-      if(e.currentTarget.checked) delete state.habitLayout.hidden[id];
+      if(el.checked) delete state.habitLayout.hidden[id];
       else state.habitLayout.hidden[id]=true;
       saveState(); return render();
     }
     if(a==="habitUp" || a==="habitDown"){
-      const id = e.currentTarget.dataset.id;
+      const id = el.dataset.id;
       state.habitLayout = state.habitLayout || { order: [], hidden:{} };
       const order = state.habitLayout.order = Array.isArray(state.habitLayout.order)?state.habitLayout.order:[];
       if(!order.includes(id)) order.push(id);
@@ -1813,7 +1818,7 @@ function handleAction(e) {
       saveState(); return render();
     }
     if(a==="dashUp" || a==="dashDown") {
-      const id = e.currentTarget.dataset.id;
+      const id = el.dataset.id;
       state.dashLayout = state.dashLayout || { order:["dash","weekly","habits"], hidden:{} };
       const order = state.dashLayout.order = Array.isArray(state.dashLayout.order) ? state.dashLayout.order : ["dash","weekly","habits"];
       const i = order.indexOf(id);
@@ -1824,13 +1829,13 @@ function handleAction(e) {
       saveState();
       return render();
     }
-    if(a==="setHabitWeekFull") { state._habitWeekFull = e.currentTarget.value; saveState(); return render(); }
+    if(a==="setHabitWeekFull") { state._habitWeekFull = el.value; saveState(); return render(); }
     if(a==="addHabit") return openAddHabit();
     if(a==="addFinance") return openAddFinance();
 
     // ----- Finances: focus income/expenses (chart + stat highlight) -----
     if(a==="finFocus") {
-      const kind = (e.currentTarget.dataset.kind || "both");
+      const kind = (el.dataset.kind || "both");
       const cur = state._finFocus || "";
       // toggle: clicking the same focus resets to both
       state._finFocus = (cur === kind) ? "both" : (kind === "income" || kind === "expense" ? kind : "both");
@@ -1841,13 +1846,13 @@ function handleAction(e) {
     // ----- Finances goals -----
     if(a==="addGoal") return openAddGoal();
     if(a==="delGoal") {
-      const gid = e.currentTarget.dataset.gid;
+      const gid = el.dataset.gid;
       state.finGoals = (state.finGoals||[]).filter(g=>g.id!==gid);
       return saveState();
     }
-    if(a==="addGoalProgress") return openAddGoalProgress(e.currentTarget.dataset.gid);
+    if(a==="addGoalProgress") return openAddGoalProgress(el.dataset.gid);
     if(a==="resetGoalProgress") {
-      const gid = e.currentTarget.dataset.gid;
+      const gid = el.dataset.gid;
       const g = (state.finGoals||[]).find(x=>x.id===gid);
       if(g) g.manualProgress = 0;
       return saveState();
@@ -1866,41 +1871,41 @@ function handleAction(e) {
       return;
     }
     if(a==="delFinance") {
-      const idx = Number(e.currentTarget.dataset.idx);
+      const idx = Number(el.dataset.idx);
       state.finances.splice(idx,1);
       return saveState();
     }
     if(a==="addFood") return openAddFood();
     if(a==="delFood") {
-      const idx=Number(e.currentTarget.dataset.idx);
+      const idx=Number(el.dataset.idx);
       state.nutrition.splice(idx,1);
       return saveState();
     }
     if(a==="addWorkout") return openAddWorkout();
     if(a==="delWorkout") {
-      const idx=Number(e.currentTarget.dataset.idx);
+      const idx=Number(el.dataset.idx);
       state.workouts.splice(idx,1);
       return saveState();
     }
     if(a==="setWorkoutsTab") {
-      state._workoutsTab = e.currentTarget.dataset.tab;
+      state._workoutsTab = el.dataset.tab;
       return render();
     }
 if(a==="toggleHaptics") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.haptics = !state.prefs.haptics; saveState(); return render(); }
     if(a==="toggleSound") { state.prefs = state.prefs || {haptics:false,sound:false}; state.prefs.sound = !state.prefs.sound; saveState(); return render(); }
 
     if(a==="selectPlanDay") {
-      const v = e.currentTarget.value;
+      const v = el.value;
       state._selectedPlanDay = v;
       return render();
     }
     if(a==="addPlanItem") {
-      return openAddPlanItem(e.currentTarget.dataset.day, e.currentTarget.dataset.sec);
+      return openAddPlanItem(el.dataset.day, el.dataset.sec);
     }
     if(a==="delPlanItem") {
-      const day=e.currentTarget.dataset.day;
-      const sec=e.currentTarget.dataset.sec;
-      const i=Number(e.currentTarget.dataset.i);
+      const day=el.dataset.day;
+      const sec=el.dataset.sec;
+      const i=Number(el.dataset.i);
       const arr = state.workoutPlan?.[day]?.[sec];
       if(Array.isArray(arr)) arr.splice(i,1);
       return saveState();

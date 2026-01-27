@@ -75,3 +75,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.11** — Hotfix: interactions restored on mobile (Habits ticks/buttons) using pointerup delegation + duplicate click suppression.
+
+
+**v10.6.12** — Hotfix: restored Habits ticks/buttons by making handleAction resolve the clicked element via closest('[data-action]').

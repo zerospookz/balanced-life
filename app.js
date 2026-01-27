@@ -305,7 +305,8 @@ function habitDisplayName(h){
   
   // ===== THEME_MODE v6.2.5 (manual light/dark) =====
 const BUILD_LOG = [
-  { v: "10.6.9", d: "2026-01-26", t: "Hotfix: delegated events now pass correct currentTarget so buttons/toggles work again (no tremble, no leak)." },
+  { v: "10.6.10", d: "2026-01-26", t: "Hotfix: restored Habits interactions by exposing setRoute globally for delegated routing; buttons and ticks work again." },
+{ v: "10.6.9", d: "2026-01-26", t: "Hotfix: delegated events now pass correct currentTarget so buttons/toggles work again (no tremble, no leak)." },
 { v: "10.6.8", d: "2026-01-26", t: "Habits stability + performance: fixed memory leak (delegated event handling) and removed transform/lift interactions on Habits to stop full-screen tremble." },
 { v: "10.6.6", d: "2026-01-26", t: "Habits UX: fixed mobile tap animation jitter (no full-screen tremble) by removing transform scaling on habit cells and using shadow/brightness pulse." },
 { v: "10.6.5", d: "2026-01-26", t: "Habits visual fix: removed double background by making Habits page container transparent (route-scoped) while keeping rows readable." },
@@ -332,7 +333,7 @@ const BUILD_LOG = [
 
 
 let state;
-const APP_VERSION = "10.6.9";
+const APP_VERSION = "10.6.10";
 const THEME_KEY = "bl_theme_mode"; // light | dark
 
 // NOTE v6.9.2: Light theme is temporarily locked.
@@ -374,6 +375,8 @@ function saveState() {
     if (location.hash !== hash) location.hash = hash;
     render();
   }
+  // expose for delegated handlers
+  window.setRoute = setRoute;
 
   window.addEventListener("hashchange", () => {
     const h = (location.hash || "#home").replace("#","");
@@ -1430,7 +1433,7 @@ function render() {
 
       document.addEventListener("click", (e)=>{
         const rBtn = e.target.closest("[data-route]");
-        if(rBtn){ return setRoute(rBtn.dataset.route); }
+        if(rBtn){ return (window.setRoute||setRoute)(rBtn.dataset.route); }
 
         const act = e.target.closest("[data-action]");
         if(!act) return;

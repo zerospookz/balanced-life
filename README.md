@@ -69,3 +69,6 @@ Upload this folder to GitHub and enable GitHub Pages (branch main / root).
 
 
 **v10.6.9** — Hotfix: delegated event handlers now pass correct currentTarget to action dispatcher; Habits buttons and ticks work again.
+
+
+**v10.6.10** — Hotfix: expose setRoute globally so delegated navigation works; Habits buttons and ticks respond again.

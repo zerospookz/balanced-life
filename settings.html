@@ -1,0 +1,82 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0f1a">
+<title>Settings</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logoDot"></div>
+      <div>
+        <div class="brandTitle">LifeSync</div>
+        <div class="brandSub">Command center</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="dashboard.html"><span class="left">🏠 <span>Dashboard</span></span><span class="pill">Today</span></a>
+      <a href="habits.html"><span class="left">🔥 <span>Habits</span></span><span class="pill">Streaks</span></a>
+      <a href="workouts.html"><span class="left">🏋️ <span>Workouts</span></span><span class="pill">PRs</span></a>
+      <a href="nutrition.html"><span class="left">🍎 <span>Nutrition</span></span><span class="pill">Log</span></a>
+      <a href="finances.html"><span class="left">💰 <span>Finances</span></span><span class="pill">Budget</span></a>
+      <a href="settings.html"><span class="left">⚙️ <span>Settings</span></span><span class="pill">Data</span></a>
+    </nav>
+
+    <div class="sidebarFooter">Tip: Export data in Settings before big updates.</div>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div>
+        <h1 class="pageTitle">Settings</h1>
+        <p class="subtitle">Backup and restore your local data.</p>
+      </div>
+      <div class="actionsRow">
+        <a class="btn secondary" href="dashboard.html">Home</a>
+      </div>
+    </div>
+
+    
+
+<div class="card soft">
+  <div class="cardHeader"><h3 class="cardTitle">Habits reminder</h3><span class="badge">Daily</span></div>
+  <p class="small">Get a reminder if today’s completion is below your target at the chosen time. When Push is enabled (and a server is connected), reminders can arrive in the background.</p>
+  <div class="formRow" style="display:flex; gap:12px; flex-wrap:wrap; align-items:end">
+    <label style="display:flex; gap:8px; align-items:center">
+      <input id="hr_enabled" type="checkbox">
+      <span class="small">Enabled</span>
+    </label>
+    <div style="display:flex; flex-direction:column; gap:6px">
+      <span class="small">Time</span>
+      <input id="hr_time" type="time" value="20:00">
+    </div>
+    <div style="display:flex; flex-direction:column; gap:6px">
+      <span class="small">Target %</span>
+      <input id="hr_pct" type="number" min="0" max="100" step="1" value="50" style="width:110px">
+    </div>
+    <button id="hr_perm" class="btn secondary" type="button">Enable notifications</button>
+    <span id="hr_status" class="small" style="opacity:.8"></span>
+  </div>
+</div>
+
+
+<div class="card soft">
+  <div class="cardHeader"><h3 class="cardTitle">Data</h3><span class="badge">Backup</span></div>
+  <p class="small">Everything is stored locally in your browser. Export before switching devices.</p>
+  <div class="actionsRow">
+    <button onclick="exportData()">Export JSON</button>
+    <input id="importFile" type="file" accept="application/json">
+    <button class="btn secondary" onclick="importData()">Import</button>
+  </div>
+  <div class="badges" style="margin-top:12px">
+    <span class="badge">Habits</span><span class="badge">Workouts</span><span class="badge">Planner</span><span class="badge">Nutrition</span><span class="badge">Finances</span>
+  </div>
+</div>
+
+  </main>
+</div>
+<script src="app.js"></script>
+<script src="ui.js"></script><script src="settings.js"></script>
+</body></html>
